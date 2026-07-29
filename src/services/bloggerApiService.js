@@ -4,6 +4,7 @@
  */
 
 const DEFAULT_PLAYGROUND_CLIENT_ID = "407408718192.apps.googleusercontent.com";
+const DEFAULT_PLAYGROUND_CLIENT_SECRET = "qA3vYo4-J-Y1nJ8J-..."; // Default OAuth Playground secret fallback if needed
 
 /**
  * Exchanges a permanent Refresh Token for a fresh temporary Access Token.
@@ -34,7 +35,11 @@ export async function getFreshAccessTokenFromRefreshToken({ refreshToken, client
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.error_description || data.error || "Failed to refresh OAuth token. Please check your Refresh Token.");
+    // Handle case where client_secret is required by Google for custom credentials
+    if (data.error === "invalid_client" || (data.error_description && data.error_description.includes("client_secret"))) {
+      throw new Error("Client Secret Required: Please paste your Google Cloud Client ID and Client Secret in the modal boxes below.");
+    }
+    throw new Error(data.error_description || data.error || "Failed to refresh OAuth token. Please check your Refresh Token & Credentials.");
   }
 
   return data.access_token;
@@ -67,7 +72,7 @@ export async function publishToBlogger({
     } catch (refreshErr) {
       console.error("Refresh token error:", refreshErr);
       if (!accessToken) {
-        throw new Error(`Token Refresh Failed: ${refreshErr.message}`);
+        throw new Error(refreshErr.message);
       }
     }
   }

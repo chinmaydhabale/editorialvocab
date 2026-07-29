@@ -163,7 +163,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
 
               {tokenMode === 'permanent' ? (
                 /* PERMANENT REFRESH TOKEN MODE */
-                <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.05)', border: '1px stroke rgba(16, 185, 129, 0.2)', padding: '14px', borderRadius: '10px', marginBottom: '14px' }}>
+                <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '14px', borderRadius: '10px', marginBottom: '14px' }}>
                   <div className="input-group mb-2">
                     <label className="text-emerald-400 font-semibold">Permanent Refresh Token (Never Expires!)</label>
                     <input 
@@ -177,10 +177,10 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
 
                   <div className="grid-2" style={{ gap: '10px', marginTop: '10px' }}>
                     <div className="input-group">
-                      <label className="text-xs text-slate-400">Client ID (Optional if using Playground)</label>
+                      <label className="text-xs text-amber-400 font-semibold">Google Cloud Client ID</label>
                       <input 
                         type="text" 
-                        placeholder="Google Cloud Client ID" 
+                        placeholder="e.g. 407408718192-xxx...apps.googleusercontent.com" 
                         value={clientId}
                         onChange={(e) => setClientId(e.target.value)}
                         className="modal-input"
@@ -188,10 +188,10 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
                       />
                     </div>
                     <div className="input-group">
-                      <label className="text-xs text-slate-400">Client Secret (Optional)</label>
+                      <label className="text-xs text-amber-400 font-semibold">Google Cloud Client Secret</label>
                       <input 
                         type="password" 
-                        placeholder="Google Cloud Client Secret" 
+                        placeholder="e.g. GOCSPX-xxxxxx..." 
                         value={clientSecret}
                         onChange={(e) => setClientSecret(e.target.value)}
                         className="modal-input"
@@ -200,8 +200,8 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
                     </div>
                   </div>
 
-                  <p className="text-xs text-emerald-400" style={{ marginTop: '10px', fontSize: '11.5px' }}>
-                    💡 <b>Permanent Mode:</b> Copy <code>refresh_token</code> from OAuth Playground Step 2. The app will auto-refresh access tokens in the background forever!
+                  <p className="text-xs text-emerald-400" style={{ marginTop: '10px', fontSize: '11.5px', lineHeight: '1.4' }}>
+                    💡 <b>Tip:</b> If you used your own Google Cloud OAuth app in OAuth Playground, paste your <b>Client ID</b> and <b>Client Secret</b> (from your Google Cloud Console tab) into the boxes above.
                   </p>
                 </div>
               ) : (
