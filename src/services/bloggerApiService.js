@@ -34,10 +34,10 @@ export async function getFreshAccessTokenFromRefreshToken({ refreshToken, client
   const data = await response.json();
 
   if (!response.ok) {
-    if (data.error === "invalid_client" || (data.error_description && data.error_description.includes("client_secret"))) {
-      throw new Error("Client Secret Required: Please paste your Google Cloud Client ID and Client Secret in the modal boxes below.");
-    }
-    throw new Error(data.error_description || data.error || "Failed to refresh OAuth token. Please check your Refresh Token & Credentials.");
+    console.error("Google Token Refresh Error Response:", data);
+    const errCode = data.error || "unknown";
+    const errDesc = data.error_description || "Token exchange failed";
+    throw new Error(`Google OAuth Token Error [${errCode}]: ${errDesc}. (Ensure Client ID & Secret match the ones used in OAuth Playground)`);
   }
 
   return data.access_token;
@@ -104,10 +104,6 @@ export async function publishToBlogger({
       const detailedReason = data.error?.errors?.[0]?.reason || "";
       const detailedMessage = data.error?.message || `Blogger API Error (${response.status})`;
       
-      if (response.status === 401 || detailedReason === "unauthorized" || detailedMessage.includes("Unauthorized")) {
-        throw new Error(`Unauthorized (401): Please ensure Blogger API is enabled in Google Cloud Console AND test with "Access Token (1 Hour)" mode first.`);
-      }
-
       throw new Error(`${detailedMessage} ${detailedReason ? `(${detailedReason})` : ''}`);
     }
 
