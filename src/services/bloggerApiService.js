@@ -4,7 +4,6 @@
  */
 
 const DEFAULT_PLAYGROUND_CLIENT_ID = "407408718192.apps.googleusercontent.com";
-const DEFAULT_PLAYGROUND_CLIENT_SECRET = "qA3vYo4-J-Y1nJ8J-..."; // Default OAuth Playground secret fallback if needed
 
 /**
  * Exchanges a permanent Refresh Token for a fresh temporary Access Token.
@@ -35,7 +34,6 @@ export async function getFreshAccessTokenFromRefreshToken({ refreshToken, client
   const data = await response.json();
 
   if (!response.ok) {
-    // Handle case where client_secret is required by Google for custom credentials
     if (data.error === "invalid_client" || (data.error_description && data.error_description.includes("client_secret"))) {
       throw new Error("Client Secret Required: Please paste your Google Cloud Client ID and Client Secret in the modal boxes below.");
     }
@@ -103,7 +101,14 @@ export async function publishToBlogger({
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error?.message || `Blogger API Error (${response.status})`);
+      const detailedReason = data.error?.errors?.[0]?.reason || "";
+      const detailedMessage = data.error?.message || `Blogger API Error (${response.status})`;
+      
+      if (response.status === 401 || detailedReason === "unauthorized" || detailedMessage.includes("Unauthorized")) {
+        throw new Error(`Unauthorized (401): Please ensure Blogger API is enabled in Google Cloud Console AND test with "Access Token (1 Hour)" mode first.`);
+      }
+
+      throw new Error(`${detailedMessage} ${detailedReason ? `(${detailedReason})` : ''}`);
     }
 
     return {
