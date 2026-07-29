@@ -1,11 +1,20 @@
 /**
  * Service to publish posts directly to Google Blogger via Blogger API v3.
- * Automatically assigns Month Tag/Label (e.g. ["July"]) based on post date.
+ * Automatically assigns Month Tag (e.g. "July") AND Newspaper Source Tag (e.g. "The Hindu") based on post metadata.
  */
 
 export const MONTHS_ARRAY = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+export const NEWSPAPERS_ARRAY = [
+  'The Hindu',
+  'Indian Express',
+  'LiveMint',
+  'Business Standard',
+  'Times of India',
+  'Custom Editorial'
 ];
 
 /**
@@ -16,6 +25,17 @@ export function getMonthTagFromDate(dateStr) {
   const d = dateStr ? new Date(dateStr) : new Date();
   const monthIndex = d.getMonth();
   return MONTHS_ARRAY[monthIndex] || 'July';
+}
+
+/**
+ * Extracts Clean Newspaper Tag from a source name.
+ * e.g. "The Hindu Editorial" -> "The Hindu"
+ */
+export function getNewspaperTagFromName(sourceName) {
+  if (!sourceName) return 'The Hindu';
+  const clean = sourceName.replace(' Editorial', '').trim();
+  const matched = NEWSPAPERS_ARRAY.find(n => n.toLowerCase() === clean.toLowerCase());
+  return matched || clean || 'The Hindu';
 }
 
 const DEFAULT_PLAYGROUND_CLIENT_ID = "407408718192.apps.googleusercontent.com";
@@ -59,7 +79,7 @@ export async function getFreshAccessTokenFromRefreshToken({ refreshToken, client
 }
 
 /**
- * Publishes post directly to Blogger API v3 with automatic Month Label tagging.
+ * Publishes post directly to Blogger API v3 with automatic Dual Tagging (Month + Newspaper).
  */
 export async function publishToBlogger({ 
   blogId, 
@@ -70,6 +90,7 @@ export async function publishToBlogger({
   title, 
   htmlContent, 
   postDate,
+  sourceName,
   isDraft = false 
 }) {
   if (!blogId || !blogId.trim()) {
@@ -98,14 +119,15 @@ export async function publishToBlogger({
   const cleanBlogId = blogId.trim();
   const url = `https://www.googleapis.com/blogger/v3/blogs/${cleanBlogId}/posts/?isDraft=${isDraft}`;
 
-  // Automatically calculate Month Tag (e.g., "July")
+  // Automatically calculate Month Tag (e.g., "July") and Newspaper Tag (e.g., "The Hindu")
   const monthLabel = getMonthTagFromDate(postDate);
+  const newspaperLabel = getNewspaperTagFromName(sourceName);
 
   const payload = {
     kind: "blogger#post",
     title: title,
     content: htmlContent,
-    labels: [monthLabel] // Assigns Month Tag directly to Blogger post
+    labels: [monthLabel, newspaperLabel] // Assigns BOTH Month Tag & Newspaper Tag
   };
 
   try {
@@ -133,7 +155,7 @@ export async function publishToBlogger({
       url: data.url,
       publishedDate: data.published,
       title: data.title,
-      labels: data.labels || [monthLabel],
+      labels: data.labels || [monthLabel, newspaperLabel],
       status: isDraft ? 'DRAFT' : 'PUBLISHED'
     };
   } catch (error) {

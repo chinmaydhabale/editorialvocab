@@ -163,6 +163,7 @@ export default function HtmlExporter({ postData, currentTheme }) {
         postTitle={formattedTitle}
         postHtml={fullHtml}
         postDate={postData.date}
+        sourceName={postData.sourceName}
       />
     </div>
   );
