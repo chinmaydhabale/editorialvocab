@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Globe, Send, CheckCircle2, AlertCircle, HelpCircle, ExternalLink, RefreshCw, Key, ShieldCheck } from 'lucide-react';
+import { Globe, Send, CheckCircle2, AlertCircle, HelpCircle, ExternalLink, ShieldCheck, Key } from 'lucide-react';
 import { publishToBlogger } from '../services/bloggerApiService';
 
 export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHtml }) {
   const [blogId, setBlogId] = useState(() => localStorage.getItem('blogger_blog_id') || '');
-  const [tokenMode, setTokenMode] = useState(() => localStorage.getItem('blogger_token_mode') || 'permanent'); // 'permanent' or 'temporary'
+  const [tokenMode, setTokenMode] = useState(() => localStorage.getItem('blogger_token_mode') || 'permanent');
   
   // Permanent credentials
   const [refreshToken, setRefreshToken] = useState(() => localStorage.getItem('blogger_refresh_token') || '');
@@ -28,7 +28,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
     }
 
     if (tokenMode === 'permanent' && !refreshToken.trim()) {
-      setErrorMsg("Please enter your Permanent Refresh Token (from OAuth Playground).");
+      setErrorMsg("Please paste your Permanent Refresh Token (from OAuth Playground Step 2).");
       return;
     }
 
@@ -40,7 +40,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
     setErrorMsg(null);
     setIsPublishing(true);
 
-    // Save configuration
+    // Save configuration locally
     localStorage.setItem('blogger_blog_id', blogId.trim());
     localStorage.setItem('blogger_token_mode', tokenMode);
     localStorage.setItem('blogger_refresh_token', refreshToken.trim());
@@ -51,8 +51,8 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
     try {
       const res = await publishToBlogger({
         blogId,
-        accessToken,
-        refreshToken,
+        accessToken: tokenMode === 'temporary' ? accessToken : '',
+        refreshToken: tokenMode === 'permanent' ? refreshToken : '',
         clientId,
         clientSecret,
         title: postTitle,
@@ -135,7 +135,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
                 <label>Blogger Blog ID</label>
                 <input 
                   type="text" 
-                  placeholder="e.g. 84920491820491829" 
+                  placeholder="e.g. 3404156005712061709" 
                   value={blogId}
                   onChange={(e) => setBlogId(e.target.value)}
                   className="modal-input"
@@ -177,7 +177,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
 
                   <div className="grid-2" style={{ gap: '10px', marginTop: '10px' }}>
                     <div className="input-group">
-                      <label className="text-xs text-slate-400">Client ID (Optional)</label>
+                      <label className="text-xs text-slate-400">Client ID (Optional if using Playground)</label>
                       <input 
                         type="text" 
                         placeholder="Google Cloud Client ID" 
@@ -201,7 +201,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
                   </div>
 
                   <p className="text-xs text-emerald-400" style={{ marginTop: '10px', fontSize: '11.5px' }}>
-                    💡 <b>Permanent Mode:</b> In OAuth Playground Step 2, copy <code>refresh_token</code>. The app will auto-refresh access tokens in the background forever without asking again!
+                    💡 <b>Permanent Mode:</b> Copy <code>refresh_token</code> from OAuth Playground Step 2. The app will auto-refresh access tokens in the background forever!
                   </p>
                 </div>
               ) : (

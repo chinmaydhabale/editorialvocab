@@ -3,6 +3,8 @@
  * Supports automatic token refresh using Refresh Token (Permanent No-Expiry Publishing).
  */
 
+const DEFAULT_PLAYGROUND_CLIENT_ID = "407408718192.apps.googleusercontent.com";
+
 /**
  * Exchanges a permanent Refresh Token for a fresh temporary Access Token.
  */
@@ -12,11 +14,14 @@ export async function getFreshAccessTokenFromRefreshToken({ refreshToken, client
   }
 
   const payload = new URLSearchParams({
-    client_id: (clientId || "").trim(),
-    client_secret: (clientSecret || "").trim(),
+    client_id: (clientId && clientId.trim()) ? clientId.trim() : DEFAULT_PLAYGROUND_CLIENT_ID,
     refresh_token: refreshToken.trim(),
     grant_type: "refresh_token"
   });
+
+  if (clientSecret && clientSecret.trim()) {
+    payload.append("client_secret", clientSecret.trim());
+  }
 
   const response = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
@@ -29,7 +34,7 @@ export async function getFreshAccessTokenFromRefreshToken({ refreshToken, client
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.error_description || data.error || "Failed to refresh OAuth token");
+    throw new Error(data.error_description || data.error || "Failed to refresh OAuth token. Please check your Refresh Token.");
   }
 
   return data.access_token;
@@ -48,7 +53,7 @@ export async function publishToBlogger({
   htmlContent, 
   isDraft = false 
 }) {
-  if (!blogId || blogId.trim() === "") {
+  if (!blogId || !blogId.trim()) {
     throw new Error("Blogger Blog ID is required. Find it in your Blogger dashboard URL.");
   }
 
@@ -60,7 +65,10 @@ export async function publishToBlogger({
       console.log("Automatically refreshing OAuth access token via Refresh Token...");
       validToken = await getFreshAccessTokenFromRefreshToken({ refreshToken, clientId, clientSecret });
     } catch (refreshErr) {
-      console.warn("Could not refresh via Refresh Token, attempting direct access token:", refreshErr);
+      console.error("Refresh token error:", refreshErr);
+      if (!accessToken) {
+        throw new Error(`Token Refresh Failed: ${refreshErr.message}`);
+      }
     }
   }
 
