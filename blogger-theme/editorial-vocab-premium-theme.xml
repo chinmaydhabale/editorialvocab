@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html b:css='false' b:defaultmessages='true' b:layoutsVersion='3' b:responsive='true' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' xmlns:expr='http://www.google.com/2005/gml/expr'>
+<head>
+  <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' name='viewport'/>
+  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'/>
+  <b:include data='blog' name='all-head-content'/>
+  
+  <title><data:blog.pageTitle/></title>
+
+  <!-- Clean Google Fonts -->
+  <link href='https://fonts.googleapis.com/css2?family=Hind:wght@400;600;700&amp;family=Plus+Jakarta+Sans:wght@500;700;800&amp;display=swap' rel='stylesheet'/>
+
+  <b:skin><![CDATA[
+    /* --------------------------------------------------------------------------
+     * EditorialVocab Minimalist Premium Theme CSS (Zero Clutter)
+     * -------------------------------------------------------------------------- */
+    :root {
+      --bg-main: #0b0f19;
+      --bg-card: #131b2e;
+      --bg-card-hover: #1c2742;
+      --border-color: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-indigo: #6366f1;
+      --accent-emerald: #10b981;
+      --font-hindi: 'Hind', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background-color: var(--bg-main); color: var(--text-main); font-family: var(--font-body); line-height: 1.6; min-height: 100vh; }
+    a { color: var(--accent-indigo); text-decoration: none; transition: color 0.2s ease; }
+    a:hover { color: #a5f3fc; }
+
+    /* Sticky Clean Navigation Bar */
+    .site-navbar { background: rgba(19, 27, 46, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; padding: 14px 20px; }
+    .nav-container { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .brand-logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; color: #fff; text-decoration: none; }
+    .brand-logo span { background: linear-gradient(135deg, var(--accent-indigo), #4f46e5); padding: 4px 10px; border-radius: 8px; font-size: 13px; text-transform: uppercase; color: #fff; }
+    
+    .nav-links { display: flex; gap: 24px; list-style: none; margin: 0; padding: 0; }
+    .nav-links a { color: var(--text-muted); font-size: 14px; font-weight: 700; }
+    .nav-links a:hover { color: #fff; }
+
+    /* Header Title Area */
+    .site-hero { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border-bottom: 1px solid var(--border-color); padding: 36px 20px; text-align: center; }
+    .hero-title { font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+    .hero-sub { font-size: 15px; color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+
+    /* Main Grid Layout */
+    .main-layout { max-width: 1100px; margin: 30px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 300px; gap: 30px; }
+    .content-area { min-width: 0; }
+    .sidebar-area { min-width: 0; }
+
+    /* Clean Post Card Item */
+    .post-card-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; margin-bottom: 24px; transition: border-color 0.2s ease; }
+    .post-card-item:hover { border-color: var(--accent-indigo); }
+    .post-card-title { font-size: 22px; font-weight: 800; margin-bottom: 10px; line-height: 1.3; }
+    .post-card-title a { color: #fff; }
+    .post-meta { font-size: 13px; color: var(--text-muted); display: flex; gap: 12px; margin-bottom: 14px; }
+
+    /* Sidebar Widgets */
+    .widget-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+    .widget-title { font-size: 15px; font-weight: 800; border-bottom: 2px solid var(--accent-indigo); padding-bottom: 6px; margin-bottom: 14px; color: #fff; text-transform: uppercase; }
+
+    /* Footer Pages Bar (About, Privacy, Disclaimer, Contact, Terms) */
+    .site-footer { background: #090d16; border-top: 1px solid var(--border-color); padding: 36px 20px; margin-top: 50px; text-align: center; }
+    .footer-pages-nav { display: flex; justify-content: center; gap: 20px; margin-bottom: 16px; flex-wrap: wrap; }
+    .footer-pages-nav a { color: var(--text-muted); font-size: 14px; font-weight: 600; }
+    .footer-pages-nav a:hover { color: var(--accent-emerald); }
+    .copyright-text { font-size: 13px; color: #64748b; }
+
+    /* Mobile Responsive Rules */
+    @media (max-width: 800px) {
+      .main-layout { grid-template-columns: 1fr; }
+      .hero-title { font-size: 22px; }
+      .nav-links { gap: 14px; flex-wrap: wrap; }
+      .nav-links a { font-size: 13px; }
+    }
+  ]]></b:skin>
+</head>
+<body>
+
+  <!-- Minimalist Navigation Bar (Only Main Links) -->
+  <header class='site-navbar'>
+    <div class='nav-container'>
+      <a class='brand-logo' href='/'>
+        <span>VOCAB</span> Daily Editorial
+      </a>
+      <ul class='nav-links'>
+        <li><a href='/'>Home</a></li>
+        <li><a href='/search/label/The%20Hindu'>The Hindu</a></li>
+        <li><a href='/search/label/Indian%20Express'>Indian Express</a></li>
+        <li><a href='/p/about-us.html'>About Us</a></li>
+        <li><a href='/p/contact-us.html'>Contact Us</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Simple Header Banner -->
+  <div class='site-hero'>
+    <h1 class='hero-title'>Daily Editorial Vocabulary &amp; Tricky Words</h1>
+    <p class='hero-sub'>Daily Words, English &amp; Hindi Meanings, Relatable Memory Tricks &amp; Root Words.</p>
+  </div>
+
+  <!-- Main Grid Layout -->
+  <div class='main-layout'>
+    
+    <!-- Main Content Area -->
+    <main class='content-area'>
+      <b:section id='main-posts' showaddelement='yes'>
+        <b:widget id='Blog1' locked='true' title='Blog Posts' type='Blog'>
+          <b:widget-settings>
+            <b:widget-setting name='showTitleDate'>true</b:widget-setting>
+            <b:widget-setting name='showAuthor'>true</b:widget-setting>
+            <b:widget-setting name='postsPerPage'>10</b:widget-setting>
+          </b:widget-settings>
+          <b:includable id='main' var='top'>
+            <b:loop values='data:posts' var='post'>
+              <article class='post-card-item'>
+                <div class='post-meta'>
+                  <span>📰 <data:post.author/></span>
+                  <span>🗓️ <data:post.date/></span>
+                </div>
+                <h2 class='post-card-title'>
+                  <a expr:href='data:post.url'><data:post.title/></a>
+                </h2>
+                <div class='post-body-snippet'>
+                  <data:post.body/>
+                </div>
+              </article>
+            </b:loop>
+          </b:includable>
+        </b:widget>
+      </b:section>
+    </main>
+
+    <!-- Simple Sidebar Area -->
+    <aside class='sidebar-area'>
+      <!-- Widget 1: Simple Search -->
+      <div class='widget-box'>
+        <h3 class='widget-title'>🔍 Search Vocab</h3>
+        <form action='/search' method='get'>
+          <input name='q' placeholder='Search word or topic...' required='required' style='width:100%; background:#0f172a; border:1px solid #1e293b; color:#fff; padding:10px 12px; border-radius:8px; font-size:13px; outline:none;' type='text'/>
+        </form>
+      </div>
+
+      <!-- Widget 2: About Blog -->
+      <div class='widget-box'>
+        <h3 class='widget-title'>💡 About</h3>
+        <p style='font-size:13px; color:#94a3b8; line-height:1.6;'>
+          Daily tricky words extracted directly from news editorials with English &amp; Hindi meanings, mnemonics, and idioms.
+        </p>
+      </div>
+
+      <b:section id='sidebar-widgets' showaddelement='yes'/>
+    </aside>
+
+  </div>
+
+  <!-- Footer Pages Navigation (About, Privacy, Disclaimer, Contact, Terms) -->
+  <footer class='site-footer'>
+    <div class='footer-pages-nav'>
+      <a href='/p/about-us.html'>About Us</a>
+      <a href='/p/privacy-policy.html'>Privacy Policy</a>
+      <a href='/p/disclaimer.html'>Disclaimer</a>
+      <a href='/p/contact-us.html'>Contact Us</a>
+      <a href='/p/terms-and-conditions.html'>Terms &amp; Conditions</a>
+    </div>
+    <p class='copyright-text'>
+      © <script>document.write(new Date().getFullYear())</script> Daily Editorial Vocabulary. All Rights Reserved.
+    </p>
+  </footer>
+
+</body>
+</html>
