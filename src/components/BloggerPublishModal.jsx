@@ -1,39 +1,96 @@
-import React, { useState } from 'react';
-import { Globe, Send, CheckCircle2, AlertCircle, HelpCircle, ExternalLink, ShieldCheck, Key } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Globe, Send, CheckCircle2, AlertCircle, ExternalLink, ShieldCheck, Key, LogIn, Sparkles } from 'lucide-react';
 import { publishToBlogger } from '../services/bloggerApiService';
+
+const DEFAULT_CLIENT_ID = "455333068454-3r6vcu0m571rm2cfujt4j5.apps.googleusercontent.com";
 
 export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHtml }) {
   const [blogId, setBlogId] = useState(() => localStorage.getItem('blogger_blog_id') || '');
-  const [tokenMode, setTokenMode] = useState(() => localStorage.getItem('blogger_token_mode') || 'permanent');
-  
-  // Permanent credentials
-  const [refreshToken, setRefreshToken] = useState(() => localStorage.getItem('blogger_refresh_token') || '');
-  const [clientId, setClientId] = useState(() => localStorage.getItem('blogger_client_id') || '');
-  const [clientSecret, setClientSecret] = useState(() => localStorage.getItem('blogger_client_secret') || '');
-  
-  // Temporary access token
+  const [clientId, setClientId] = useState(() => localStorage.getItem('blogger_client_id') || DEFAULT_CLIENT_ID);
   const [accessToken, setAccessToken] = useState(() => localStorage.getItem('blogger_access_token') || '');
+  const [userGmail, setUserGmail] = useState(() => localStorage.getItem('blogger_user_gmail') || '');
   
   const [isDraft, setIsDraft] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishResult, setPublishResult] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
 
+  // Check URL hash for OAuth redirect token on mount / popup return
+  useEffect(() => {
+    if (window.location.hash && window.location.hash.includes('access_token')) {
+      const params = new URLSearchParams(window.location.hash.replace('#', '?'));
+      const token = params.get('access_token');
+      if (token) {
+        setAccessToken(token);
+        localStorage.setItem('blogger_access_token', token);
+        setUserGmail('Google Account Connected ✓');
+        localStorage.setItem('blogger_user_gmail', 'Google Account Connected ✓');
+        // Clean URL hash
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    }
+  }, []);
+
   if (!isOpen) return null;
+
+  // Direct Google OAuth 2.0 Sign In Popup
+  const handleGoogleLogin = () => {
+    const activeClientId = clientId.trim() || DEFAULT_CLIENT_ID;
+    const redirectUri = window.location.origin;
+    const scope = encodeURIComponent('https://www.googleapis.com/auth/blogger');
+    
+    const oauthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${activeClientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${scope}&prompt=consent`;
+
+    // Save Client ID for persistence
+    localStorage.setItem('blogger_client_id', activeClientId);
+
+    // Open Google Login Popup
+    const width = 500;
+    const height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+
+    const popup = window.open(
+      oauthUrl,
+      'GoogleBloggerLogin',
+      `width=${width},height=${height},left=${left},top=${top}`
+    );
+
+    // Listen for OAuth token callback from popup
+    const checkPopup = setInterval(() => {
+      try {
+        if (!popup || popup.closed) {
+          clearInterval(checkPopup);
+          return;
+        }
+        if (popup.location && popup.location.hash && popup.location.hash.includes('access_token')) {
+          const hash = popup.location.hash;
+          const params = new URLSearchParams(hash.replace('#', '?'));
+          const token = params.get('access_token');
+          if (token) {
+            setAccessToken(token);
+            localStorage.setItem('blogger_access_token', token);
+            setUserGmail('Connected to Google Blogger ✓');
+            localStorage.setItem('blogger_user_gmail', 'Connected to Google Blogger ✓');
+            setErrorMsg(null);
+            popup.close();
+            clearInterval(checkPopup);
+          }
+        }
+      } catch (err) {
+        // Cross-origin check while redirecting, ignore
+      }
+    }, 500);
+  };
 
   const handlePublish = async () => {
     if (!blogId.trim()) {
-      setErrorMsg("Please enter your Blogger Blog ID.");
+      setErrorMsg("Please enter your Blogger Blog ID (found in your blogger.com URL).");
       return;
     }
 
-    if (tokenMode === 'permanent' && !refreshToken.trim()) {
-      setErrorMsg("Please paste your Permanent Refresh Token (from OAuth Playground Step 2).");
-      return;
-    }
-
-    if (tokenMode === 'temporary' && !accessToken.trim()) {
-      setErrorMsg("Please enter your Google OAuth Access Token.");
+    if (!accessToken.trim()) {
+      setErrorMsg("Please click 'Continue with Google' above to authorize your Blogger account.");
       return;
     }
 
@@ -42,19 +99,11 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
 
     // Save configuration locally
     localStorage.setItem('blogger_blog_id', blogId.trim());
-    localStorage.setItem('blogger_token_mode', tokenMode);
-    localStorage.setItem('blogger_refresh_token', refreshToken.trim());
-    localStorage.setItem('blogger_client_id', clientId.trim());
-    localStorage.setItem('blogger_client_secret', clientSecret.trim());
-    localStorage.setItem('blogger_access_token', accessToken.trim());
 
     try {
       const res = await publishToBlogger({
         blogId,
-        accessToken: tokenMode === 'temporary' ? accessToken : '',
-        refreshToken: tokenMode === 'permanent' ? refreshToken : '',
-        clientId,
-        clientSecret,
+        accessToken: accessToken.trim(),
         title: postTitle,
         htmlContent: postHtml,
         isDraft
@@ -120,7 +169,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
             /* FORM INPUT VIEW */
             <>
               <p className="modal-text">
-                Connect your Blogger.com blog for 1-click publishing.
+                Connect your Google Blogger account in 1-click for automatic publishing.
               </p>
 
               {errorMsg && (
@@ -129,6 +178,57 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
                   <span>{errorMsg}</span>
                 </div>
               )}
+
+              {/* DIRECT GOOGLE LOGIN BUTTON */}
+              <div style={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '12px', padding: '16px', marginBottom: '16px', textAlign: 'center' }}>
+                {accessToken ? (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', padding: '10px 16px', borderRadius: '8px', color: '#34d399' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '700' }}>
+                      <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                      <span>{userGmail || 'Blogger Account Connected!'}</span>
+                    </div>
+                    <button 
+                      onClick={handleGoogleLogin} 
+                      style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '12px', textDecoration: 'underline', cursor: 'pointer' }}
+                    >
+                      Reconnect
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <button 
+                      onClick={handleGoogleLogin}
+                      style={{
+                        width: '100%',
+                        backgroundColor: '#ffffff',
+                        color: '#1e293b',
+                        border: '1px solid #cbd5e1',
+                        padding: '12px 20px',
+                        borderRadius: '10px',
+                        fontSize: '15px',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '10px',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                      }}
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                      </svg>
+                      <span>Continue with Google (Connect Blogger)</span>
+                    </button>
+                    <p style={{ fontSize: '12px', color: '#94a3b8', marginTop: '8px', margin: '8px 0 0 0' }}>
+                      Click to sign in with your Google account. No manual tokens or playground needed!
+                    </p>
+                  </div>
+                )}
+              </div>
 
               {/* Blog ID */}
               <div className="input-group mb-3" style={{ marginBottom: '14px' }}>
@@ -142,81 +242,23 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
                 />
               </div>
 
-              {/* TOKEN MODE SELECTOR */}
-              <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', backgroundColor: '#090d16', padding: '4px', borderRadius: '8px', border: '1px solid #1f2937' }}>
-                <button 
-                  onClick={() => setTokenMode('permanent')}
-                  style={{ flex: 1, border: 'none', padding: '8px', borderRadius: '6px', fontSize: '12px', fontWeight: '700', cursor: 'pointer', backgroundColor: tokenMode === 'permanent' ? '#10b981' : 'transparent', color: tokenMode === 'permanent' ? '#fff' : '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
-                >
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Permanent Refresh Token (No Expiry)</span>
-                </button>
-
-                <button 
-                  onClick={() => setTokenMode('temporary')}
-                  style={{ flex: 1, border: 'none', padding: '8px', borderRadius: '6px', fontSize: '12px', fontWeight: '700', cursor: 'pointer', backgroundColor: tokenMode === 'temporary' ? '#6366f1' : 'transparent', color: tokenMode === 'temporary' ? '#fff' : '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
-                >
-                  <Key className="w-3.5 h-3.5" />
-                  <span>Access Token (1 Hour)</span>
-                </button>
-              </div>
-
-              {tokenMode === 'permanent' ? (
-                /* PERMANENT REFRESH TOKEN MODE */
-                <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '14px', borderRadius: '10px', marginBottom: '14px' }}>
-                  <div className="input-group mb-2">
-                    <label className="text-emerald-400 font-semibold">Permanent Refresh Token (Never Expires!)</label>
-                    <input 
-                      type="password" 
-                      placeholder="Paste refresh_token from OAuth Playground Step 2..." 
-                      value={refreshToken}
-                      onChange={(e) => setRefreshToken(e.target.value)}
-                      className="modal-input"
-                    />
-                  </div>
-
-                  <div className="grid-2" style={{ gap: '10px', marginTop: '10px' }}>
-                    <div className="input-group">
-                      <label className="text-xs text-amber-400 font-semibold">Google Cloud Client ID</label>
-                      <input 
-                        type="text" 
-                        placeholder="e.g. 407408718192-xxx...apps.googleusercontent.com" 
-                        value={clientId}
-                        onChange={(e) => setClientId(e.target.value)}
-                        className="modal-input"
-                        style={{ fontSize: '12px', padding: '8px' }}
-                      />
-                    </div>
-                    <div className="input-group">
-                      <label className="text-xs text-amber-400 font-semibold">Google Cloud Client Secret</label>
-                      <input 
-                        type="password" 
-                        placeholder="e.g. GOCSPX-xxxxxx..." 
-                        value={clientSecret}
-                        onChange={(e) => setClientSecret(e.target.value)}
-                        className="modal-input"
-                        style={{ fontSize: '12px', padding: '8px' }}
-                      />
-                    </div>
-                  </div>
-
-                  <p className="text-xs text-emerald-400" style={{ marginTop: '10px', fontSize: '11.5px', lineHeight: '1.4' }}>
-                    💡 <b>Tip:</b> If you used your own Google Cloud OAuth app in OAuth Playground, paste your <b>Client ID</b> and <b>Client Secret</b> (from your Google Cloud Console tab) into the boxes above.
-                  </p>
-                </div>
-              ) : (
-                /* TEMPORARY ACCESS TOKEN MODE */
-                <div className="input-group mb-3" style={{ marginBottom: '14px' }}>
-                  <label>Google OAuth Access Token (Expires in 60 mins)</label>
+              {/* Optional Custom OAuth Client ID */}
+              <details style={{ marginBottom: '14px', fontSize: '12px', color: '#94a3b8' }}>
+                <summary style={{ cursor: 'pointer', color: '#818cf8', fontWeight: '600' }}>
+                  ⚙️ Advanced OAuth Client Config (Optional)
+                </summary>
+                <div style={{ marginTop: '8px' }}>
+                  <label style={{ display: 'block', marginBottom: '4px' }}>Custom Google Cloud Client ID</label>
                   <input 
-                    type="password" 
-                    placeholder="ya29.a0A..." 
-                    value={accessToken}
-                    onChange={(e) => setAccessToken(e.target.value)}
+                    type="text" 
+                    placeholder={DEFAULT_CLIENT_ID} 
+                    value={clientId}
+                    onChange={(e) => setClientId(e.target.value)}
                     className="modal-input"
+                    style={{ fontSize: '11px', padding: '6px 10px' }}
                   />
                 </div>
-              )}
+              </details>
 
               {/* Publish Mode Toggle */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '14px' }}>
