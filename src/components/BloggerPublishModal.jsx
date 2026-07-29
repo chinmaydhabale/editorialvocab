@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Globe, Send, CheckCircle2, AlertCircle, ExternalLink, LogIn } from 'lucide-react';
-import { publishToBlogger } from '../services/bloggerApiService';
+import { Globe, Send, CheckCircle2, AlertCircle, ExternalLink, LogIn, Tag } from 'lucide-react';
+import { publishToBlogger, getMonthTagFromDate } from '../services/bloggerApiService';
 
-export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHtml }) {
+export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHtml, postDate }) {
   const [blogId, setBlogId] = useState(() => localStorage.getItem('blogger_blog_id') || '');
   const [clientId, setClientId] = useState(() => localStorage.getItem('blogger_client_id') || '');
   const [accessToken, setAccessToken] = useState(() => localStorage.getItem('blogger_access_token') || '');
@@ -12,6 +12,8 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishResult, setPublishResult] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+
+  const monthTag = getMonthTagFromDate(postDate);
 
   // Check URL hash for OAuth redirect token on mount / popup return
   useEffect(() => {
@@ -109,6 +111,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
         accessToken: accessToken.trim(),
         title: postTitle,
         htmlContent: postHtml,
+        postDate: postDate,
         isDraft
       });
 
@@ -137,14 +140,14 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
           {publishResult ? (
             /* SUCCESS PUBLISHED VIEW */
             <div className="publish-success-box" style={{ textAlign: 'center', padding: '20px 0' }}>
-              <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'rgba(16, 185, 129, 0.2)', color: '#34d399', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'rgba(16, 185, 129, 0.2)', color: '#34d399', display: 'flex', itemsAlign: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
                 <CheckCircle2 style={{ width: '36px', height: '36px' }} />
               </div>
               <h3 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '8px', color: '#f8fafc' }}>
                 {isDraft ? 'Post Saved as Draft on Blogger!' : 'Successfully Published to Blogger.com!'}
               </h3>
-              <p style={{ fontSize: '14px', color: '#94a3b8', marginBottom: '20px' }}>
-                Your daily editorial vocabulary post is live on your blog.
+              <p style={{ fontSize: '14px', color: '#94a3b8', marginBottom: '14px' }}>
+                Your daily editorial vocabulary post is live on your blog with label tag: <strong>{monthTag}</strong>
               </p>
 
               {publishResult.url && (
@@ -174,6 +177,12 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
               <p className="modal-text">
                 Connect your Google Blogger account for automatic 1-click publishing.
               </p>
+
+              {/* Month Tag Auto Notice */}
+              <div style={{ backgroundColor: 'rgba(99, 102, 241, 0.12)', border: '1px solid #6366f1', color: '#a5f3fc', padding: '10px 14px', borderRadius: '8px', fontSize: '12.5px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Tag className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+                <span>Auto-Tag: This post will be published with month label <strong>"{monthTag}"</strong>.</span>
+              </div>
 
               {errorMsg && (
                 <div style={{ backgroundColor: 'rgba(244, 63, 94, 0.15)', border: '1px solid #f43f5e', color: '#fda4af', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -295,7 +304,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
                   ) : (
                     <>
                       <Send className="w-4 h-4" />
-                      <span>{isDraft ? 'Save Draft to Blogger' : 'Publish Live Now'}</span>
+                      <span>{isDraft ? 'Save Draft to Blogger' : `Publish Live (${monthTag})`}</span>
                     </>
                   )}
                 </button>

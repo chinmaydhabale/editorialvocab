@@ -1,7 +1,22 @@
 /**
  * Service to publish posts directly to Google Blogger via Blogger API v3.
- * Supports automatic token refresh using Refresh Token (Permanent No-Expiry Publishing).
+ * Automatically assigns Month Tag/Label (e.g. ["July"]) based on post date.
  */
+
+export const MONTHS_ARRAY = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+/**
+ * Extracts Month Name Tag from a date string.
+ * e.g. "2026-07-29" -> "July"
+ */
+export function getMonthTagFromDate(dateStr) {
+  const d = dateStr ? new Date(dateStr) : new Date();
+  const monthIndex = d.getMonth();
+  return MONTHS_ARRAY[monthIndex] || 'July';
+}
 
 const DEFAULT_PLAYGROUND_CLIENT_ID = "407408718192.apps.googleusercontent.com";
 
@@ -37,14 +52,14 @@ export async function getFreshAccessTokenFromRefreshToken({ refreshToken, client
     console.error("Google Token Refresh Error Response:", data);
     const errCode = data.error || "unknown";
     const errDesc = data.error_description || "Token exchange failed";
-    throw new Error(`Google OAuth Token Error [${errCode}]: ${errDesc}. (Ensure Client ID & Secret match the ones used in OAuth Playground)`);
+    throw new Error(`Google OAuth Token Error [${errCode}]: ${errDesc}`);
   }
 
   return data.access_token;
 }
 
 /**
- * Publishes post directly to Blogger API.
+ * Publishes post directly to Blogger API v3 with automatic Month Label tagging.
  */
 export async function publishToBlogger({ 
   blogId, 
@@ -54,6 +69,7 @@ export async function publishToBlogger({
   clientSecret, 
   title, 
   htmlContent, 
+  postDate,
   isDraft = false 
 }) {
   if (!blogId || !blogId.trim()) {
@@ -76,16 +92,20 @@ export async function publishToBlogger({
   }
 
   if (!validToken) {
-    throw new Error("Google OAuth Access Token or Refresh Token is required.");
+    throw new Error("Google OAuth Access Token is required.");
   }
 
   const cleanBlogId = blogId.trim();
   const url = `https://www.googleapis.com/blogger/v3/blogs/${cleanBlogId}/posts/?isDraft=${isDraft}`;
 
+  // Automatically calculate Month Tag (e.g., "July")
+  const monthLabel = getMonthTagFromDate(postDate);
+
   const payload = {
     kind: "blogger#post",
     title: title,
-    content: htmlContent
+    content: htmlContent,
+    labels: [monthLabel] // Assigns Month Tag directly to Blogger post
   };
 
   try {
@@ -113,6 +133,7 @@ export async function publishToBlogger({
       url: data.url,
       publishedDate: data.published,
       title: data.title,
+      labels: data.labels || [monthLabel],
       status: isDraft ? 'DRAFT' : 'PUBLISHED'
     };
   } catch (error) {

@@ -162,6 +162,7 @@ export default function HtmlExporter({ postData, currentTheme }) {
         onClose={() => setShowAutoPublishModal(false)}
         postTitle={formattedTitle}
         postHtml={fullHtml}
+        postDate={postData.date}
       />
     </div>
   );
