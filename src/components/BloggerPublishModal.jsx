@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Globe, Send, CheckCircle2, AlertCircle, ExternalLink, ShieldCheck, Key, LogIn, Sparkles } from 'lucide-react';
+import { Globe, Send, CheckCircle2, AlertCircle, ExternalLink, LogIn } from 'lucide-react';
 import { publishToBlogger } from '../services/bloggerApiService';
-
-const DEFAULT_CLIENT_ID = "455333068454-3r6vcu0m571rm2cfujt4j5.apps.googleusercontent.com";
 
 export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHtml }) {
   const [blogId, setBlogId] = useState(() => localStorage.getItem('blogger_blog_id') || '');
-  const [clientId, setClientId] = useState(() => localStorage.getItem('blogger_client_id') || DEFAULT_CLIENT_ID);
+  const [clientId, setClientId] = useState(() => localStorage.getItem('blogger_client_id') || '');
   const [accessToken, setAccessToken] = useState(() => localStorage.getItem('blogger_access_token') || '');
   const [userGmail, setUserGmail] = useState(() => localStorage.getItem('blogger_user_gmail') || '');
   
@@ -35,7 +33,12 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
 
   // Direct Google OAuth 2.0 Sign In Popup
   const handleGoogleLogin = () => {
-    const activeClientId = clientId.trim() || DEFAULT_CLIENT_ID;
+    if (!clientId.trim()) {
+      setErrorMsg("Please paste your Google Cloud Client ID below first.");
+      return;
+    }
+
+    const activeClientId = clientId.trim();
     const redirectUri = window.location.origin;
     const scope = encodeURIComponent('https://www.googleapis.com/auth/blogger');
     
@@ -169,7 +172,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
             /* FORM INPUT VIEW */
             <>
               <p className="modal-text">
-                Connect your Google Blogger account in 1-click for automatic publishing.
+                Connect your Google Blogger account for automatic 1-click publishing.
               </p>
 
               {errorMsg && (
@@ -178,6 +181,24 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
                   <span>{errorMsg}</span>
                 </div>
               )}
+
+              {/* Client ID Input Field */}
+              <div className="input-group mb-3" style={{ marginBottom: '14px' }}>
+                <label className="text-indigo-300 font-semibold" style={{ fontSize: '13px', display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Google Cloud Client ID</span>
+                  <a href="https://console.cloud.google.com/auth/clients" target="_blank" rel="noreferrer" style={{ color: '#818cf8', fontSize: '11px', textDecoration: 'underline' }}>
+                    Find in Google Cloud Console ↗
+                  </a>
+                </label>
+                <input 
+                  type="text" 
+                  placeholder="Paste your Client ID (e.g. 455333068454-xxx...apps.googleusercontent.com)" 
+                  value={clientId}
+                  onChange={(e) => setClientId(e.target.value)}
+                  className="modal-input"
+                  style={{ fontSize: '12px', padding: '10px' }}
+                />
+              </div>
 
               {/* DIRECT GOOGLE LOGIN BUTTON */}
               <div style={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '12px', padding: '16px', marginBottom: '16px', textAlign: 'center' }}>
@@ -224,7 +245,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
                       <span>Continue with Google (Connect Blogger)</span>
                     </button>
                     <p style={{ fontSize: '12px', color: '#94a3b8', marginTop: '8px', margin: '8px 0 0 0' }}>
-                      Click to sign in with your Google account. No manual tokens or playground needed!
+                      Click to sign in with your Google account. Saved in your browser!
                     </p>
                   </div>
                 )}
@@ -241,24 +262,6 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
                   className="modal-input"
                 />
               </div>
-
-              {/* Optional Custom OAuth Client ID */}
-              <details style={{ marginBottom: '14px', fontSize: '12px', color: '#94a3b8' }}>
-                <summary style={{ cursor: 'pointer', color: '#818cf8', fontWeight: '600' }}>
-                  ⚙️ Advanced OAuth Client Config (Optional)
-                </summary>
-                <div style={{ marginTop: '8px' }}>
-                  <label style={{ display: 'block', marginBottom: '4px' }}>Custom Google Cloud Client ID</label>
-                  <input 
-                    type="text" 
-                    placeholder={DEFAULT_CLIENT_ID} 
-                    value={clientId}
-                    onChange={(e) => setClientId(e.target.value)}
-                    className="modal-input"
-                    style={{ fontSize: '11px', padding: '6px 10px' }}
-                  />
-                </div>
-              </details>
 
               {/* Publish Mode Toggle */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '14px' }}>
