@@ -1,20 +1,74 @@
 /**
  * Service to publish posts directly to Google Blogger via Blogger API v3.
- * Endpoint: https://www.googleapis.com/blogger/v3/blogs/{blogId}/posts/
+ * Supports automatic token refresh using Refresh Token (Permanent No-Expiry Publishing).
  */
 
-export async function publishToBlogger({ blogId, accessToken, title, htmlContent, isDraft = false }) {
+/**
+ * Exchanges a permanent Refresh Token for a fresh temporary Access Token.
+ */
+export async function getFreshAccessTokenFromRefreshToken({ refreshToken, clientId, clientSecret }) {
+  if (!refreshToken || !refreshToken.trim()) {
+    throw new Error("Refresh token missing.");
+  }
+
+  const payload = new URLSearchParams({
+    client_id: (clientId || "").trim(),
+    client_secret: (clientSecret || "").trim(),
+    refresh_token: refreshToken.trim(),
+    grant_type: "refresh_token"
+  });
+
+  const response = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: payload
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error_description || data.error || "Failed to refresh OAuth token");
+  }
+
+  return data.access_token;
+}
+
+/**
+ * Publishes post directly to Blogger API.
+ */
+export async function publishToBlogger({ 
+  blogId, 
+  accessToken, 
+  refreshToken, 
+  clientId, 
+  clientSecret, 
+  title, 
+  htmlContent, 
+  isDraft = false 
+}) {
   if (!blogId || blogId.trim() === "") {
     throw new Error("Blogger Blog ID is required. Find it in your Blogger dashboard URL.");
   }
 
-  if (!accessToken || accessToken.trim() === "") {
-    throw new Error("Google OAuth Access Token is required for auto-publishing.");
+  let validToken = accessToken ? accessToken.trim() : "";
+
+  // If refresh token is provided, get a fresh non-expired access token automatically
+  if (refreshToken && refreshToken.trim()) {
+    try {
+      console.log("Automatically refreshing OAuth access token via Refresh Token...");
+      validToken = await getFreshAccessTokenFromRefreshToken({ refreshToken, clientId, clientSecret });
+    } catch (refreshErr) {
+      console.warn("Could not refresh via Refresh Token, attempting direct access token:", refreshErr);
+    }
+  }
+
+  if (!validToken) {
+    throw new Error("Google OAuth Access Token or Refresh Token is required.");
   }
 
   const cleanBlogId = blogId.trim();
-  const cleanToken = accessToken.trim();
-
   const url = `https://www.googleapis.com/blogger/v3/blogs/${cleanBlogId}/posts/?isDraft=${isDraft}`;
 
   const payload = {
@@ -27,7 +81,7 @@ export async function publishToBlogger({ blogId, accessToken, title, htmlContent
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${cleanToken}`,
+        "Authorization": `Bearer ${validToken}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify(payload)

@@ -1,10 +1,19 @@
 import React, { useState } from 'react';
-import { Globe, Send, CheckCircle2, AlertCircle, HelpCircle, ExternalLink, Sparkles } from 'lucide-react';
+import { Globe, Send, CheckCircle2, AlertCircle, HelpCircle, ExternalLink, RefreshCw, Key, ShieldCheck } from 'lucide-react';
 import { publishToBlogger } from '../services/bloggerApiService';
 
 export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHtml }) {
   const [blogId, setBlogId] = useState(() => localStorage.getItem('blogger_blog_id') || '');
+  const [tokenMode, setTokenMode] = useState(() => localStorage.getItem('blogger_token_mode') || 'permanent'); // 'permanent' or 'temporary'
+  
+  // Permanent credentials
+  const [refreshToken, setRefreshToken] = useState(() => localStorage.getItem('blogger_refresh_token') || '');
+  const [clientId, setClientId] = useState(() => localStorage.getItem('blogger_client_id') || '');
+  const [clientSecret, setClientSecret] = useState(() => localStorage.getItem('blogger_client_secret') || '');
+  
+  // Temporary access token
   const [accessToken, setAccessToken] = useState(() => localStorage.getItem('blogger_access_token') || '');
+  
   const [isDraft, setIsDraft] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishResult, setPublishResult] = useState(null);
@@ -18,7 +27,12 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
       return;
     }
 
-    if (!accessToken.trim()) {
+    if (tokenMode === 'permanent' && !refreshToken.trim()) {
+      setErrorMsg("Please enter your Permanent Refresh Token (from OAuth Playground).");
+      return;
+    }
+
+    if (tokenMode === 'temporary' && !accessToken.trim()) {
       setErrorMsg("Please enter your Google OAuth Access Token.");
       return;
     }
@@ -26,14 +40,21 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
     setErrorMsg(null);
     setIsPublishing(true);
 
-    // Save settings locally
+    // Save configuration
     localStorage.setItem('blogger_blog_id', blogId.trim());
+    localStorage.setItem('blogger_token_mode', tokenMode);
+    localStorage.setItem('blogger_refresh_token', refreshToken.trim());
+    localStorage.setItem('blogger_client_id', clientId.trim());
+    localStorage.setItem('blogger_client_secret', clientSecret.trim());
     localStorage.setItem('blogger_access_token', accessToken.trim());
 
     try {
       const res = await publishToBlogger({
         blogId,
         accessToken,
+        refreshToken,
+        clientId,
+        clientSecret,
         title: postTitle,
         htmlContent: postHtml,
         isDraft
@@ -49,7 +70,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-card" style={{ maxWidth: '540px' }} onClick={(e) => e.stopPropagation()}>
+      <div className="modal-card" style={{ maxWidth: '560px' }} onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
         <div className="modal-header">
@@ -99,7 +120,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
             /* FORM INPUT VIEW */
             <>
               <p className="modal-text">
-                Connect your Blogger.com blog to publish posts with 1 click directly from this app.
+                Connect your Blogger.com blog for 1-click publishing.
               </p>
 
               {errorMsg && (
@@ -119,34 +140,86 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
                   onChange={(e) => setBlogId(e.target.value)}
                   className="modal-input"
                 />
-                <span className="text-xs text-slate-400" style={{ display: 'block', marginTop: '4px' }}>
-                  💡 Found in your Blogger URL: <code>blogger.com/blog/posts/<b>YOUR_BLOG_ID</b></code>
-                </span>
               </div>
 
-              {/* OAuth Access Token */}
-              <div className="input-group mb-3" style={{ marginBottom: '14px' }}>
-                <label>Google OAuth Access Token</label>
-                <input 
-                  type="password" 
-                  placeholder="ya29.a0A..." 
-                  value={accessToken}
-                  onChange={(e) => setAccessToken(e.target.value)}
-                  className="modal-input"
-                />
-                <div className="api-help-box" style={{ marginTop: '6px' }}>
-                  <HelpCircle className="help-icon" />
-                  <span>
-                    Get a quick 1-minute test token from{' '}
-                    <a href="https://developers.google.com/oauthplayground/" target="_blank" rel="noreferrer">
-                      Google OAuth Playground
-                    </a> (Select Blogger API v3 scope).
-                  </span>
-                </div>
+              {/* TOKEN MODE SELECTOR */}
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', backgroundColor: '#090d16', padding: '4px', borderRadius: '8px', border: '1px solid #1f2937' }}>
+                <button 
+                  onClick={() => setTokenMode('permanent')}
+                  style={{ flex: 1, border: 'none', padding: '8px', borderRadius: '6px', fontSize: '12px', fontWeight: '700', cursor: 'pointer', backgroundColor: tokenMode === 'permanent' ? '#10b981' : 'transparent', color: tokenMode === 'permanent' ? '#fff' : '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                >
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>Permanent Refresh Token (No Expiry)</span>
+                </button>
+
+                <button 
+                  onClick={() => setTokenMode('temporary')}
+                  style={{ flex: 1, border: 'none', padding: '8px', borderRadius: '6px', fontSize: '12px', fontWeight: '700', cursor: 'pointer', backgroundColor: tokenMode === 'temporary' ? '#6366f1' : 'transparent', color: tokenMode === 'temporary' ? '#fff' : '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                >
+                  <Key className="w-3.5 h-3.5" />
+                  <span>Access Token (1 Hour)</span>
+                </button>
               </div>
+
+              {tokenMode === 'permanent' ? (
+                /* PERMANENT REFRESH TOKEN MODE */
+                <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.05)', border: '1px stroke rgba(16, 185, 129, 0.2)', padding: '14px', borderRadius: '10px', marginBottom: '14px' }}>
+                  <div className="input-group mb-2">
+                    <label className="text-emerald-400 font-semibold">Permanent Refresh Token (Never Expires!)</label>
+                    <input 
+                      type="password" 
+                      placeholder="Paste refresh_token from OAuth Playground Step 2..." 
+                      value={refreshToken}
+                      onChange={(e) => setRefreshToken(e.target.value)}
+                      className="modal-input"
+                    />
+                  </div>
+
+                  <div className="grid-2" style={{ gap: '10px', marginTop: '10px' }}>
+                    <div className="input-group">
+                      <label className="text-xs text-slate-400">Client ID (Optional)</label>
+                      <input 
+                        type="text" 
+                        placeholder="Google Cloud Client ID" 
+                        value={clientId}
+                        onChange={(e) => setClientId(e.target.value)}
+                        className="modal-input"
+                        style={{ fontSize: '12px', padding: '8px' }}
+                      />
+                    </div>
+                    <div className="input-group">
+                      <label className="text-xs text-slate-400">Client Secret (Optional)</label>
+                      <input 
+                        type="password" 
+                        placeholder="Google Cloud Client Secret" 
+                        value={clientSecret}
+                        onChange={(e) => setClientSecret(e.target.value)}
+                        className="modal-input"
+                        style={{ fontSize: '12px', padding: '8px' }}
+                      />
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-emerald-400" style={{ marginTop: '10px', fontSize: '11.5px' }}>
+                    💡 <b>Permanent Mode:</b> In OAuth Playground Step 2, copy <code>refresh_token</code>. The app will auto-refresh access tokens in the background forever without asking again!
+                  </p>
+                </div>
+              ) : (
+                /* TEMPORARY ACCESS TOKEN MODE */
+                <div className="input-group mb-3" style={{ marginBottom: '14px' }}>
+                  <label>Google OAuth Access Token (Expires in 60 mins)</label>
+                  <input 
+                    type="password" 
+                    placeholder="ya29.a0A..." 
+                    value={accessToken}
+                    onChange={(e) => setAccessToken(e.target.value)}
+                    className="modal-input"
+                  />
+                </div>
+              )}
 
               {/* Publish Mode Toggle */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '14px' }}>
                 <input 
                   type="checkbox" 
                   id="draftModeCheck" 
