@@ -141,11 +141,11 @@
 
   <!-- Mobile Slide-Out Menu Drawer -->
   <div class='mobile-nav-drawer' id='mobileNavDrawer'>
-    <a href='/'><span>🏠 Home</span> <span>&rarr;</span></a>
-    <a href='/search/label/The%20Hindu'><span>📰 The Hindu</span> <span>&rarr;</span></a>
-    <a href='/search/label/Indian%20Express'><span>📰 Indian Express</span> <span>&rarr;</span></a>
-    <a href='/p/about-us.html'><span>ℹ️ About Us</span> <span>&rarr;</span></a>
-    <a href='/p/contact-us.html'><span>📧 Contact Us</span> <span>&rarr;</span></a>
+    <a href='/'><span>🏠 Home</span> <span>&#8594;</span></a>
+    <a href='/search/label/The%20Hindu'><span>📰 The Hindu</span> <span>&#8594;</span></a>
+    <a href='/search/label/Indian%20Express'><span>📰 Indian Express</span> <span>&#8594;</span></a>
+    <a href='/p/about-us.html'><span>ℹ️ About Us</span> <span>&#8594;</span></a>
+    <a href='/p/contact-us.html'><span>📧 Contact Us</span> <span>&#8594;</span></a>
   </div>
 
   <!-- Simple Header Banner -->
