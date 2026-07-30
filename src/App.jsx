@@ -39,7 +39,6 @@ export default function App() {
 
   const [postData, setPostData] = useState({
     title: initialSeoTitle,
-    headlineOnly: SAMPLE_EDITORIALS[0].title,
     date: initialDate,
     sourceName: SAMPLE_EDITORIALS[0].sourceName,
     bannerTopic: SAMPLE_EDITORIALS[0].bannerTopic,
@@ -96,7 +95,6 @@ export default function App() {
 
       setPostData({
         title: seoTitle,
-        headlineOnly: extractedHeadline,
         date: generatedDate,
         sourceName: generatedSource,
         bannerTopic: finalTopic,
@@ -129,7 +127,6 @@ export default function App() {
 
     setPostData({
       title: seoTitle,
-      headlineOnly: sample.title,
       date: sample.date,
       sourceName: sample.sourceName,
       bannerTopic: sample.bannerTopic,

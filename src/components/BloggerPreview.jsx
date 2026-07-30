@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Eye, Code, Copy, Check, Download } from 'lucide-react';
 import { generateBloggerHtml } from '../services/bloggerTemplateService';
+import { copyTextToClipboard } from '../services/clipboardService';
 
 export default function BloggerPreview({ postData, currentTheme }) {
   const [viewMode, setViewMode] = useState('preview'); // 'preview' or 'code'
@@ -9,17 +10,25 @@ export default function BloggerPreview({ postData, currentTheme }) {
 
   const fullHtml = generateBloggerHtml(postData, currentTheme);
 
-  const handleCopyCode = () => {
-    navigator.clipboard.writeText(fullHtml);
-    setCopiedCode(true);
-    setTimeout(() => setCopiedCode(false), 2000);
+  const handleCopyCode = async () => {
+    try {
+      await copyTextToClipboard(fullHtml);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
-  const handleCopyTitle = () => {
+  const handleCopyTitle = async () => {
     const formattedTitle = postData.title || 'Daily Editorial Vocabulary Today';
-    navigator.clipboard.writeText(formattedTitle);
-    setCopiedTitle(true);
-    setTimeout(() => setCopiedTitle(false), 2000);
+    try {
+      await copyTextToClipboard(formattedTitle);
+      setCopiedTitle(true);
+      setTimeout(() => setCopiedTitle(false), 2000);
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   const handleDownloadHtml = () => {
@@ -28,7 +37,9 @@ export default function BloggerPreview({ postData, currentTheme }) {
     const a = document.createElement('a');
     a.href = url;
     a.download = `editorial-vocab-${postData.date || 'post'}.html`;
+    document.body.appendChild(a);
     a.click();
+    a.remove();
     URL.revokeObjectURL(url);
   };
 

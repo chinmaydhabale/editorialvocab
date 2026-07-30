@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Copy, Check, Download, ExternalLink, Globe, Sparkles, Send } from 'lucide-react';
 import { generateBloggerHtml } from '../services/bloggerTemplateService';
 import BloggerPublishModal from './BloggerPublishModal';
+import { copyTextToClipboard } from '../services/clipboardService';
 
 export default function HtmlExporter({ postData, currentTheme }) {
   const [copiedTitle, setCopiedTitle] = useState(false);
@@ -10,17 +11,26 @@ export default function HtmlExporter({ postData, currentTheme }) {
 
   const fullHtml = generateBloggerHtml(postData, currentTheme);
   const formattedTitle = postData.title || 'Daily Editorial Vocabulary Today';
+  const hasIdioms = (postData.idiomsAndPhrases || []).length > 0;
 
-  const handleCopyTitle = () => {
-    navigator.clipboard.writeText(formattedTitle);
-    setCopiedTitle(true);
-    setTimeout(() => setCopiedTitle(false), 2000);
+  const handleCopyTitle = async () => {
+    try {
+      await copyTextToClipboard(formattedTitle);
+      setCopiedTitle(true);
+      setTimeout(() => setCopiedTitle(false), 2000);
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
-  const handleCopyHtml = () => {
-    navigator.clipboard.writeText(fullHtml);
-    setCopiedHtml(true);
-    setTimeout(() => setCopiedHtml(false), 2000);
+  const handleCopyHtml = async () => {
+    try {
+      await copyTextToClipboard(fullHtml);
+      setCopiedHtml(true);
+      setTimeout(() => setCopiedHtml(false), 2000);
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   const handleDownload = () => {
@@ -29,7 +39,9 @@ export default function HtmlExporter({ postData, currentTheme }) {
     const a = document.createElement('a');
     a.href = url;
     a.download = `editorial-vocab-${postData.date || 'post'}.html`;
+    document.body.appendChild(a);
     a.click();
+    a.remove();
     URL.revokeObjectURL(url);
   };
 
@@ -44,49 +56,22 @@ export default function HtmlExporter({ postData, currentTheme }) {
       </p>
 
       {/* AUTO PUBLISH HERO BANNER */}
-      <div 
-        style={{
-          background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
-          borderRadius: '16px',
-          padding: '24px',
-          marginBottom: '24px',
-          color: '#ffffff',
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '16px',
-          boxShadow: '0 12px 30px -5px rgba(16, 185, 129, 0.3)'
-        }}
-      >
+      <div className="auto-publish-panel">
         <div>
-          <span style={{ backgroundColor: 'rgba(255,255,255,0.25)', fontSize: '11px', fontWeight: '800', padding: '3px 10px', borderRadius: '12px', textTransform: 'uppercase', display: 'inline-block', marginBottom: '8px' }}>
-            ⚡ Direct Integration
+          <span className="auto-publish-badge">
+            Direct Integration
           </span>
-          <h3 style={{ fontSize: '20px', fontWeight: '800', margin: '0 0 4px 0' }}>
+          <h3>
             Auto-Publish Directly to Blogger.com
           </h3>
-          <p style={{ fontSize: '14px', margin: 0, opacity: 0.9 }}>
+          <p>
             Publish this editorial vocab post to your blog with 1 click without manually copying HTML!
           </p>
         </div>
 
         <button 
           onClick={() => setShowAutoPublishModal(true)} 
-          style={{
-            backgroundColor: '#ffffff',
-            color: '#065f46',
-            border: 'none',
-            padding: '12px 24px',
-            borderRadius: '10px',
-            fontSize: '15px',
-            fontWeight: '800',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.15)'
-          }}
+          className="auto-publish-button"
         >
           <Send className="w-4 h-4" />
           <span>Auto-Publish Now</span>
@@ -164,6 +149,7 @@ export default function HtmlExporter({ postData, currentTheme }) {
         postHtml={fullHtml}
         postDate={postData.date}
         sourceName={postData.sourceName}
+        hasIdioms={hasIdioms}
       />
     </div>
   );

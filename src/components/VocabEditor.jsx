@@ -134,7 +134,7 @@ export default function VocabEditor({ postData, setPostData }) {
             <Plus className="btn-icon" />
             <span>Add Word</span>
           </button>
-          <button onClick={handleAddIdiom} className="btn-add-word" style={{ backgroundColor: '#10b981' }}>
+          <button onClick={handleAddIdiom} className="btn-add-word success">
             <Plus className="btn-icon" />
             <span>Add Idiom</span>
           </button>
@@ -171,9 +171,9 @@ export default function VocabEditor({ postData, setPostData }) {
         </div>
 
         {/* AI THUMBNAIL GENERATOR BOX */}
-        <div className="main-thumbnail-setting" style={{ gridColumn: '1 / -1', marginTop: '10px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <label className="text-amber-400 font-semibold flex items-center gap-2" style={{ margin: 0 }}>
+        <div className="main-thumbnail-setting">
+          <div className="thumbnail-heading-row">
+            <label className="thumbnail-label">
               <ImageIcon className="w-4 h-4" />
               Main Blog Thumbnail Image Banner
             </label>
@@ -182,27 +182,14 @@ export default function VocabEditor({ postData, setPostData }) {
             <button 
               onClick={handleGenerateAiBanner}
               disabled={isGeneratingAiBanner}
-              style={{
-                background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
-                color: '#fff',
-                border: 'none',
-                padding: '6px 14px',
-                borderRadius: '8px',
-                fontSize: '12px',
-                fontWeight: '700',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                boxShadow: '0 4px 12px rgba(168, 85, 247, 0.3)'
-              }}
+              className="btn-ai-banner"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>{isGeneratingAiBanner ? 'Generating AI Banner...' : '✨ Generate AI Thumbnail Banner'}</span>
             </button>
           </div>
           
-          <div className="grid-2" style={{ marginBottom: '10px' }}>
+          <div className="grid-2 thumbnail-grid">
             <input 
               type="text" 
               placeholder="Paste main thumbnail image URL or click Generate AI Thumbnail..." 
@@ -212,22 +199,13 @@ export default function VocabEditor({ postData, setPostData }) {
             />
             
             {/* Quick Presets */}
-            <div className="flex gap-2 items-center flex-wrap">
+            <div className="preset-list">
               <span className="text-xs text-slate-400">Presets:</span>
               {THUMBNAIL_PRESETS.map((preset, idx) => (
                 <button
                   key={idx}
                   onClick={() => setPostData({ ...postData, mainImageUrl: preset.url })}
                   className="preset-img-btn"
-                  style={{
-                    backgroundColor: 'rgba(255,255,255,0.06)',
-                    border: '1px solid #334155',
-                    color: '#cbd5e1',
-                    fontSize: '11px',
-                    padding: '4px 8px',
-                    borderRadius: '6px',
-                    cursor: 'pointer'
-                  }}
                 >
                   {preset.name}
                 </button>
@@ -236,15 +214,15 @@ export default function VocabEditor({ postData, setPostData }) {
           </div>
 
           {postData.mainImageUrl && (
-            <div style={{ marginTop: '8px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #334155', maxHeight: '180px' }}>
-              <img src={postData.mainImageUrl} alt="Thumbnail banner preview" style={{ width: '100%', height: '180px', objectFit: 'cover' }} />
+            <div className="thumbnail-preview">
+              <img src={postData.mainImageUrl} alt="Thumbnail banner preview" />
             </div>
           )}
         </div>
       </div>
 
       {/* SECTION 1: WORDS CARDS LIST */}
-      <h3 className="text-lg font-bold mb-3 flex items-center gap-2 text-indigo-400">
+      <h3 className="editor-subtitle">
         <BookOpen className="w-5 h-5" />
         Tricky Words Cards ({(postData.words || []).length})
       </h3>
@@ -355,7 +333,7 @@ export default function VocabEditor({ postData, setPostData }) {
       </div>
 
       {/* SECTION 2: DEDICATED IDIOMS & PHRASES LIST */}
-      <h3 className="text-lg font-bold mb-3 flex items-center gap-2 text-emerald-400" style={{ marginTop: '24px' }}>
+      <h3 className="editor-subtitle idiom-section-title">
         <LinkIcon className="w-5 h-5" />
         Dedicated Idioms & Phrases Section ({(postData.idiomsAndPhrases || []).length})
       </h3>
@@ -365,10 +343,10 @@ export default function VocabEditor({ postData, setPostData }) {
           const isEditing = editingIdiomIndex === index;
 
           return (
-            <div key={index} className={`word-editor-card ${isEditing ? 'is-editing' : ''}`} style={{ borderColor: '#059669' }}>
+            <div key={index} className={`word-editor-card idiom-card ${isEditing ? 'is-editing' : ''}`}>
               <div className="word-card-top-row">
                 <div className="flex items-center gap-3">
-                  <span className="word-number-badge" style={{ backgroundColor: 'rgba(16, 185, 129, 0.2)', color: '#34d399' }}>
+                  <span className="word-number-badge phrase-badge">
                     Phrase #{index + 1}
                   </span>
                   <span className="word-title-text text-emerald-400">"{item.phrase}"</span>

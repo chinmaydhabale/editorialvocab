@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Globe, Send, CheckCircle2, AlertCircle, ExternalLink, LogIn, Tag } from 'lucide-react';
-import { publishToBlogger, getMonthTagFromDate, getNewspaperTagFromName } from '../services/bloggerApiService';
+import { Globe, Send, CheckCircle2, AlertCircle, ExternalLink, Tag } from 'lucide-react';
+import { publishToBlogger, getAutomationLabels } from '../services/bloggerApiService';
 
-export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHtml, postDate, sourceName }) {
+export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHtml, postDate, sourceName, hasIdioms }) {
   const [blogId, setBlogId] = useState(() => localStorage.getItem('blogger_blog_id') || '');
   const [clientId, setClientId] = useState(() => localStorage.getItem('blogger_client_id') || '');
   const [accessToken, setAccessToken] = useState(() => localStorage.getItem('blogger_access_token') || '');
@@ -13,8 +13,8 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
   const [publishResult, setPublishResult] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
 
-  const monthTag = getMonthTagFromDate(postDate);
-  const newspaperTag = getNewspaperTagFromName(sourceName);
+  const automationLabels = getAutomationLabels({ postDate, sourceName, hasIdioms });
+  const labelsPreview = automationLabels.join(', ');
 
   // Check URL hash for OAuth redirect token on mount / popup return
   useEffect(() => {
@@ -27,7 +27,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
         setUserGmail('Google Account Connected ✓');
         localStorage.setItem('blogger_user_gmail', 'Google Account Connected ✓');
         // Clean URL hash
-        window.history.replaceState(null, '', window.location.pathname);
+        window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
       }
     }
   }, []);
@@ -61,6 +61,11 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
       'GoogleBloggerLogin',
       `width=${width},height=${height},left=${left},top=${top}`
     );
+
+    if (!popup) {
+      setErrorMsg("Popup blocked. Please allow popups for this site and try again.");
+      return;
+    }
 
     // Listen for OAuth token callback from popup
     const checkPopup = setInterval(() => {
@@ -108,12 +113,13 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
 
     try {
       const res = await publishToBlogger({
-        blogId,
+        blogId: blogId.trim(),
         accessToken: accessToken.trim(),
         title: postTitle,
         htmlContent: postHtml,
         postDate: postDate,
         sourceName: sourceName,
+        hasIdioms,
         isDraft
       });
 
@@ -127,7 +133,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-card" style={{ maxWidth: '560px' }} onClick={(e) => e.stopPropagation()}>
+      <div className="modal-card publish-modal-card" onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
         <div className="modal-header">
@@ -141,15 +147,15 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
         <div className="modal-body">
           {publishResult ? (
             /* SUCCESS PUBLISHED VIEW */
-            <div className="publish-success-box" style={{ textAlign: 'center', padding: '20px 0' }}>
-              <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'rgba(16, 185, 129, 0.2)', color: '#34d399', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                <CheckCircle2 style={{ width: '36px', height: '36px' }} />
+            <div className="publish-success-box">
+              <div className="publish-success-icon">
+                <CheckCircle2 className="publish-success-check" />
               </div>
-              <h3 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '8px', color: '#f8fafc' }}>
+              <h3 className="publish-success-title">
                 {isDraft ? 'Post Saved as Draft on Blogger!' : 'Successfully Published to Blogger.com!'}
               </h3>
-              <p style={{ fontSize: '14px', color: '#94a3b8', marginBottom: '14px' }}>
-                Your daily editorial vocabulary post is live on your blog with tags: <strong>"{monthTag}"</strong> and <strong>"{newspaperTag}"</strong>
+              <p className="publish-success-text">
+                Your daily editorial vocabulary post is live on your blog with labels: <strong>{labelsPreview}</strong>
               </p>
 
               {publishResult.url && (
@@ -157,8 +163,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
                   href={publishResult.url} 
                   target="_blank" 
                   rel="noreferrer" 
-                  className="btn-primary" 
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', textDecoration: 'none', backgroundColor: '#10b981', padding: '10px 20px', borderRadius: '8px', margin: '0 auto' }}
+                  className="btn-primary publish-live-link" 
                 >
                   <span>View Live Blog Post</span>
                   <ExternalLink className="w-4 h-4" />
@@ -167,8 +172,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
 
               <button 
                 onClick={() => { setPublishResult(null); onClose(); }} 
-                className="btn-secondary"
-                style={{ display: 'block', margin: '16px auto 0' }}
+                className="btn-secondary centered-close"
               >
                 Close
               </button>
@@ -181,23 +185,23 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
               </p>
 
               {/* Dual Tags Auto Notice */}
-              <div style={{ backgroundColor: 'rgba(99, 102, 241, 0.12)', border: '1px solid #6366f1', color: '#a5f3fc', padding: '10px 14px', borderRadius: '8px', fontSize: '12.5px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className="status-callout tags-callout">
                 <Tag className="w-4 h-4 text-indigo-400 flex-shrink-0" />
-                <span>Auto-Tags: Post will be published with labels <strong>"{monthTag}"</strong> and <strong>"{newspaperTag}"</strong>.</span>
+                <span>Auto-Labels: Post will be published with <strong>{labelsPreview}</strong>.</span>
               </div>
 
               {errorMsg && (
-                <div style={{ backgroundColor: 'rgba(244, 63, 94, 0.15)', border: '1px solid #f43f5e', color: '#fda4af', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className="status-callout error-callout">
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
                   <span>{errorMsg}</span>
                 </div>
               )}
 
               {/* Client ID Input Field */}
-              <div className="input-group mb-3" style={{ marginBottom: '14px' }}>
-                <label className="text-indigo-300 font-semibold" style={{ fontSize: '13px', display: 'flex', justifyContent: 'space-between' }}>
+              <div className="input-group field-spacing">
+                <label className="client-id-label">
                   <span>Google Cloud Client ID</span>
-                  <a href="https://console.cloud.google.com/auth/clients" target="_blank" rel="noreferrer" style={{ color: '#818cf8', fontSize: '11px', textDecoration: 'underline' }}>
+                  <a href="https://console.cloud.google.com/auth/clients" target="_blank" rel="noreferrer" className="helper-link">
                     Find in Google Cloud Console ↗
                   </a>
                 </label>
@@ -206,22 +210,21 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
                   placeholder="Paste your Client ID (e.g. 455333068454-xxx...apps.googleusercontent.com)" 
                   value={clientId}
                   onChange={(e) => setClientId(e.target.value)}
-                  className="modal-input"
-                  style={{ fontSize: '12px', padding: '10px' }}
+                  className="modal-input client-id-input"
                 />
               </div>
 
               {/* DIRECT GOOGLE LOGIN BUTTON */}
-              <div style={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '12px', padding: '16px', marginBottom: '16px', textAlign: 'center' }}>
+              <div className="oauth-card">
                 {accessToken ? (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', padding: '10px 16px', borderRadius: '8px', color: '#34d399' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '700' }}>
+                  <div className="oauth-connected-card">
+                    <div className="oauth-connected-label">
                       <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                       <span>{userGmail || 'Blogger Account Connected!'}</span>
                     </div>
                     <button 
                       onClick={handleGoogleLogin} 
-                      style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '12px', textDecoration: 'underline', cursor: 'pointer' }}
+                      className="text-link-button"
                     >
                       Reconnect
                     </button>
@@ -230,22 +233,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
                   <div>
                     <button 
                       onClick={handleGoogleLogin}
-                      style={{
-                        width: '100%',
-                        backgroundColor: '#ffffff',
-                        color: '#1e293b',
-                        border: '1px solid #cbd5e1',
-                        padding: '12px 20px',
-                        borderRadius: '10px',
-                        fontSize: '15px',
-                        fontWeight: '700',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '10px',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                      }}
+                      className="google-login-button"
                     >
                       <svg width="20" height="20" viewBox="0 0 24 24">
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -255,7 +243,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
                       </svg>
                       <span>Continue with Google (Connect Blogger)</span>
                     </button>
-                    <p style={{ fontSize: '12px', color: '#94a3b8', marginTop: '8px', margin: '8px 0 0 0' }}>
+                    <p className="modal-help-text">
                       Click to sign in with your Google account. Saved in your browser!
                     </p>
                   </div>
@@ -263,7 +251,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
               </div>
 
               {/* Blog ID */}
-              <div className="input-group mb-3" style={{ marginBottom: '14px' }}>
+              <div className="input-group field-spacing">
                 <label>Blogger Blog ID</label>
                 <input 
                   type="text" 
@@ -275,15 +263,15 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
               </div>
 
               {/* Publish Mode Toggle */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '14px' }}>
+              <div className="draft-toggle-row">
                 <input 
                   type="checkbox" 
                   id="draftModeCheck" 
                   checked={isDraft} 
                   onChange={(e) => setIsDraft(e.target.checked)} 
-                  style={{ width: '16px', height: '16px', cursor: 'pointer' }}
+                  className="draft-checkbox"
                 />
-                <label htmlFor="draftModeCheck" style={{ fontSize: '14px', color: '#cbd5e1', cursor: 'pointer', margin: 0 }}>
+                <label htmlFor="draftModeCheck" className="draft-toggle-label">
                   Save as Draft (Don't publish live immediately)
                 </label>
               </div>
@@ -295,8 +283,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
                 <button 
                   onClick={handlePublish} 
                   disabled={isPublishing} 
-                  className="btn-primary" 
-                  style={{ backgroundColor: '#10b981' }}
+                  className="btn-primary publish-button" 
                 >
                   {isPublishing ? (
                     <>
@@ -306,7 +293,7 @@ export default function BloggerPublishModal({ isOpen, onClose, postTitle, postHt
                   ) : (
                     <>
                       <Send className="w-4 h-4" />
-                      <span>{isDraft ? 'Save Draft to Blogger' : `Publish Live (${monthTag}, ${newspaperTag})`}</span>
+                      <span>{isDraft ? 'Save Draft to Blogger' : 'Publish Live with Labels'}</span>
                     </>
                   )}
                 </button>

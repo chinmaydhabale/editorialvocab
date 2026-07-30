@@ -1,6 +1,6 @@
 /**
  * Service to publish posts directly to Google Blogger via Blogger API v3.
- * Automatically assigns Month Tag (e.g. "July") AND Newspaper Source Tag (e.g. "The Hindu") based on post metadata.
+ * Automatically assigns automation-friendly labels used by the Blogger theme.
  */
 
 export const MONTHS_ARRAY = [
@@ -38,59 +38,31 @@ export function getNewspaperTagFromName(sourceName) {
   return matched || clean || 'The Hindu';
 }
 
-const DEFAULT_PLAYGROUND_CLIENT_ID = "407408718192.apps.googleusercontent.com";
+export function getAutomationLabels({ postDate, sourceName, hasIdioms = false }) {
+  const labels = [
+    'Vocabulary',
+    getMonthTagFromDate(postDate),
+    getNewspaperTagFromName(sourceName)
+  ];
 
-/**
- * Exchanges a permanent Refresh Token for a fresh temporary Access Token.
- */
-export async function getFreshAccessTokenFromRefreshToken({ refreshToken, clientId, clientSecret }) {
-  if (!refreshToken || !refreshToken.trim()) {
-    throw new Error("Refresh token missing.");
+  if (hasIdioms) {
+    labels.push('Idioms');
   }
 
-  const payload = new URLSearchParams({
-    client_id: (clientId && clientId.trim()) ? clientId.trim() : DEFAULT_PLAYGROUND_CLIENT_ID,
-    refresh_token: refreshToken.trim(),
-    grant_type: "refresh_token"
-  });
-
-  if (clientSecret && clientSecret.trim()) {
-    payload.append("client_secret", clientSecret.trim());
-  }
-
-  const response = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: payload
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    console.error("Google Token Refresh Error Response:", data);
-    const errCode = data.error || "unknown";
-    const errDesc = data.error_description || "Token exchange failed";
-    throw new Error(`Google OAuth Token Error [${errCode}]: ${errDesc}`);
-  }
-
-  return data.access_token;
+  return labels.filter((label, index, allLabels) => label && allLabels.indexOf(label) === index);
 }
 
 /**
- * Publishes post directly to Blogger API v3 with automatic Dual Tagging (Month + Newspaper).
+ * Publishes post directly to Blogger API v3 with automatic theme labels.
  */
 export async function publishToBlogger({ 
   blogId, 
   accessToken, 
-  refreshToken, 
-  clientId, 
-  clientSecret, 
   title, 
   htmlContent, 
   postDate,
   sourceName,
+  hasIdioms = false,
   isDraft = false 
 }) {
   if (!blogId || !blogId.trim()) {
@@ -99,19 +71,6 @@ export async function publishToBlogger({
 
   let validToken = accessToken ? accessToken.trim() : "";
 
-  // If refresh token is provided, get a fresh non-expired access token automatically
-  if (refreshToken && refreshToken.trim()) {
-    try {
-      console.log("Automatically refreshing OAuth access token via Refresh Token...");
-      validToken = await getFreshAccessTokenFromRefreshToken({ refreshToken, clientId, clientSecret });
-    } catch (refreshErr) {
-      console.error("Refresh token error:", refreshErr);
-      if (!accessToken) {
-        throw new Error(refreshErr.message);
-      }
-    }
-  }
-
   if (!validToken) {
     throw new Error("Google OAuth Access Token is required.");
   }
@@ -119,15 +78,13 @@ export async function publishToBlogger({
   const cleanBlogId = blogId.trim();
   const url = `https://www.googleapis.com/blogger/v3/blogs/${cleanBlogId}/posts/?isDraft=${isDraft}`;
 
-  // Automatically calculate Month Tag (e.g., "July") and Newspaper Tag (e.g., "The Hindu")
-  const monthLabel = getMonthTagFromDate(postDate);
-  const newspaperLabel = getNewspaperTagFromName(sourceName);
+  const labels = getAutomationLabels({ postDate, sourceName, hasIdioms });
 
   const payload = {
     kind: "blogger#post",
     title: title,
     content: htmlContent,
-    labels: [monthLabel, newspaperLabel] // Assigns BOTH Month Tag & Newspaper Tag
+    labels
   };
 
   try {
@@ -155,7 +112,7 @@ export async function publishToBlogger({
       url: data.url,
       publishedDate: data.published,
       title: data.title,
-      labels: data.labels || [monthLabel, newspaperLabel],
+      labels: data.labels || labels,
       status: isDraft ? 'DRAFT' : 'PUBLISHED'
     };
   } catch (error) {

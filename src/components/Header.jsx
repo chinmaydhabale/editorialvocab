@@ -99,7 +99,7 @@ export default function Header({ apiKey, setApiKey, currentTheme, setCurrentThem
                 Enter your Google Gemini API Key and select from the latest Gemini Flash models.
               </p>
               
-              <div className="input-group mb-3" style={{ marginBottom: '14px' }}>
+              <div className="input-group field-spacing">
                 <label>Gemini API Key</label>
                 <input 
                   type="password" 
@@ -110,7 +110,7 @@ export default function Header({ apiKey, setApiKey, currentTheme, setCurrentThem
                 />
               </div>
 
-              <div className="input-group mb-3" style={{ marginBottom: '14px' }}>
+              <div className="input-group field-spacing">
                 <label className="flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <Cpu className="w-4 h-4 text-indigo-400" />

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FileText, Link, Image as ImageIcon, Sparkles, Zap, ArrowRight, Info, Plus, Trash2, Layers } from 'lucide-react';
 import { SAMPLE_EDITORIALS } from '../services/sampleEditorials';
+import { extractArticleFromUrl } from '../services/urlExtractionService';
 
 export default function InputSection({ 
   onProcessText, 
@@ -16,8 +17,11 @@ export default function InputSection({
   const [imageList, setImageList] = useState([]); // Array of Base64 image data URLs
   const [customTitle, setCustomTitle] = useState('');
   const [sourceName, setSourceName] = useState('The Hindu Editorial');
+  const [isExtractingUrl, setIsExtractingUrl] = useState(false);
 
-  const handleProcess = () => {
+  const isBusy = isLoading || isExtractingUrl;
+
+  const handleProcess = async () => {
     if (activeTab === 'text') {
       if (!inputText.trim()) {
         alert('Please paste or type editorial text first.');
@@ -34,12 +38,21 @@ export default function InputSection({
         alert('Please enter an editorial URL.');
         return;
       }
-      onProcessText({
-        text: `Editorial Content extracted from link ${urlInput}:\n\nThe recent economic indicators reflect a subtle shift in macroeconomic parameters. While persistent fiscal deficit concerns linger, foreign institutional investments show resilience. Policymakers must maintain a judicious balance between liquidity management and inflationary pressures. Ad-hoc policy shifts exacerbate structural bottlenecks in key sectors.`,
-        title: customTitle || 'Daily Editorial Vocabulary Analysis',
-        sourceName: sourceName || `Editorial (${urlInput})`,
-        wordCount: wordCountTarget
-      });
+
+      try {
+        setIsExtractingUrl(true);
+        const extractedText = await extractArticleFromUrl(urlInput);
+        onProcessText({
+          text: extractedText,
+          title: customTitle || 'Daily Editorial Vocabulary Analysis',
+          sourceName: sourceName || `Editorial (${urlInput})`,
+          wordCount: wordCountTarget
+        });
+      } catch (err) {
+        alert(err.message);
+      } finally {
+        setIsExtractingUrl(false);
+      }
     } else if (activeTab === 'image') {
       if (imageList.length === 0) {
         alert('Please upload at least one editorial page screenshot or image.');
@@ -55,8 +68,8 @@ export default function InputSection({
     }
   };
 
-  const handleMultipleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
+  const handleFilesUpload = (filesList) => {
+    const files = Array.from(filesList || []).filter((file) => file.type.startsWith('image/'));
     if (files.length > 0) {
       files.forEach((file) => {
         const reader = new FileReader();
@@ -66,6 +79,16 @@ export default function InputSection({
         reader.readAsDataURL(file);
       });
     }
+  };
+
+  const handleMultipleImageUpload = (e) => {
+    handleFilesUpload(e.target.files);
+    e.target.value = '';
+  };
+
+  const handleImageDrop = (e) => {
+    e.preventDefault();
+    handleFilesUpload(e.dataTransfer.files);
   };
 
   const handleRemoveImage = (indexToRemove) => {
@@ -204,13 +227,13 @@ export default function InputSection({
           <div className="tab-pane">
             {imageList.length > 0 ? (
               <div className="multiple-images-container">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                  <div style={{ fontSize: '14px', fontWeight: '700', color: '#a5f3fc', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div className="image-list-header">
+                  <div className="image-list-title">
                     <Layers className="w-4 h-4 text-emerald-400" />
                     <span>{imageList.length} Split Editorial Page Screenshots Uploaded</span>
                   </div>
                   
-                  <label className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer', padding: '6px 14px', fontSize: '13px' }}>
+                  <label className="btn-secondary compact-file-btn">
                     <Plus className="w-4 h-4" />
                     <span>Add More Screenshots</span>
                     <input 
@@ -224,31 +247,35 @@ export default function InputSection({
                 </div>
 
                 {/* Uploaded Images Grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '14px' }}>
+                <div className="uploaded-images-grid">
                   {imageList.map((imgSrc, idx) => (
-                    <div key={idx} style={{ position: 'relative', backgroundColor: '#000', borderRadius: '12px', overflow: 'hidden', border: '1px solid #334155', height: '220px' }}>
-                      <span style={{ position: 'absolute', top: '8px', left: '8px', backgroundColor: 'rgba(0,0,0,0.75)', color: '#34d399', fontSize: '11px', fontWeight: '800', padding: '2px 8px', borderRadius: '10px' }}>
+                    <div key={idx} className="uploaded-image-card">
+                      <span className="uploaded-image-badge">
                         Page #{idx + 1}
                       </span>
                       
                       <button 
                         onClick={() => handleRemoveImage(idx)} 
                         title="Remove page"
-                        style={{ position: 'absolute', top: '8px', right: '8px', backgroundColor: '#f43f5e', color: '#fff', border: 'none', width: '26px', height: '26px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        className="uploaded-image-remove"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
 
-                      <img src={imgSrc} alt={`Editorial Page ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img src={imgSrc} alt={`Editorial Page ${idx + 1}`} />
                     </div>
                   ))}
                 </div>
               </div>
             ) : (
-              <div className="image-upload-dropzone">
+              <div
+                className="image-upload-dropzone"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={handleImageDrop}
+              >
                 <label className="upload-label">
                   <ImageIcon className="upload-icon" />
-                  <span style={{ fontSize: '16px', fontWeight: '700', color: '#f8fafc' }}>
+                  <span className="upload-title">
                     Click or drag multiple editorial page screenshots here
                   </span>
                   <span className="upload-sub">
@@ -304,13 +331,13 @@ export default function InputSection({
             )}
             <button 
               onClick={handleProcess} 
-              disabled={isLoading}
+              disabled={isBusy}
               className="btn-generate-main"
             >
-              {isLoading ? (
+              {isBusy ? (
                 <>
                   <div className="spinner" />
-                  <span>Analyzing {activeTab === 'image' ? `${imageList.length} Editorial Pages` : 'Editorial'} & Extracting Tricky Words...</span>
+                  <span>{isExtractingUrl ? 'Extracting article text from URL...' : `Analyzing ${activeTab === 'image' ? `${imageList.length} Editorial Pages` : 'Editorial'} & Extracting Tricky Words...`}</span>
                 </>
               ) : (
                 <>

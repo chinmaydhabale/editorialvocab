@@ -2,10 +2,38 @@
  * Compiles Editorial Vocabulary data into self-contained, Blogger-ready HTML code.
  * Clean, un-watermarked layout for Blogger publishing.
  */
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function escapeAttribute(value) {
+  return escapeHtml(value).replace(/`/g, '&#96;');
+}
+
+function safeUrl(value, fallback) {
+  const rawValue = String(value || '').trim();
+
+  if (!rawValue) return fallback;
+  if (/^(https?:|data:image\/)/i.test(rawValue)) return escapeAttribute(rawValue);
+
+  return fallback;
+}
+
 export function generateBloggerHtml(postData, theme = 'slate') {
   const { title, date, sourceName, bannerTopic, words = [], idiomsAndPhrases = [], mainImageUrl } = postData;
 
-  const heroImage = mainImageUrl || "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=1200&auto=format&fit=crop&q=80";
+  const fallbackHeroImage = "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=1200&auto=format&fit=crop&q=80";
+  const heroImage = safeUrl(mainImageUrl, fallbackHeroImage);
+  const safeTitle = escapeHtml(title || 'Daily Editorial Vocabulary');
+  const safeDate = escapeHtml(date || new Date().toISOString().split('T')[0]);
+  const safeSourceName = escapeHtml(sourceName || 'Editorial Vocabulary');
+  const safeBannerTopic = escapeHtml(bannerTopic || 'Daily Editorial Vocabulary & Idioms Analysis');
 
   const themeStyles = {
     slate: {
@@ -75,14 +103,21 @@ export function generateBloggerHtml(postData, theme = 'slate') {
   // Words Cards HTML
   const wordsHtml = words.map((w, index) => {
     const synonymsList = (w.synonyms || []).map(s => 
-      `<span style="display:inline-block; background-color:${st.synBg}; color:${st.synText}; font-size:13px; font-weight:600; padding:4px 10px; border-radius:12px; margin:2px 4px 2px 0;">✓ ${s}</span>`
+      `<span style="display:inline-block; background-color:${st.synBg}; color:${st.synText}; font-size:13px; font-weight:600; padding:4px 10px; border-radius:12px; margin:2px 4px 2px 0;">✓ ${escapeHtml(s)}</span>`
     ).join('');
 
     const antonymsList = (w.antonyms || []).map(a => 
-      `<span style="display:inline-block; background-color:${st.antBg}; color:${st.antText}; font-size:13px; font-weight:600; padding:4px 10px; border-radius:12px; margin:2px 4px 2px 0;">✗ ${a}</span>`
+      `<span style="display:inline-block; background-color:${st.antBg}; color:${st.antText}; font-size:13px; font-weight:600; padding:4px 10px; border-radius:12px; margin:2px 4px 2px 0;">✗ ${escapeHtml(a)}</span>`
     ).join('');
 
-    const cleanPronun = w.pronunciation ? w.pronunciation.replace(/^\/|\/$/g, '') : '';
+    const cleanPronun = w.pronunciation ? escapeHtml(w.pronunciation.replace(/^\/|\/$/g, '')) : '';
+    const safeWord = escapeHtml(w.word || 'Word');
+    const safePos = escapeHtml(w.pos || 'word');
+    const safeMeaningEn = escapeHtml(w.meaningEn || 'N/A');
+    const safeMeaningHi = escapeHtml(w.meaningHi || 'N/A');
+    const safeContext = escapeHtml(w.context || '');
+    const safeMemoryTrick = escapeHtml(w.memoryTrick || '');
+    const safeRootWord = escapeHtml(w.rootWord || '');
 
     return `
     <!-- VOCAB CARD ${index + 1} -->
@@ -91,28 +126,28 @@ export function generateBloggerHtml(postData, theme = 'slate') {
       <!-- Word Header -->
       <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1px solid ${st.border}; padding-bottom: 14px; margin-bottom: 16px;">
         <div>
-          <span style="font-size: 26px; font-weight: 800; color: ${st.textPrimary}; letter-spacing: -0.5px;">${index + 1}. ${w.word}</span>
+          <span style="font-size: 26px; font-weight: 800; color: ${st.textPrimary}; letter-spacing: 0;">${index + 1}. ${safeWord}</span>
           ${cleanPronun ? `<span style="font-size: 14px; color: ${st.textSecondary}; margin-left: 10px; font-weight: 600; background-color: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 6px;">🗣️ ${cleanPronun}</span>` : ''}
         </div>
         <span style="background-color: ${st.accent}; color: #ffffff; font-size: 12px; font-weight: 700; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.5px;">
-          ${w.pos || 'word'}
+          ${safePos}
         </span>
       </div>
 
       <!-- Meaning Section -->
       <div style="margin-bottom: 16px;">
         <div style="font-size: 15px; line-height: 1.6; color: ${st.textPrimary}; margin-bottom: 8px;">
-          <strong>English Meaning:</strong> ${w.meaningEn}
+          <strong>English Meaning:</strong> ${safeMeaningEn}
         </div>
         <div style="font-size: 16px; font-weight: 600; line-height: 1.6; color: ${st.accent}; background-color: rgba(99, 102, 241, 0.1); padding: 10px 14px; border-radius: 8px; border-left: 4px solid ${st.accent};">
-          🇮🇳 <strong>हिंदी अर्थ:</strong> ${w.meaningHi}
+          🇮🇳 <strong>हिंदी अर्थ:</strong> ${safeMeaningHi}
         </div>
       </div>
 
       <!-- Context Sentence -->
-      ${w.context ? `
+      ${safeContext ? `
       <div style="background-color: rgba(255,255,255,0.03); border-left: 3px solid ${st.textSecondary}; padding: 10px 14px; margin-bottom: 16px; border-radius: 0 8px 8px 0; font-style: italic; color: ${st.textSecondary}; font-size: 14px;">
-        "${w.context}"
+        "${safeContext}"
       </div>` : ''}
 
       <!-- Synonyms & Antonyms Grid -->
@@ -128,20 +163,20 @@ export function generateBloggerHtml(postData, theme = 'slate') {
       </div>
 
       <!-- Memory Trick (याद करने की Trick) -->
-      ${w.memoryTrick ? `
+      ${safeMemoryTrick ? `
       <div style="background-color: ${st.trickBg}; border: 1px dashed ${st.trickBorder}; padding: 14px 16px; border-radius: 12px; margin-bottom: 14px;">
         <div style="font-size: 14px; font-weight: 700; color: ${st.accent}; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
           💡 <span>याद करने की Trick (Mnemonic):</span>
         </div>
         <div style="font-size: 14.5px; color: ${st.trickText}; line-height: 1.5; font-weight: 500;">
-          ${w.memoryTrick}
+          ${safeMemoryTrick}
         </div>
       </div>` : ''}
 
       <!-- Root Word Breakdown -->
-      ${w.rootWord && w.rootWord !== 'N/A' ? `
+      ${safeRootWord && safeRootWord !== 'N/A' ? `
       <div style="background-color: ${st.rootBg}; border-left: 4px solid ${st.rootBorder}; padding: 10px 14px; border-radius: 6px; font-size: 13.5px; color: ${st.textPrimary};">
-        🌱 <strong>Root Word & Etymology:</strong> ${w.rootWord}
+        🌱 <strong>Root Word & Etymology:</strong> ${safeRootWord}
       </div>` : ''}
 
     </div>
@@ -167,25 +202,25 @@ export function generateBloggerHtml(postData, theme = 'slate') {
         <div style="background-color: ${st.cardBg}; border: 1px solid ${st.idiomBorder}; border-radius: 14px; padding: 20px; font-family: 'Hind', sans-serif; box-shadow: 0 8px 20px -5px rgba(16, 185, 129, 0.15);">
           
           <div style="font-size: 20px; font-weight: 800; color: ${st.idiomText}; margin-bottom: 8px;">
-            ${idx + 1}. "${item.phrase}"
+            ${idx + 1}. "${escapeHtml(item.phrase || 'Phrase')}"
           </div>
 
           <div style="font-size: 14.5px; color: ${st.textPrimary}; margin-bottom: 6px;">
-            <strong>English Meaning:</strong> ${item.meaningEn}
+            <strong>English Meaning:</strong> ${escapeHtml(item.meaningEn || 'N/A')}
           </div>
 
           <div style="font-size: 15.5px; font-weight: 600; color: ${st.idiomText}; background-color: ${st.idiomBg}; padding: 8px 12px; border-radius: 8px; margin-bottom: 10px;">
-            🇮🇳 <strong>हिंदी अर्थ:</strong> ${item.meaningHi}
+            🇮🇳 <strong>हिंदी अर्थ:</strong> ${escapeHtml(item.meaningHi || 'N/A')}
           </div>
 
           ${item.sentence ? `
           <div style="font-size: 13.5px; font-style: italic; color: ${st.textSecondary}; border-left: 3px solid ${st.idiomBorder}; padding-left: 10px; margin-bottom: 8px;">
-            "${item.sentence}"
+            "${escapeHtml(item.sentence)}"
           </div>` : ''}
 
           ${item.memoryTrick ? `
           <div style="font-size: 13px; color: #fcd34d; background: rgba(245, 158, 11, 0.12); padding: 6px 12px; border-radius: 6px; font-weight: 500;">
-            💡 <strong>Trick:</strong> ${item.memoryTrick}
+            💡 <strong>Trick:</strong> ${escapeHtml(item.memoryTrick)}
           </div>` : ''}
 
         </div>
@@ -201,19 +236,19 @@ export function generateBloggerHtml(postData, theme = 'slate') {
 
   <!-- SINGLE MAIN FEATURED THUMBNAIL IMAGE -->
   <div style="margin-bottom: 24px; text-align: center; border-radius: 20px; overflow: hidden; box-shadow: 0 15px 35px -5px rgba(0,0,0,0.4);">
-    <img src="${heroImage}" alt="${title} Main Featured Thumbnail" style="width: 100%; max-height: 400px; object-fit: cover; display: block;" />
+    <img src="${heroImage}" alt="${escapeAttribute(title || 'Editorial Vocabulary')} Main Featured Thumbnail" style="width: 100%; max-height: 400px; object-fit: cover; display: block;" />
   </div>
 
   <!-- TOP HERO TITLE BANNER -->
   <div style="background: linear-gradient(135deg, ${st.accent} 0%, #4f46e5 100%); color: #ffffff; padding: 28px 24px; border-radius: 20px; text-align: center; margin-bottom: 28px; box-shadow: 0 15px 30px -10px ${st.accent}80;">
     <span style="background-color: rgba(255,255,255,0.2); font-size: 12px; font-weight: 800; padding: 4px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-bottom: 12px;">
-      📰 ${sourceName || 'Editorial Vocabulary'} • ${date || new Date().toISOString().split('T')[0]}
+      📰 ${safeSourceName} • ${safeDate}
     </span>
-    <h1 style="font-size: 28px; font-weight: 800; margin: 0 0 10px 0; line-height: 1.3; letter-spacing: -0.5px;">
-      ${title}
+    <h1 style="font-size: 28px; font-weight: 800; margin: 0 0 10px 0; line-height: 1.3; letter-spacing: 0;">
+      ${safeTitle}
     </h1>
     <p style="font-size: 15px; margin: 0; opacity: 0.9; font-weight: 500;">
-      Topic: ${bannerTopic || 'Daily Editorial Vocabulary & Idioms Analysis'}
+      Topic: ${safeBannerTopic}
     </p>
   </div>
 

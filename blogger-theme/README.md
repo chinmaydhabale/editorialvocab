@@ -1,41 +1,69 @@
-# Custom Blogger Theme for Daily Editorial Vocabulary 🎨📚
+# Blogger Theme For Automated EditorialVocab Site
 
-This folder contains the custom **Blogger XML Theme** (`editorial-vocab-theme.xml`) and 5 pre-built **Static Legal & Information Pages** (`pages/`) designed specifically for your Daily Editorial Vocabulary blog!
+This folder contains the Blogger shell for an automation-first Daily Editorial Vocabulary website.
 
----
+## Files
 
-## 📁 Folder Contents
+- `editorial-vocab-2026-theme.xml`: Current Blogger XML theme.
+- `pages/about-us.html`: Static About page.
+- `pages/privacy-policy.html`: Static Privacy Policy page.
+- `pages/disclaimer.html`: Static Disclaimer page.
+- `pages/contact-us.html`: Static Contact page.
+- `pages/terms-and-conditions.html`: Static Terms page.
 
-- **`editorial-vocab-theme.xml`**: Premium Glassmorphic Dark Theme custom XML file for Blogger.com.
-- **`pages/about-us.html`**: Pre-written About Us page template.
-- **`pages/privacy-policy.html`**: Pre-written AdSense-compliant Privacy Policy page.
-- **`pages/disclaimer.html`**: Educational & Fair Use Disclaimer page.
-- **`pages/contact-us.html`**: Contact Us page with direct email & messaging form.
-- **`pages/terms-and-conditions.html`**: Terms & Conditions page.
+## Automation Contract
 
----
+The React bot publishes complete Blogger post bodies with:
 
-## 🚀 How to Install Theme on Blogger.com (Step-by-Step)
+- Featured thumbnail image.
+- SEO title banner.
+- Intro callout.
+- Vocabulary cards.
+- Optional idioms and phrases section.
+- Revision footer.
 
-### Step 1: Upload Theme XML
-1. Log in to **[Blogger.com](https://www.blogger.com)**.
-2. In the left navigation menu, click **Theme**.
-3. Click the small down arrow **v** next to `CUSTOMIZE` -> click **Restore**.
-4. Click **Upload** and select `editorial-vocab-theme.xml`.
-5. Your blog will instantly update to the new Slate Dark Editorial Vocab theme!
+Because each post body is self-contained, the Blogger theme intentionally stays minimal:
 
----
+- Header navigation.
+- Homepage hero.
+- Search and auto-label browse panel.
+- Latest lesson feed.
+- Legal/footer links.
 
-### Step 2: Create the 5 Static Pages (About Us, Privacy Policy, etc.)
-1. In Blogger Dashboard, click **Pages** in the left menu.
-2. Click **+ New Page** for each of the 5 pages:
-   - **Page 1 Title**: `About Us` -> Click `<>` (HTML View) -> Paste contents of `pages/about-us.html` -> Click **Publish**.
-   - **Page 2 Title**: `Privacy Policy` -> HTML View -> Paste `pages/privacy-policy.html` -> **Publish**.
-   - **Page 3 Title**: `Disclaimer` -> HTML View -> Paste `pages/disclaimer.html` -> **Publish**.
-   - **Page 4 Title**: `Contact Us` -> HTML View -> Paste `pages/contact-us.html` -> **Publish**.
-   - **Page 5 Title**: `Terms and Conditions` -> HTML View -> Paste `pages/terms-and-conditions.html` -> **Publish**.
+## Auto Labels
 
----
+The bot now publishes labels that this theme uses for navigation:
 
-### Step 3: Link Pages in Footer Navigation
-- The theme footer automatically links to `/p/about-us.html`, `/p/privacy-policy.html`, `/p/disclaimer.html`, `/p/contact-us.html`, `/p/terms-and-conditions.html`!
+- `Vocabulary`
+- `Idioms` when the post contains idioms.
+- Month label such as `January`, `February`, `July`.
+- Newspaper/source label such as `The Hindu`, `Indian Express`, `LiveMint`, `Business Standard`, or `Times of India`.
+
+Do not manually depend on old exam labels such as `UPSC`, `Banking`, `SSC`, or `CLAT` unless the bot is changed to publish them.
+
+## Install Theme
+
+1. Open Blogger.
+2. Go to `Theme`.
+3. Click the arrow next to `Customize`.
+4. Choose `Restore`.
+5. Upload `editorial-vocab-2026-theme.xml`.
+6. Open one homepage, one post page, and one static page to verify layout.
+
+## Create Static Pages
+
+In Blogger, open `Pages`, create each page below, switch to HTML view, paste the matching file contents, and publish.
+
+- `About Us`: `pages/about-us.html`
+- `Privacy Policy`: `pages/privacy-policy.html`
+- `Disclaimer`: `pages/disclaimer.html`
+- `Contact Us`: `pages/contact-us.html`
+- `Terms and Conditions`: `pages/terms-and-conditions.html`
+
+The theme links these pages from the footer:
+
+- `/p/about-us.html`
+- `/p/privacy-policy.html`
+- `/p/disclaimer.html`
+- `/p/contact-us.html`
+- `/p/terms-and-conditions.html`

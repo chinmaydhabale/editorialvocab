@@ -21,6 +21,27 @@ export async function getAvailableGeminiModels(apiKey) {
   return [];
 }
 
+function extractJsonPayload(rawText) {
+  const trimmed = String(rawText || '').trim();
+  const withoutFence = trimmed
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/```\s*$/i, '')
+    .trim();
+
+  if (withoutFence.startsWith('{') && withoutFence.endsWith('}')) {
+    return withoutFence;
+  }
+
+  const firstBrace = withoutFence.indexOf('{');
+  const lastBrace = withoutFence.lastIndexOf('}');
+
+  if (firstBrace !== -1 && lastBrace > firstBrace) {
+    return withoutFence.slice(firstBrace, lastBrace + 1);
+  }
+
+  return withoutFence;
+}
+
 /**
  * Analyzes an editorial passage or multiple image screenshots using Gemini API:
  * Exhaustive extraction mandate: Extracts ALL tricky words across all pages (15-30+ words),
@@ -108,26 +129,30 @@ SCHEMA:
     textOrImages.forEach(imgBase64 => {
       if (typeof imgBase64 === 'string' && imgBase64.startsWith('data:image/')) {
         const parts = imgBase64.split(',');
-        const mimeType = parts[0].match(/:(.*?);/)[1];
+        const mimeType = parts[0].match(/:(.*?);/)?.[1];
         const base64Data = parts[1];
-        contents.push({
-          inlineData: {
-            mimeType: mimeType,
-            data: base64Data
-          }
-        });
+        if (mimeType && base64Data) {
+          contents.push({
+            inlineData: {
+              mimeType: mimeType,
+              data: base64Data
+            }
+          });
+        }
       }
     });
   } else if (typeof textOrImages === 'string' && textOrImages.startsWith('data:image/')) {
     const parts = textOrImages.split(',');
-    const mimeType = parts[0].match(/:(.*?);/)[1];
+    const mimeType = parts[0].match(/:(.*?);/)?.[1];
     const base64Data = parts[1];
-    contents.push({
-      inlineData: {
-        mimeType: mimeType,
-        data: base64Data
-      }
-    });
+    if (mimeType && base64Data) {
+      contents.push({
+        inlineData: {
+          mimeType: mimeType,
+          data: base64Data
+        }
+      });
+    }
   } else {
     contents.push(`EDITORIAL TEXT:\n"""\n${textOrImages}\n"""`);
   }
@@ -139,15 +164,7 @@ SCHEMA:
       const model = genAI.getGenerativeModel({ model: modelName });
       const result = await model.generateContent(contents);
       const response = await result.response;
-      let rawText = response.text().trim();
-      
-      if (rawText.startsWith("```json")) {
-        rawText = rawText.replace(/^```json/, "").replace(/```$/, "").trim();
-      } else if (rawText.startsWith("```")) {
-        rawText = rawText.replace(/^```/, "").replace(/```$/, "").trim();
-      }
-
-      const parsedData = JSON.parse(rawText);
+      const parsedData = JSON.parse(extractJsonPayload(response.text()));
 
       return {
         articleTitle: parsedData.articleTitle || "Daily Editorial Vocabulary & Tricky Words",

@@ -2,10 +2,20 @@
  * Generates dynamic, high-quality SVG data-URL thumbnails for the blog post
  * based on editorial topic, source name, date, and title.
  */
+function escapeSvgText(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
 export function generateAiThumbnail({ title, sourceName, date, topic = "Daily Editorial Vocabulary" }) {
-  const cleanTitle = (title || "Daily Editorial Vocabulary").slice(0, 45);
-  const cleanSource = sourceName || "The Hindu & Indian Express";
-  const cleanDate = date || new Date().toISOString().split('T')[0];
+  const cleanTitle = escapeSvgText((title || "Daily Editorial Vocabulary").slice(0, 45));
+  const cleanSource = escapeSvgText((sourceName || "The Hindu & Indian Express").toUpperCase());
+  const cleanDate = escapeSvgText(date || new Date().toISOString().split('T')[0]);
+  const cleanTopic = escapeSvgText((topic || "Daily Editorial Vocabulary").slice(0, 64).toUpperCase());
 
   const svgString = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
@@ -65,7 +75,7 @@ export function generateAiThumbnail({ title, sourceName, date, topic = "Daily Ed
   <!-- Top Source Tag Badge -->
   <rect x="130" y="120" width="420" height="42" rx="21" fill="url(#badgeGrad)"/>
   <text x="150" y="147" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="16" font-weight="800" fill="#ffffff" letter-spacing="1.5">
-    📰 ${cleanSource.toUpperCase()}
+    📰 ${cleanSource}
   </text>
 
   <!-- Date Tag Right Aligned -->
@@ -101,7 +111,7 @@ export function generateAiThumbnail({ title, sourceName, date, topic = "Daily Ed
   <!-- Clean Footer Line (No bot branding) -->
   <line x1="130" y1="480" x2="1030" y2="480" stroke="#ffffff" stroke-opacity="0.1" stroke-width="1"/>
   <text x="130" y="515" font-family="'Plus Jakarta Sans', sans-serif" font-size="14" font-weight="700" fill="#818cf8">
-    DAILY EDITORIAL VOCABULARY &amp; IDIOMS • COMPETITIVE EXAM PREP
+    ${cleanTopic} • COMPETITIVE EXAM PREP
   </text>
 </svg>
   `.trim();
