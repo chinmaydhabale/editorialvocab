@@ -134,7 +134,7 @@
 
       <!-- Mobile Hamburger Menu Button -->
       <button class='mobile-menu-toggle' id='mobileMenuBtn' type='button'>
-        ☰
+        &#9776;
       </button>
     </div>
   </header>
@@ -283,31 +283,33 @@
       <a href='/p/terms-and-conditions.html'>Terms &amp; Conditions</a>
     </div>
     <p class='copyright-text'>
-      © <script>document.write(new Date().getFullYear())</script> Daily Editorial Vocabulary. All Rights Reserved.
+      © Daily Editorial Vocabulary. All Rights Reserved.
     </p>
   </footer>
 
-  <!-- Script for Mobile Hamburger Toggle -->
+  <!-- Clean Blogger XML Compliant Script for Mobile Hamburger Toggle -->
   <script type='text/javascript'>
     //<![CDATA[
-    document.addEventListener('DOMContentLoaded', function() {
-      var btn = document.getElementById('mobileMenuBtn');
-      var drawer = document.getElementById('mobileNavDrawer');
-      if (btn && drawer) {
-        btn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          drawer.classList.toggle('active');
-          btn.innerHTML = drawer.classList.contains('active') ? '✕' : '☰';
-        });
+    (function() {
+      document.addEventListener('DOMContentLoaded', function() {
+        var btn = document.getElementById('mobileMenuBtn');
+        var drawer = document.getElementById('mobileNavDrawer');
+        if (btn && drawer) {
+          btn.onclick = function(e) {
+            e.stopPropagation();
+            var isActive = drawer.classList.toggle('active');
+            btn.innerHTML = isActive ? '&#10005;' : '&#9776;';
+          };
 
-        document.addEventListener('click', function(e) {
-          if (!drawer.contains(e.target) && !btn.contains(e.target)) {
-            drawer.classList.remove('active');
-            btn.innerHTML = '☰';
-          }
-        });
-      }
-    });
+          document.onclick = function(e) {
+            if (!drawer.contains(e.target) && !btn.contains(e.target)) {
+              drawer.classList.remove('active');
+              btn.innerHTML = '&#9776;';
+            }
+          };
+        }
+      });
+    })();
     //]]>
   </script>
 
