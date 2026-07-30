@@ -13,7 +13,7 @@
 
   <b:skin><![CDATA[
     /* --------------------------------------------------------------------------
-     * EditorialVocab Premium Theme (100% Blogger XML Compliant & Pure CSS Nav)
+     * EditorialVocab Premium Theme (Blogger Auto-Pagination Fix)
      * -------------------------------------------------------------------------- */
     :root {
       --bg-main: #0b0f19;
@@ -168,7 +168,7 @@
           <b:widget-settings>
             <b:widget-setting name='showTitleDate'>true</b:widget-setting>
             <b:widget-setting name='showAuthor'>true</b:widget-setting>
-            <b:widget-setting name='postsPerPage'>10</b:widget-setting>
+            <b:widget-setting name='postsPerPage'>20</b:widget-setting>
           </b:widget-settings>
           <b:includable id='main' var='top'>
             
