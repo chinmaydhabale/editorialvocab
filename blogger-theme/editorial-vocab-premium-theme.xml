@@ -13,7 +13,7 @@
 
   <b:skin><![CDATA[
     /* --------------------------------------------------------------------------
-     * EditorialVocab Minimalist Premium Theme CSS (Short Card Form & Dual Tags)
+     * EditorialVocab Premium Theme (Dynamic Month Archive & Mobile Nav Drawer)
      * -------------------------------------------------------------------------- */
     :root {
       --bg-main: #0b0f19;
@@ -28,8 +28,8 @@
       --font-body: 'Plus Jakarta Sans', sans-serif;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background-color: var(--bg-main); color: var(--text-main); font-family: var(--font-body); line-height: 1.6; min-height: 100vh; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg-main); color: var(--text-main); font-family: var(--font-body); line-height: 1.6; min-height: 100vh; overflow-x: hidden; }
     a { color: var(--accent-indigo); text-decoration: none; transition: color 0.2s ease; }
     a:hover { color: #a5f3fc; }
 
@@ -42,6 +42,15 @@
     .nav-links { display: flex; gap: 24px; list-style: none; margin: 0; padding: 0; }
     .nav-links a { color: var(--text-muted); font-size: 14px; font-weight: 700; }
     .nav-links a:hover { color: #fff; }
+
+    /* Mobile Hamburger Toggle Button */
+    .mobile-menu-toggle { display: none; background: #1e293b; border: 1px solid var(--border-color); color: #fff; width: 40px; height: 40px; border-radius: 10px; font-size: 20px; cursor: pointer; align-items: center; justify-content: center; }
+
+    /* Mobile Slide-Out Navigation Drawer */
+    .mobile-nav-drawer { display: none; position: fixed; top: 69px; left: 0; right: 0; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-color); padding: 20px; z-index: 99; flex-direction: column; gap: 14px; transform: translateY(-100%); opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; }
+    .mobile-nav-drawer.active { transform: translateY(0); opacity: 1; pointer-events: auto; }
+    .mobile-nav-drawer a { color: var(--text-main); font-size: 16px; font-weight: 700; padding: 10px 14px; border-radius: 8px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+    .mobile-nav-drawer a:hover { background: rgba(99, 102, 241, 0.15); border-color: var(--accent-indigo); color: #a5f3fc; }
 
     /* Header Title Area */
     .site-hero { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border-bottom: 1px solid var(--border-color); padding: 36px 20px; text-align: center; }
@@ -81,10 +90,11 @@
     .widget-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
     .widget-title { font-size: 15px; font-weight: 800; border-bottom: 2px solid var(--accent-indigo); padding-bottom: 6px; margin-bottom: 14px; color: #fff; text-transform: uppercase; }
 
-    /* Monthly Filter Grid List */
-    .months-filter-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; list-style: none; }
-    .month-filter-link { background: #0f172a; border: 1px solid var(--border-color); color: var(--text-main); padding: 8px; border-radius: 8px; font-size: 13px; font-weight: 700; text-align: center; display: block; transition: all 0.2s ease; }
+    /* Dynamic Monthly Filter Grid List */
+    .months-filter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; list-style: none; margin: 0; padding: 0; }
+    .month-filter-link { background: #0f172a; border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 10px; border-radius: 8px; font-size: 12.5px; font-weight: 700; text-align: center; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s ease; }
     .month-filter-link:hover { border-color: var(--accent-indigo); background: rgba(99, 102, 241, 0.15); color: #a5f3fc; }
+    .month-count-badge { background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 10px; padding: 1px 6px; border-radius: 8px; }
 
     /* Footer Pages Navigation */
     .site-footer { background: #090d16; border-top: 1px solid var(--border-color); padding: 36px 20px; margin-top: 50px; text-align: center; }
@@ -95,22 +105,25 @@
 
     /* Mobile Responsive Rules */
     @media (max-width: 800px) {
-      .main-layout { grid-template-columns: 1fr; }
+      .main-layout { grid-template-columns: 1fr; padding: 0 12px; }
       .blog-posts-grid-container { grid-template-columns: 1fr; }
       .hero-title { font-size: 22px; }
-      .nav-links { gap: 14px; flex-wrap: wrap; }
-      .nav-links a { font-size: 13px; }
+      .nav-links { display: none; }
+      .mobile-menu-toggle { display: flex; }
+      .mobile-nav-drawer { display: flex; }
     }
   ]]></b:skin>
 </head>
 <body>
 
-  <!-- Minimalist Navigation Bar -->
+  <!-- Minimalist Navigation Bar with Mobile Drawer Toggle -->
   <header class='site-navbar'>
     <div class='nav-container'>
       <a class='brand-logo' href='/'>
         <span>VOCAB</span> Daily Editorial
       </a>
+
+      <!-- Desktop Links -->
       <ul class='nav-links'>
         <li><a href='/'>Home</a></li>
         <li><a href='/search/label/The%20Hindu'>The Hindu</a></li>
@@ -118,8 +131,22 @@
         <li><a href='/p/about-us.html'>About Us</a></li>
         <li><a href='/p/contact-us.html'>Contact Us</a></li>
       </ul>
+
+      <!-- Mobile Hamburger Menu Button -->
+      <button class='mobile-menu-toggle' id='mobileMenuBtn' type='button'>
+        ☰
+      </button>
     </div>
   </header>
+
+  <!-- Mobile Slide-Out Menu Drawer -->
+  <div class='mobile-nav-drawer' id='mobileNavDrawer'>
+    <a href='/'><span>🏠 Home</span> <span>&rarr;</span></a>
+    <a href='/search/label/The%20Hindu'><span>📰 The Hindu</span> <span>&rarr;</span></a>
+    <a href='/search/label/Indian%20Express'><span>📰 Indian Express</span> <span>&rarr;</span></a>
+    <a href='/p/about-us.html'><span>ℹ️ About Us</span> <span>&rarr;</span></a>
+    <a href='/p/contact-us.html'><span>📧 Contact Us</span> <span>&rarr;</span></a>
+  </div>
 
   <!-- Simple Header Banner -->
   <div class='site-hero'>
@@ -201,24 +228,29 @@
     <!-- Simple Sidebar Area -->
     <aside class='sidebar-area'>
       
-      <!-- Widget 1: MONTHLY ARCHIVES FILTER -->
-      <div class='widget-box'>
-        <h3 class='widget-title'>📅 Monthly Archives</h3>
-        <ul class='months-filter-grid'>
-          <li><a class='month-filter-link' href='/search/label/January'>Jan</a></li>
-          <li><a class='month-filter-link' href='/search/label/February'>Feb</a></li>
-          <li><a class='month-filter-link' href='/search/label/March'>Mar</a></li>
-          <li><a class='month-filter-link' href='/search/label/April'>Apr</a></li>
-          <li><a class='month-filter-link' href='/search/label/May'>May</a></li>
-          <li><a class='month-filter-link' href='/search/label/June'>Jun</a></li>
-          <li><a class='month-filter-link' href='/search/label/July'>Jul</a></li>
-          <li><a class='month-filter-link' href='/search/label/August'>Aug</a></li>
-          <li><a class='month-filter-link' href='/search/label/September'>Sep</a></li>
-          <li><a class='month-filter-link' href='/search/label/October'>Oct</a></li>
-          <li><a class='month-filter-link' href='/search/label/November'>Nov</a></li>
-          <li><a class='month-filter-link' href='/search/label/December'>Dec</a></li>
-        </ul>
-      </div>
+      <!-- Widget 1: DYNAMIC AUTOMATIC MONTHLY ARCHIVES (Filters ONLY Published Month Labels!) -->
+      <b:section id='monthly-archive-section' showaddelement='yes'>
+        <b:widget id='Label1' locked='false' title='📅 Monthly Archives' type='Label'>
+          <b:includable id='main'>
+            <div class='widget-box'>
+              <h3 class='widget-title'><data:title/></h3>
+              <ul class='months-filter-grid'>
+                <b:loop values='data:labels' var='label'>
+                  <!-- Dynamically filter ONLY Month Labels present in published posts -->
+                  <b:if cond='data:label.name == "January" or data:label.name == "February" or data:label.name == "March" or data:label.name == "April" or data:label.name == "May" or data:label.name == "June" or data:label.name == "July" or data:label.name == "August" or data:label.name == "September" or data:label.name == "October" or data:label.name == "November" or data:label.name == "December"'>
+                    <li>
+                      <a class='month-filter-link' expr:href='data:label.url'>
+                        <span><data:label.name/></span>
+                        <span class='month-count-badge'><data:label.count/></span>
+                      </a>
+                    </li>
+                  </b:if>
+                </b:loop>
+              </ul>
+            </div>
+          </b:includable>
+        </b:widget>
+      </b:section>
 
       <!-- Widget 2: Search Box -->
       <div class='widget-box'>
@@ -254,6 +286,30 @@
       © <script>document.write(new Date().getFullYear())</script> Daily Editorial Vocabulary. All Rights Reserved.
     </p>
   </footer>
+
+  <!-- Script for Mobile Hamburger Toggle -->
+  <script type='text/javascript'>
+    //<![CDATA[
+    document.addEventListener('DOMContentLoaded', function() {
+      var btn = document.getElementById('mobileMenuBtn');
+      var drawer = document.getElementById('mobileNavDrawer');
+      if (btn && drawer) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          drawer.classList.toggle('active');
+          btn.innerHTML = drawer.classList.contains('active') ? '✕' : '☰';
+        });
+
+        document.addEventListener('click', function(e) {
+          if (!drawer.contains(e.target) && !btn.contains(e.target)) {
+            drawer.classList.remove('active');
+            btn.innerHTML = '☰';
+          }
+        });
+      }
+    });
+    //]]>
+  </script>
 
 </body>
 </html>
