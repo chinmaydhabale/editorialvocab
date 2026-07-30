@@ -13,7 +13,7 @@
 
   <b:skin><![CDATA[
     /* --------------------------------------------------------------------------
-     * EditorialVocab Premium Theme (Dynamic Month Archive & Mobile Nav Drawer)
+     * EditorialVocab Premium Theme (100% Blogger XML Compliant & Pure CSS Nav)
      * -------------------------------------------------------------------------- */
     :root {
       --bg-main: #0b0f19;
@@ -43,12 +43,13 @@
     .nav-links a { color: var(--text-muted); font-size: 14px; font-weight: 700; }
     .nav-links a:hover { color: #fff; }
 
-    /* Mobile Hamburger Toggle Button */
-    .mobile-menu-toggle { display: none; background: #1e293b; border: 1px solid var(--border-color); color: #fff; width: 40px; height: 40px; border-radius: 10px; font-size: 20px; cursor: pointer; align-items: center; justify-content: center; }
+    /* Pure CSS Hamburger Menu Toggle */
+    .nav-toggle-checkbox { display: none; }
+    .mobile-menu-label { display: none; background: #1e293b; border: 1px solid var(--border-color); color: #fff; width: 40px; height: 40px; border-radius: 10px; font-size: 20px; cursor: pointer; align-items: center; justify-content: center; user-select: none; }
 
-    /* Mobile Slide-Out Navigation Drawer */
-    .mobile-nav-drawer { display: none; position: fixed; top: 69px; left: 0; right: 0; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-color); padding: 20px; z-index: 99; flex-direction: column; gap: 14px; transform: translateY(-100%); opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; }
-    .mobile-nav-drawer.active { transform: translateY(0); opacity: 1; pointer-events: auto; }
+    /* Pure CSS Mobile Navigation Drawer */
+    .mobile-nav-drawer { display: none; position: fixed; top: 69px; left: 0; right: 0; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-color); padding: 20px; z-index: 99; flex-direction: column; gap: 14px; transform: translateY(-100%); opacity: 0; transition: all 0.3s ease; pointer-events: none; }
+    .nav-toggle-checkbox:checked ~ .mobile-nav-drawer { transform: translateY(0); opacity: 1; pointer-events: auto; }
     .mobile-nav-drawer a { color: var(--text-main); font-size: 16px; font-weight: 700; padding: 10px 14px; border-radius: 8px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
     .mobile-nav-drawer a:hover { background: rgba(99, 102, 241, 0.15); border-color: var(--accent-indigo); color: #a5f3fc; }
 
@@ -109,14 +110,17 @@
       .blog-posts-grid-container { grid-template-columns: 1fr; }
       .hero-title { font-size: 22px; }
       .nav-links { display: none; }
-      .mobile-menu-toggle { display: flex; }
+      .mobile-menu-label { display: flex; }
       .mobile-nav-drawer { display: flex; }
     }
   ]]></b:skin>
 </head>
 <body>
 
-  <!-- Minimalist Navigation Bar with Mobile Drawer Toggle -->
+  <!-- Pure CSS Checkbox for Mobile Navigation -->
+  <input class='nav-toggle-checkbox' id='navToggle' type='checkbox'/>
+
+  <!-- Minimalist Navigation Bar -->
   <header class='site-navbar'>
     <div class='nav-container'>
       <a class='brand-logo' href='/'>
@@ -132,15 +136,15 @@
         <li><a href='/p/contact-us.html'>Contact Us</a></li>
       </ul>
 
-      <!-- Mobile Hamburger Menu Button -->
-      <button class='mobile-menu-toggle' id='mobileMenuBtn' type='button'>
+      <!-- Pure CSS Mobile Menu Label Button -->
+      <label class='mobile-menu-label' for='navToggle'>
         &#9776;
-      </button>
+      </label>
     </div>
   </header>
 
-  <!-- Mobile Slide-Out Menu Drawer -->
-  <div class='mobile-nav-drawer' id='mobileNavDrawer'>
+  <!-- Pure CSS Mobile Slide-Out Drawer -->
+  <div class='mobile-nav-drawer'>
     <a href='/'><span>🏠 Home</span> <span>&#8594;</span></a>
     <a href='/search/label/The%20Hindu'><span>📰 The Hindu</span> <span>&#8594;</span></a>
     <a href='/search/label/Indian%20Express'><span>📰 Indian Express</span> <span>&#8594;</span></a>
@@ -286,32 +290,6 @@
       © Daily Editorial Vocabulary. All Rights Reserved.
     </p>
   </footer>
-
-  <!-- Clean Blogger XML Compliant Script for Mobile Hamburger Toggle -->
-  <script type='text/javascript'>
-    //<![CDATA[
-    (function() {
-      document.addEventListener('DOMContentLoaded', function() {
-        var btn = document.getElementById('mobileMenuBtn');
-        var drawer = document.getElementById('mobileNavDrawer');
-        if (btn && drawer) {
-          btn.onclick = function(e) {
-            e.stopPropagation();
-            var isActive = drawer.classList.toggle('active');
-            btn.innerHTML = isActive ? '&#10005;' : '&#9776;';
-          };
-
-          document.onclick = function(e) {
-            if (!drawer.contains(e.target) && !btn.contains(e.target)) {
-              drawer.classList.remove('active');
-              btn.innerHTML = '&#9776;';
-            }
-          };
-        }
-      });
-    })();
-    //]]>
-  </script>
 
 </body>
 </html>
