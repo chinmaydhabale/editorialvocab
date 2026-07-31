@@ -239,3 +239,5 @@ export default function App() {
     </div>
   );
 }
+
+// Trigger Vercel rebuild for stable quiz release
