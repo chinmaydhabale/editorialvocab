@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Eye, Code, Copy, Check, Download } from 'lucide-react';
 import { generateBloggerHtml } from '../services/bloggerTemplateService';
 import { copyTextToClipboard } from '../services/clipboardService';
@@ -9,6 +9,19 @@ export default function BloggerPreview({ postData, currentTheme }) {
   const [copiedTitle, setCopiedTitle] = useState(false);
 
   const fullHtml = generateBloggerHtml(postData, currentTheme);
+  const previewRef = useRef(null);
+
+  useEffect(() => {
+    if (viewMode === 'preview' && previewRef.current) {
+      const scripts = previewRef.current.querySelectorAll('script');
+      scripts.forEach(oldScript => {
+        const newScript = document.createElement('script');
+        newScript.text = oldScript.text;
+        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+        oldScript.parentNode.replaceChild(newScript, oldScript);
+      });
+    }
+  }, [fullHtml, viewMode]);
 
   const handleCopyCode = async () => {
     try {
@@ -110,6 +123,7 @@ export default function BloggerPreview({ postData, currentTheme }) {
         <div className="flex-1 overflow-y-auto bg-slate-950 p-6 sm:p-10 shadow-inner custom-scrollbar relative">
           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none" />
           <div 
+            ref={previewRef}
             className="w-full max-w-4xl mx-auto bg-white rounded-lg overflow-hidden shadow-2xl min-h-[60vh] relative z-10 p-6"
             dangerouslySetInnerHTML={{ __html: fullHtml }}
           />
