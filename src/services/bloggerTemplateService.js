@@ -194,190 +194,240 @@ export function generateBloggerHtml(postData, theme = 'slate') {
   </div>
   ` : ''}
 
-  <!-- Interactive Practice Quiz Section -->
+  <!-- Interactive Swipe Card Quiz -->
   ${quizQuestions.length > 0 ? `
-  <div id="evQuizContainer" style="background-color: ${t.cardBg}; border: 2px solid ${t.accentIndigo}; border-radius: 16px; padding: 24px; margin-bottom: 24px; position: relative; overflow: hidden;">
+  <div id="evQBox" style="background-color: ${t.cardBg}; border: 2px solid ${t.accentIndigo}; border-radius: 20px; padding: 0; margin-bottom: 24px; overflow: hidden;">
+    
     <!-- Quiz Header -->
-    <div style="display: flex; align-items: center; gap: 10px; border-bottom: 2px solid ${t.accentIndigo}; padding-bottom: 14px; margin-bottom: 20px;">
-      <span style="font-size: 28px;">🧠</span>
-      <div>
-        <h2 style="font-size: 22px; font-weight: 800; color: ${t.textMain}; margin: 0; text-transform: uppercase;">
-          Vocabulary &amp; Idioms Practice Quiz Test
-        </h2>
-        <span style="font-size: 13px; color: ${t.textMuted}; font-family: 'Hind', sans-serif;">
-          आज के एडिटोरियल से खुद को टेस्ट करें! नीचे हर सवाल का जवाब चुनें और Submit करें।
-        </span>
+    <div style="padding: 20px 24px; background: linear-gradient(135deg, ${t.accentIndigo}22, ${t.accentIndigo}08); border-bottom: 1px solid ${t.border};">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+        <span style="font-size: 26px;">🧠</span>
+        <div>
+          <h2 style="font-size: 20px; font-weight: 800; color: ${t.textMain}; margin: 0;">Vocabulary Practice Quiz</h2>
+          <span style="font-size: 12px; color: ${t.textMuted}; font-family: 'Hind', sans-serif;">आज के एडिटोरियल से खुद को टेस्ट करें!</span>
+        </div>
+      </div>
+      <!-- Progress -->
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="flex: 1; background: ${t.border}; border-radius: 10px; height: 6px; overflow: hidden;">
+          <div id="evBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, ${t.accentIndigo}, ${t.accentEmerald}); border-radius: 10px; transition: width 0.5s cubic-bezier(.4,0,.2,1);"></div>
+        </div>
+        <span id="evCount" style="font-size: 12px; font-weight: 800; color: ${t.textMuted}; white-space: nowrap;">0 / ${quizQuestions.length}</span>
       </div>
     </div>
 
-    <!-- Progress Bar -->
-    <div id="evQuizProgress" style="background: rgba(0,0,0,0.3); border-radius: 10px; height: 8px; margin-bottom: 22px; overflow: hidden;">
-      <div id="evQuizProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, ${t.accentIndigo}, ${t.accentEmerald}); border-radius: 10px; transition: width 0.4s ease;"></div>
-    </div>
-
-    <!-- Questions Container -->
-    <div id="evQuizQuestions" style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Card Viewport -->
+    <div style="position: relative; overflow: hidden; min-height: 320px;" id="evViewport">
       ${quizQuestions.map((q, idx) => `
-      <div class="evQuizQ" id="evQ${idx}" style="background: rgba(0,0,0,0.2); border: 1px solid ${t.border}; padding: 20px; border-radius: 14px; transition: all 0.3s ease;">
-        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px;">
-          <span style="background: ${t.accentIndigo}; color: #fff; font-size: 13px; font-weight: 900; min-width: 32px; height: 32px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">Q${idx + 1}</span>
-          <div style="font-size: 16px; font-weight: 700; color: ${t.textMain}; line-height: 1.5;">${q.question}</div>
+      <div id="evC${idx}" class="evCard" style="position: absolute; top: 0; left: 0; width: 100%; padding: 24px; box-sizing: border-box; transition: transform 0.45s cubic-bezier(.4,0,.2,1), opacity 0.45s ease; ${idx === 0 ? 'transform: translateX(0); opacity: 1;' : 'transform: translateX(105%); opacity: 0;'}">
+        
+        <!-- Question Number Pill -->
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+          <span style="background: ${t.accentIndigo}; color: #fff; font-size: 12px; font-weight: 900; padding: 5px 14px; border-radius: 20px; letter-spacing: 1px;">QUESTION ${idx + 1} OF ${quizQuestions.length}</span>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 8px;" id="evOpts${idx}">
+        <!-- Question Text -->
+        <div style="font-size: 18px; font-weight: 700; color: ${t.textMain}; line-height: 1.6; margin-bottom: 20px; font-family: 'Plus Jakarta Sans', sans-serif;">${q.question}</div>
+
+        <!-- Options -->
+        <div style="display: flex; flex-direction: column; gap: 10px;">
           ${(q.options || []).map((opt, oi) => {
             const letter = ['A','B','C','D'][oi];
             return `
-          <label id="evOpt${idx}_${letter}" onclick="evSelectOpt(${idx},'${letter}')" style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.03); border: 2px solid ${t.border}; padding: 12px 16px; border-radius: 10px; font-size: 14px; color: ${t.textMain}; font-weight: 600; cursor: pointer; transition: all 0.25s ease; user-select: none;">
-            <span id="evRadio${idx}_${letter}" style="min-width: 24px; height: 24px; border-radius: 50%; border: 2px solid ${t.border}; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; transition: all 0.25s ease; flex-shrink: 0;"></span>
-            <span>${opt}</span>
-          </label>`;
+          <div id="evO${idx}_${letter}" onclick="evPick(${idx},'${letter}')" style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; border: 2px solid ${t.border}; border-radius: 12px; cursor: pointer; transition: all 0.3s cubic-bezier(.4,0,.2,1); user-select: none; background: transparent;">
+            <span id="evD${idx}_${letter}" style="min-width: 36px; height: 36px; border-radius: 50%; border: 2px solid ${t.border}; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: ${t.textMuted}; transition: all 0.3s ease; flex-shrink: 0;">${letter}</span>
+            <span style="font-size: 15px; font-weight: 600; color: ${t.textMain}; line-height: 1.4;">${opt.replace(/^[A-D]\)\s*/, '')}</span>
+          </div>`;
           }).join('')}
         </div>
 
-        <!-- Per-question result (hidden initially) -->
-        <div id="evResult${idx}" style="display: none; margin-top: 14px; padding: 14px; border-radius: 10px; font-family: 'Hind', sans-serif;"></div>
+        <!-- Per-card result -->
+        <div id="evR${idx}" style="display: none; margin-top: 16px; padding: 14px 18px; border-radius: 12px; font-family: 'Hind', sans-serif;"></div>
       </div>
       `).join('')}
-    </div>
 
-    <!-- Submit Button -->
-    <div id="evSubmitArea" style="text-align: center; margin-top: 28px;">
-      <div id="evAnsweredCount" style="font-size: 13px; color: ${t.textMuted}; margin-bottom: 10px; font-weight: 600;">Answered: 0 / ${quizQuestions.length}</div>
-      <button id="evSubmitBtn" onclick="evSubmitQuiz()" style="background: linear-gradient(135deg, ${t.accentIndigo}, #8b5cf6); color: #fff; border: none; padding: 14px 48px; font-size: 17px; font-weight: 800; border-radius: 12px; cursor: pointer; box-shadow: 0 8px 25px rgba(99,102,241,0.4); transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;">
-        ✅ Submit Test
-      </button>
-    </div>
+      <!-- Scorecard Card -->
+      <div id="evScore" class="evCard" style="position: absolute; top: 0; left: 0; width: 100%; padding: 24px; box-sizing: border-box; transform: translateX(105%); opacity: 0; transition: transform 0.45s cubic-bezier(.4,0,.2,1), opacity 0.45s ease;">
+        <div style="text-align: center; padding: 20px 0;">
+          <div id="evEmoji" style="font-size: 56px; margin-bottom: 8px;">🏆</div>
+          <div style="font-size: 12px; font-weight: 800; color: ${t.textMuted}; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 4px;">YOUR SCORE</div>
+          <div id="evSV" style="font-size: 48px; font-weight: 900; color: ${t.accentEmerald}; line-height: 1.1;"></div>
+          <div id="evSP" style="font-size: 16px; font-weight: 700; color: ${t.textMuted}; margin: 4px 0 8px;"></div>
+          <div id="evSM" style="font-size: 15px; font-weight: 700; font-family: 'Hind', sans-serif; margin-bottom: 16px;"></div>
+          
+          <!-- Review all answers -->
+          <div id="evReview" style="text-align: left; margin-top: 16px; border-top: 1px solid ${t.border}; padding-top: 16px;"></div>
 
-    <!-- Scorecard (hidden initially) -->
-    <div id="evScorecard" style="display: none; margin-top: 28px; text-align: center;">
-      <div style="background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.15)); border: 2px solid ${t.accentIndigo}; border-radius: 16px; padding: 28px; margin-bottom: 20px;">
-        <div style="font-size: 14px; font-weight: 700; color: ${t.textMuted}; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px;">YOUR SCORE</div>
-        <div id="evScoreValue" style="font-size: 52px; font-weight: 900; color: ${t.accentEmerald}; line-height: 1.1;"></div>
-        <div id="evScorePercent" style="font-size: 18px; font-weight: 700; color: ${t.textMuted}; margin-top: 4px;"></div>
-        <div id="evScoreMsg" style="font-size: 16px; margin-top: 12px; font-family: 'Hind', sans-serif; font-weight: 700;"></div>
+          <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap;">
+            <button onclick="evRetry()" style="background: ${t.accentIndigo}; color: #fff; border: none; padding: 12px 30px; font-size: 14px; font-weight: 800; border-radius: 10px; cursor: pointer;">🔄 Retry Quiz</button>
+          </div>
+        </div>
       </div>
-      <button onclick="evRetryQuiz()" style="background: ${t.cardBg}; color: ${t.textMain}; border: 2px solid ${t.border}; padding: 12px 36px; font-size: 15px; font-weight: 700; border-radius: 12px; cursor: pointer; transition: all 0.3s ease;">
-        🔄 Retry Quiz
-      </button>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div id="evNav" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-top: 1px solid ${t.border}; background: ${t.cardBg};">
+      <button id="evPrev" onclick="evGo(-1)" style="background: transparent; border: 2px solid ${t.border}; color: ${t.textMuted}; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; opacity: 0.4; pointer-events: none;">← Back</button>
+      
+      <!-- Dot Indicators -->
+      <div id="evDots" style="display: flex; gap: 6px; align-items: center;">
+        ${quizQuestions.map((_, idx) => `<span id="evDot${idx}" style="width: ${idx === 0 ? '24px' : '8px'}; height: 8px; border-radius: 4px; background: ${idx === 0 ? t.accentIndigo : t.border}; transition: all 0.4s ease; cursor: pointer;" onclick="evGoTo(${idx})"></span>`).join('')}
+      </div>
+
+      <button id="evNext" onclick="evGo(1)" style="background: ${t.accentIndigo}; border: none; color: #fff; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s;">Next →</button>
     </div>
   </div>
 
   <script>
   (function(){
-    var evAnswers = {};
-    var evCorrect = {${quizQuestions.map((q, idx) => `${idx}:"${q.correctOption}"`).join(',')}};
-    var evExplanations = {${quizQuestions.map((q, idx) => `${idx}:${JSON.stringify(q.explanation || '')}`).join(',')}};
-    var evTotal = ${quizQuestions.length};
-    var evSubmitted = false;
-    var evColors = {accent:'${t.accentIndigo}',emerald:'${t.accentEmerald}',rose:'${t.accentRose}',border:'${t.border}',cardBg:'${t.cardBg}',textMain:'${t.textMain}',textMuted:'${t.textMuted}'};
+    var cur=0, total=${quizQuestions.length}, ans={}, done=false;
+    var correct={${quizQuestions.map((q,i)=>`${i}:"${q.correctOption}"`).join(',')}};
+    var expl={${quizQuestions.map((q,i)=>`${i}:${JSON.stringify(q.explanation||'')}`).join(',')}};
+    var qTexts={${quizQuestions.map((q,i)=>`${i}:${JSON.stringify(q.question)}`).join(',')}};
+    var C={a:'${t.accentIndigo}',e:'${t.accentEmerald}',r:'${t.accentRose}',am:'${t.accentAmber}',b:'${t.border}',bg:'${t.cardBg}',t:'${t.textMain}',m:'${t.textMuted}'};
 
-    window.evSelectOpt = function(qIdx, letter) {
-      if (evSubmitted) return;
-      evAnswers[qIdx] = letter;
-      // Reset all options for this question
+    function show(idx, dir){
+      // Hide current card
+      var old=document.getElementById(cur<total?'evC'+cur:'evScore');
+      if(old){old.style.transform='translateX('+(dir>0?'-105%':'105%')+')';old.style.opacity='0';}
+      cur=idx;
+      // Show new card
+      setTimeout(function(){
+        var nw=document.getElementById(cur<total?'evC'+cur:'evScore');
+        if(nw){nw.style.transform='translateX(0)';nw.style.opacity='1';}
+      },50);
+      // Update dots
+      for(var i=0;i<total;i++){
+        var d=document.getElementById('evDot'+i);
+        if(d){d.style.width=i===cur?'24px':'8px';d.style.background=ans[i]!==undefined?(i===cur?C.a:C.e):(i===cur?C.a:C.b);}
+      }
+      // Update buttons
+      var pb=document.getElementById('evPrev'), nb=document.getElementById('evNext');
+      if(cur===0){pb.style.opacity='0.4';pb.style.pointerEvents='none';}else{pb.style.opacity='1';pb.style.pointerEvents='auto';}
+      if(cur>=total){
+        document.getElementById('evNav').style.display='none';
+      } else if(cur===total-1 && ans[cur]!==undefined){
+        nb.textContent='Submit ✅';nb.style.background='linear-gradient(135deg,'+C.a+',#8b5cf6)';
+      } else {
+        nb.textContent='Next →';nb.style.background=C.a;
+      }
+      // Resize viewport
+      setTimeout(function(){
+        var card=document.getElementById(cur<total?'evC'+cur:'evScore');
+        if(card){document.getElementById('evViewport').style.minHeight=card.scrollHeight+'px';}
+      },100);
+    }
+
+    window.evGoTo=function(i){if(!done&&i<total)show(i,i>cur?1:-1);};
+    window.evGo=function(dir){
+      var next=cur+dir;
+      if(next<0)return;
+      if(cur===total-1 && dir===1 && ans[cur]!==undefined && !done){evSubmit();return;}
+      if(next>=total)return;
+      show(next,dir);
+    };
+
+    window.evPick=function(qi,letter){
+      if(done)return;
+      ans[qi]=letter;
       ['A','B','C','D'].forEach(function(l){
-        var lbl = document.getElementById('evOpt'+qIdx+'_'+l);
-        var rad = document.getElementById('evRadio'+qIdx+'_'+l);
-        if(lbl){lbl.style.borderColor=evColors.border;lbl.style.background='rgba(255,255,255,0.03)';}
-        if(rad){rad.style.borderColor=evColors.border;rad.style.background='transparent';rad.innerHTML='';}
+        var o=document.getElementById('evO'+qi+'_'+l),d=document.getElementById('evD'+qi+'_'+l);
+        if(o){o.style.borderColor=C.b;o.style.background='transparent';}
+        if(d){d.style.borderColor=C.b;d.style.background='transparent';d.style.color=C.m;d.textContent=l;}
       });
-      // Highlight selected
-      var selLbl = document.getElementById('evOpt'+qIdx+'_'+letter);
-      var selRad = document.getElementById('evRadio'+qIdx+'_'+letter);
-      if(selLbl){selLbl.style.borderColor=evColors.accent;selLbl.style.background='rgba(99,102,241,0.1)';}
-      if(selRad){selRad.style.borderColor=evColors.accent;selRad.style.background=evColors.accent;selRad.innerHTML='✓';selRad.style.color='#fff';}
-      // Update progress
-      var answered = Object.keys(evAnswers).length;
-      document.getElementById('evAnsweredCount').textContent = 'Answered: '+answered+' / '+evTotal;
-      var pct = Math.round((answered/evTotal)*100);
-      document.getElementById('evQuizProgressBar').style.width = pct+'%';
+      var so=document.getElementById('evO'+qi+'_'+letter),sd=document.getElementById('evD'+qi+'_'+letter);
+      if(so){so.style.borderColor=C.a;so.style.background=C.a+'18';}
+      if(sd){sd.style.borderColor=C.a;sd.style.background=C.a;sd.style.color='#fff';sd.textContent='✓';}
+      // Update count + bar
+      var cnt=Object.keys(ans).length;
+      document.getElementById('evCount').textContent=cnt+' / '+total;
+      document.getElementById('evBar').style.width=Math.round(cnt/total*100)+'%';
+      // Update dots
+      var dot=document.getElementById('evDot'+qi);
+      if(dot&&qi!==cur)dot.style.background=C.e;
+      // Update next btn text if last Q
+      if(qi===total-1){var nb=document.getElementById('evNext');nb.textContent='Submit ✅';nb.style.background='linear-gradient(135deg,'+C.a+',#8b5cf6)';}
+      // Auto-advance after short delay
+      if(qi<total-1){setTimeout(function(){show(qi+1,1);},400);}
     };
 
-    window.evSubmitQuiz = function() {
-      var answered = Object.keys(evAnswers).length;
-      if(answered < evTotal){
-        alert('Please answer all '+evTotal+' questions before submitting! ('+answered+'/'+evTotal+' answered)');
-        return;
-      }
-      evSubmitted = true;
-      var score = 0;
-
-      for(var i=0;i<evTotal;i++){
-        var userAns = evAnswers[i] || '';
-        var correctAns = evCorrect[i];
-        var isCorrect = userAns === correctAns;
-        if(isCorrect) score++;
-
-        // Show result per question
-        var resultDiv = document.getElementById('evResult'+i);
-        var qDiv = document.getElementById('evQ'+i);
-        if(isCorrect){
-          resultDiv.style.display='block';
-          resultDiv.style.background='rgba(16,185,129,0.1)';
-          resultDiv.style.border='1px solid rgba(16,185,129,0.3)';
-          resultDiv.innerHTML='<div style="font-size:15px;font-weight:800;color:'+evColors.emerald+';margin-bottom:6px;">✅ Correct!</div><div style="font-size:13.5px;color:'+evColors.textMuted+';line-height:1.5;">'+evExplanations[i]+'</div>';
-          qDiv.style.borderColor='rgba(16,185,129,0.4)';
-        } else {
-          resultDiv.style.display='block';
-          resultDiv.style.background='rgba(244,63,94,0.1)';
-          resultDiv.style.border='1px solid rgba(244,63,94,0.3)';
-          resultDiv.innerHTML='<div style="font-size:15px;font-weight:800;color:'+evColors.rose+';margin-bottom:6px;">❌ Wrong! Your answer: '+userAns+' | Correct: '+correctAns+'</div><div style="font-size:13.5px;color:'+evColors.textMuted+';line-height:1.5;">'+evExplanations[i]+'</div>';
-          qDiv.style.borderColor='rgba(244,63,94,0.4)';
-          // Highlight correct option green
-          var corrLbl = document.getElementById('evOpt'+i+'_'+correctAns);
-          if(corrLbl){corrLbl.style.borderColor=evColors.emerald;corrLbl.style.background='rgba(16,185,129,0.15)';}
-          // Highlight wrong option red
-          var wrongLbl = document.getElementById('evOpt'+i+'_'+userAns);
-          if(wrongLbl){wrongLbl.style.borderColor=evColors.rose;wrongLbl.style.background='rgba(244,63,94,0.1)';}
+    function evSubmit(){
+      done=true;
+      var score=0;
+      var reviewHtml='';
+      for(var i=0;i<total;i++){
+        var u=ans[i]||'',c=correct[i],ok=u===c;
+        if(ok)score++;
+        // Show per-card result
+        var r=document.getElementById('evR'+i);
+        if(ok){
+          r.style.display='block';r.style.background='rgba(16,185,129,0.1)';r.style.border='1px solid rgba(16,185,129,0.3)';
+          r.innerHTML='<div style="font-weight:800;color:'+C.e+';font-size:15px;margin-bottom:4px;">✅ Correct!</div><div style="font-size:13px;color:'+C.m+';line-height:1.5;">'+expl[i]+'</div>';
+        }else{
+          r.style.display='block';r.style.background='rgba(244,63,94,0.1)';r.style.border='1px solid rgba(244,63,94,0.3)';
+          r.innerHTML='<div style="font-weight:800;color:'+C.r+';font-size:15px;margin-bottom:4px;">❌ Wrong — Correct: '+c+'</div><div style="font-size:13px;color:'+C.m+';line-height:1.5;">'+expl[i]+'</div>';
+          // Highlight correct green, wrong red
+          var cEl=document.getElementById('evO'+i+'_'+c);if(cEl){cEl.style.borderColor=C.e;cEl.style.background='rgba(16,185,129,0.12)';}
+          var wEl=document.getElementById('evO'+i+'_'+u);if(wEl){wEl.style.borderColor=C.r;wEl.style.background='rgba(244,63,94,0.08)';}
         }
-
-        // Disable all options visually
-        ['A','B','C','D'].forEach(function(l){
-          var lbl = document.getElementById('evOpt'+i+'_'+l);
-          if(lbl) lbl.style.cursor='default';
-        });
+        // Disable clicks
+        ['A','B','C','D'].forEach(function(l){var el=document.getElementById('evO'+i+'_'+l);if(el)el.style.cursor='default';});
+        // Build review line
+        reviewHtml+='<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;'+(i<total-1?'border-bottom:1px solid '+C.b+';':'')+'"><span style="font-weight:900;font-size:13px;color:'+(ok?C.e:C.r)+';min-width:24px;">Q'+(i+1)+'</span><div style="flex:1;font-size:13px;"><div style="color:'+C.t+';font-weight:600;margin-bottom:2px;">'+qTexts[i].substring(0,80)+(qTexts[i].length>80?'...':'')+'</div><div style="color:'+(ok?C.e:C.r)+';font-weight:700;">'+(ok?'✅ Correct':'❌ Your: '+u+' → Correct: '+c)+'</div></div></div>';
       }
-
+      // Fill scorecard
+      document.getElementById('evSV').textContent=score+' / '+total;
+      var pct=Math.round(score/total*100);
+      document.getElementById('evSP').textContent=pct+'% Accuracy';
+      document.getElementById('evBar').style.width='100%';
+      document.getElementById('evCount').textContent=score+' correct';
+      var em=document.getElementById('evEmoji'),sm=document.getElementById('evSM');
+      if(pct===100){em.textContent='🏆';sm.textContent='Perfect Score! Outstanding!';sm.style.color=C.e;}
+      else if(pct>=80){em.textContent='🌟';sm.textContent='Excellent! Great vocabulary skills!';sm.style.color=C.e;}
+      else if(pct>=60){em.textContent='👍';sm.textContent='Good effort! Keep practicing!';sm.style.color=C.a;}
+      else if(pct>=40){em.textContent='📚';sm.textContent='Fair attempt. Revise the words above.';sm.style.color=C.am;}
+      else{em.textContent='💪';sm.textContent='Needs work! Re-read the editorial carefully.';sm.style.color=C.r;}
+      document.getElementById('evReview').innerHTML=reviewHtml;
       // Show scorecard
-      document.getElementById('evSubmitArea').style.display='none';
-      var sc = document.getElementById('evScorecard');
-      sc.style.display='block';
-      document.getElementById('evScoreValue').textContent = score+' / '+evTotal;
-      var pct = Math.round((score/evTotal)*100);
-      document.getElementById('evScorePercent').textContent = pct+'% Accuracy';
-      document.getElementById('evQuizProgressBar').style.width = '100%';
+      show(total,1);
+    }
+    window.evSubmit=evSubmit;
 
-      var msgEl = document.getElementById('evScoreMsg');
-      if(pct===100){msgEl.textContent='🏆 Perfect Score! Outstanding!';msgEl.style.color=evColors.emerald;}
-      else if(pct>=80){msgEl.textContent='🌟 Excellent! Great vocabulary skills!';msgEl.style.color=evColors.emerald;}
-      else if(pct>=60){msgEl.textContent='👍 Good effort! Keep practicing!';msgEl.style.color=evColors.accent;}
-      else if(pct>=40){msgEl.textContent='📚 Fair attempt. Revise the words above.';msgEl.style.color='#f59e0b';}
-      else{msgEl.textContent='💪 Needs work! Re-read the editorial carefully.';msgEl.style.color=evColors.rose;}
-
-      // Scroll to scorecard
-      sc.scrollIntoView({behavior:'smooth',block:'center'});
-    };
-
-    window.evRetryQuiz = function() {
-      evAnswers = {};
-      evSubmitted = false;
-      document.getElementById('evSubmitArea').style.display='block';
-      document.getElementById('evScorecard').style.display='none';
-      document.getElementById('evAnsweredCount').textContent='Answered: 0 / '+evTotal;
-      document.getElementById('evQuizProgressBar').style.width='0%';
-      for(var i=0;i<evTotal;i++){
-        document.getElementById('evResult'+i).style.display='none';
-        document.getElementById('evQ'+i).style.borderColor=evColors.border;
+    window.evRetry=function(){
+      ans={};done=false;
+      document.getElementById('evNav').style.display='flex';
+      document.getElementById('evCount').textContent='0 / '+total;
+      document.getElementById('evBar').style.width='0%';
+      for(var i=0;i<total;i++){
+        document.getElementById('evR'+i).style.display='none';
         ['A','B','C','D'].forEach(function(l){
-          var lbl = document.getElementById('evOpt'+i+'_'+l);
-          var rad = document.getElementById('evRadio'+i+'_'+l);
-          if(lbl){lbl.style.borderColor=evColors.border;lbl.style.background='rgba(255,255,255,0.03)';lbl.style.cursor='pointer';}
-          if(rad){rad.style.borderColor=evColors.border;rad.style.background='transparent';rad.innerHTML='';}
+          var o=document.getElementById('evO'+i+'_'+l),d=document.getElementById('evD'+i+'_'+l);
+          if(o){o.style.borderColor=C.b;o.style.background='transparent';o.style.cursor='pointer';}
+          if(d){d.style.borderColor=C.b;d.style.background='transparent';d.style.color=C.m;d.textContent=l;}
         });
       }
-      document.getElementById('evQuizContainer').scrollIntoView({behavior:'smooth',block:'start'});
+      // Reset scorecard position
+      var sc=document.getElementById('evScore');sc.style.transform='translateX(105%)';sc.style.opacity='0';
+      // Reset all cards
+      for(var i=0;i<total;i++){
+        var c=document.getElementById('evC'+i);
+        c.style.transform=i===0?'translateX(0)':'translateX(105%)';
+        c.style.opacity=i===0?'1':'0';
+      }
+      cur=0;
+      // Reset dots + nav
+      for(var i=0;i<total;i++){var d=document.getElementById('evDot'+i);d.style.width=i===0?'24px':'8px';d.style.background=i===0?C.a:C.b;}
+      var pb=document.getElementById('evPrev'),nb=document.getElementById('evNext');
+      pb.style.opacity='0.4';pb.style.pointerEvents='none';nb.textContent='Next →';nb.style.background=C.a;
+      document.getElementById('evQBox').scrollIntoView({behavior:'smooth',block:'start'});
+      setTimeout(function(){document.getElementById('evViewport').style.minHeight=document.getElementById('evC0').scrollHeight+'px';},100);
     };
+
+    // Init viewport height
+    setTimeout(function(){
+      var c=document.getElementById('evC0');
+      if(c)document.getElementById('evViewport').style.minHeight=c.scrollHeight+'px';
+    },200);
   })();
   </script>
   ` : ''}
