@@ -196,49 +196,190 @@ export function generateBloggerHtml(postData, theme = 'slate') {
 
   <!-- Interactive Practice Quiz Section -->
   ${quizQuestions.length > 0 ? `
-  <div style="background-color: ${t.cardBg}; border: 1px solid ${t.border}; border-radius: 16px; padding: 24px; margin-bottom: 24px;">
-    <div style="display: flex; align-items: center; gap: 10px; border-bottom: 2px solid ${t.accentIndigo}; padding-bottom: 10px; margin-bottom: 20px;">
-      <span style="font-size: 24px;">🧠</span>
+  <div id="evQuizContainer" style="background-color: ${t.cardBg}; border: 2px solid ${t.accentIndigo}; border-radius: 16px; padding: 24px; margin-bottom: 24px; position: relative; overflow: hidden;">
+    <!-- Quiz Header -->
+    <div style="display: flex; align-items: center; gap: 10px; border-bottom: 2px solid ${t.accentIndigo}; padding-bottom: 14px; margin-bottom: 20px;">
+      <span style="font-size: 28px;">🧠</span>
       <div>
-        <h2 style="font-size: 20px; font-weight: 800; color: ${t.textMain}; margin: 0; text-transform: uppercase;">
+        <h2 style="font-size: 22px; font-weight: 800; color: ${t.textMain}; margin: 0; text-transform: uppercase;">
           Vocabulary &amp; Idioms Practice Quiz Test
         </h2>
-        <span style="font-size: 12px; color: ${t.textMuted}; font-family: 'Hind', sans-serif;">
-          आज के एडिटोरियल से खुद को टेस्ट करें (Test your learning below!)
+        <span style="font-size: 13px; color: ${t.textMuted}; font-family: 'Hind', sans-serif;">
+          आज के एडिटोरियल से खुद को टेस्ट करें! नीचे हर सवाल का जवाब चुनें और Submit करें।
         </span>
       </div>
     </div>
 
-    <div style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Progress Bar -->
+    <div id="evQuizProgress" style="background: rgba(0,0,0,0.3); border-radius: 10px; height: 8px; margin-bottom: 22px; overflow: hidden;">
+      <div id="evQuizProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, ${t.accentIndigo}, ${t.accentEmerald}); border-radius: 10px; transition: width 0.4s ease;"></div>
+    </div>
+
+    <!-- Questions Container -->
+    <div id="evQuizQuestions" style="display: flex; flex-direction: column; gap: 20px;">
       ${quizQuestions.map((q, idx) => `
-      <div style="background: rgba(0,0,0,0.25); border: 1px solid ${t.border}; padding: 18px; border-radius: 14px;">
-        <div style="font-size: 16px; font-weight: 800; color: ${t.textMain}; margin-bottom: 12px; line-height: 1.4;">
-          Q${idx + 1}. ${q.question}
+      <div class="evQuizQ" id="evQ${idx}" style="background: rgba(0,0,0,0.2); border: 1px solid ${t.border}; padding: 20px; border-radius: 14px; transition: all 0.3s ease;">
+        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px;">
+          <span style="background: ${t.accentIndigo}; color: #fff; font-size: 13px; font-weight: 900; min-width: 32px; height: 32px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">Q${idx + 1}</span>
+          <div style="font-size: 16px; font-weight: 700; color: ${t.textMain}; line-height: 1.5;">${q.question}</div>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 14px;">
-          ${(q.options || []).map(opt => `
-          <div style="background: rgba(255,255,255,0.04); border: 1px solid ${t.border}; padding: 10px 14px; border-radius: 8px; font-size: 14px; color: ${t.textMain}; font-weight: 600;">
-            ${opt}
-          </div>
-          `).join('')}
+        <div style="display: flex; flex-direction: column; gap: 8px;" id="evOpts${idx}">
+          ${(q.options || []).map((opt, oi) => {
+            const letter = ['A','B','C','D'][oi];
+            return `
+          <label id="evOpt${idx}_${letter}" onclick="evSelectOpt(${idx},'${letter}')" style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.03); border: 2px solid ${t.border}; padding: 12px 16px; border-radius: 10px; font-size: 14px; color: ${t.textMain}; font-weight: 600; cursor: pointer; transition: all 0.25s ease; user-select: none;">
+            <span id="evRadio${idx}_${letter}" style="min-width: 24px; height: 24px; border-radius: 50%; border: 2px solid ${t.border}; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; transition: all 0.25s ease; flex-shrink: 0;"></span>
+            <span>${opt}</span>
+          </label>`;
+          }).join('')}
         </div>
 
-        <details style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 10px 14px; cursor: pointer;">
-          <summary style="font-size: 13.5px; font-weight: 800; color: ${t.accentEmerald}; outline: none; user-select: none;">
-            💡 Show Correct Answer &amp; Explanation
-          </summary>
-          <div style="margin-top: 10px; font-size: 14px; color: ${t.textMain}; font-family: 'Hind', sans-serif; border-top: 1px dashed rgba(16, 185, 129, 0.3); padding-top: 8px;">
-            <strong style="color: ${t.accentEmerald}; font-size: 15px;">Correct Answer: Option ${q.correctOption}</strong>
-            <p style="margin: 4px 0 0 0; color: ${t.textMuted}; font-size: 13.5px; line-height: 1.5;">
-              ${q.explanation}
-            </p>
-          </div>
-        </details>
+        <!-- Per-question result (hidden initially) -->
+        <div id="evResult${idx}" style="display: none; margin-top: 14px; padding: 14px; border-radius: 10px; font-family: 'Hind', sans-serif;"></div>
       </div>
       `).join('')}
     </div>
+
+    <!-- Submit Button -->
+    <div id="evSubmitArea" style="text-align: center; margin-top: 28px;">
+      <div id="evAnsweredCount" style="font-size: 13px; color: ${t.textMuted}; margin-bottom: 10px; font-weight: 600;">Answered: 0 / ${quizQuestions.length}</div>
+      <button id="evSubmitBtn" onclick="evSubmitQuiz()" style="background: linear-gradient(135deg, ${t.accentIndigo}, #8b5cf6); color: #fff; border: none; padding: 14px 48px; font-size: 17px; font-weight: 800; border-radius: 12px; cursor: pointer; box-shadow: 0 8px 25px rgba(99,102,241,0.4); transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;">
+        ✅ Submit Test
+      </button>
+    </div>
+
+    <!-- Scorecard (hidden initially) -->
+    <div id="evScorecard" style="display: none; margin-top: 28px; text-align: center;">
+      <div style="background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.15)); border: 2px solid ${t.accentIndigo}; border-radius: 16px; padding: 28px; margin-bottom: 20px;">
+        <div style="font-size: 14px; font-weight: 700; color: ${t.textMuted}; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px;">YOUR SCORE</div>
+        <div id="evScoreValue" style="font-size: 52px; font-weight: 900; color: ${t.accentEmerald}; line-height: 1.1;"></div>
+        <div id="evScorePercent" style="font-size: 18px; font-weight: 700; color: ${t.textMuted}; margin-top: 4px;"></div>
+        <div id="evScoreMsg" style="font-size: 16px; margin-top: 12px; font-family: 'Hind', sans-serif; font-weight: 700;"></div>
+      </div>
+      <button onclick="evRetryQuiz()" style="background: ${t.cardBg}; color: ${t.textMain}; border: 2px solid ${t.border}; padding: 12px 36px; font-size: 15px; font-weight: 700; border-radius: 12px; cursor: pointer; transition: all 0.3s ease;">
+        🔄 Retry Quiz
+      </button>
+    </div>
   </div>
+
+  <script>
+  (function(){
+    var evAnswers = {};
+    var evCorrect = {${quizQuestions.map((q, idx) => `${idx}:"${q.correctOption}"`).join(',')}};
+    var evExplanations = {${quizQuestions.map((q, idx) => `${idx}:${JSON.stringify(q.explanation || '')}`).join(',')}};
+    var evTotal = ${quizQuestions.length};
+    var evSubmitted = false;
+    var evColors = {accent:'${t.accentIndigo}',emerald:'${t.accentEmerald}',rose:'${t.accentRose}',border:'${t.border}',cardBg:'${t.cardBg}',textMain:'${t.textMain}',textMuted:'${t.textMuted}'};
+
+    window.evSelectOpt = function(qIdx, letter) {
+      if (evSubmitted) return;
+      evAnswers[qIdx] = letter;
+      // Reset all options for this question
+      ['A','B','C','D'].forEach(function(l){
+        var lbl = document.getElementById('evOpt'+qIdx+'_'+l);
+        var rad = document.getElementById('evRadio'+qIdx+'_'+l);
+        if(lbl){lbl.style.borderColor=evColors.border;lbl.style.background='rgba(255,255,255,0.03)';}
+        if(rad){rad.style.borderColor=evColors.border;rad.style.background='transparent';rad.innerHTML='';}
+      });
+      // Highlight selected
+      var selLbl = document.getElementById('evOpt'+qIdx+'_'+letter);
+      var selRad = document.getElementById('evRadio'+qIdx+'_'+letter);
+      if(selLbl){selLbl.style.borderColor=evColors.accent;selLbl.style.background='rgba(99,102,241,0.1)';}
+      if(selRad){selRad.style.borderColor=evColors.accent;selRad.style.background=evColors.accent;selRad.innerHTML='✓';selRad.style.color='#fff';}
+      // Update progress
+      var answered = Object.keys(evAnswers).length;
+      document.getElementById('evAnsweredCount').textContent = 'Answered: '+answered+' / '+evTotal;
+      var pct = Math.round((answered/evTotal)*100);
+      document.getElementById('evQuizProgressBar').style.width = pct+'%';
+    };
+
+    window.evSubmitQuiz = function() {
+      var answered = Object.keys(evAnswers).length;
+      if(answered < evTotal){
+        alert('Please answer all '+evTotal+' questions before submitting! ('+answered+'/'+evTotal+' answered)');
+        return;
+      }
+      evSubmitted = true;
+      var score = 0;
+
+      for(var i=0;i<evTotal;i++){
+        var userAns = evAnswers[i] || '';
+        var correctAns = evCorrect[i];
+        var isCorrect = userAns === correctAns;
+        if(isCorrect) score++;
+
+        // Show result per question
+        var resultDiv = document.getElementById('evResult'+i);
+        var qDiv = document.getElementById('evQ'+i);
+        if(isCorrect){
+          resultDiv.style.display='block';
+          resultDiv.style.background='rgba(16,185,129,0.1)';
+          resultDiv.style.border='1px solid rgba(16,185,129,0.3)';
+          resultDiv.innerHTML='<div style="font-size:15px;font-weight:800;color:'+evColors.emerald+';margin-bottom:6px;">✅ Correct!</div><div style="font-size:13.5px;color:'+evColors.textMuted+';line-height:1.5;">'+evExplanations[i]+'</div>';
+          qDiv.style.borderColor='rgba(16,185,129,0.4)';
+        } else {
+          resultDiv.style.display='block';
+          resultDiv.style.background='rgba(244,63,94,0.1)';
+          resultDiv.style.border='1px solid rgba(244,63,94,0.3)';
+          resultDiv.innerHTML='<div style="font-size:15px;font-weight:800;color:'+evColors.rose+';margin-bottom:6px;">❌ Wrong! Your answer: '+userAns+' | Correct: '+correctAns+'</div><div style="font-size:13.5px;color:'+evColors.textMuted+';line-height:1.5;">'+evExplanations[i]+'</div>';
+          qDiv.style.borderColor='rgba(244,63,94,0.4)';
+          // Highlight correct option green
+          var corrLbl = document.getElementById('evOpt'+i+'_'+correctAns);
+          if(corrLbl){corrLbl.style.borderColor=evColors.emerald;corrLbl.style.background='rgba(16,185,129,0.15)';}
+          // Highlight wrong option red
+          var wrongLbl = document.getElementById('evOpt'+i+'_'+userAns);
+          if(wrongLbl){wrongLbl.style.borderColor=evColors.rose;wrongLbl.style.background='rgba(244,63,94,0.1)';}
+        }
+
+        // Disable all options visually
+        ['A','B','C','D'].forEach(function(l){
+          var lbl = document.getElementById('evOpt'+i+'_'+l);
+          if(lbl) lbl.style.cursor='default';
+        });
+      }
+
+      // Show scorecard
+      document.getElementById('evSubmitArea').style.display='none';
+      var sc = document.getElementById('evScorecard');
+      sc.style.display='block';
+      document.getElementById('evScoreValue').textContent = score+' / '+evTotal;
+      var pct = Math.round((score/evTotal)*100);
+      document.getElementById('evScorePercent').textContent = pct+'% Accuracy';
+      document.getElementById('evQuizProgressBar').style.width = '100%';
+
+      var msgEl = document.getElementById('evScoreMsg');
+      if(pct===100){msgEl.textContent='🏆 Perfect Score! Outstanding!';msgEl.style.color=evColors.emerald;}
+      else if(pct>=80){msgEl.textContent='🌟 Excellent! Great vocabulary skills!';msgEl.style.color=evColors.emerald;}
+      else if(pct>=60){msgEl.textContent='👍 Good effort! Keep practicing!';msgEl.style.color=evColors.accent;}
+      else if(pct>=40){msgEl.textContent='📚 Fair attempt. Revise the words above.';msgEl.style.color='#f59e0b';}
+      else{msgEl.textContent='💪 Needs work! Re-read the editorial carefully.';msgEl.style.color=evColors.rose;}
+
+      // Scroll to scorecard
+      sc.scrollIntoView({behavior:'smooth',block:'center'});
+    };
+
+    window.evRetryQuiz = function() {
+      evAnswers = {};
+      evSubmitted = false;
+      document.getElementById('evSubmitArea').style.display='block';
+      document.getElementById('evScorecard').style.display='none';
+      document.getElementById('evAnsweredCount').textContent='Answered: 0 / '+evTotal;
+      document.getElementById('evQuizProgressBar').style.width='0%';
+      for(var i=0;i<evTotal;i++){
+        document.getElementById('evResult'+i).style.display='none';
+        document.getElementById('evQ'+i).style.borderColor=evColors.border;
+        ['A','B','C','D'].forEach(function(l){
+          var lbl = document.getElementById('evOpt'+i+'_'+l);
+          var rad = document.getElementById('evRadio'+i+'_'+l);
+          if(lbl){lbl.style.borderColor=evColors.border;lbl.style.background='rgba(255,255,255,0.03)';lbl.style.cursor='pointer';}
+          if(rad){rad.style.borderColor=evColors.border;rad.style.background='transparent';rad.innerHTML='';}
+        });
+      }
+      document.getElementById('evQuizContainer').scrollIntoView({behavior:'smooth',block:'start'});
+    };
+  })();
+  </script>
   ` : ''}
 
 </div>
