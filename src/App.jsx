@@ -4,7 +4,7 @@ import InputSection from './components/InputSection';
 import VocabEditor from './components/VocabEditor';
 import BloggerPreview from './components/BloggerPreview';
 import HtmlExporter from './components/HtmlExporter';
-import { analyzeEditorialWithGemini } from './services/geminiService';
+import { analyzeEditorialWithGemini, generateQuizWithGemini } from './services/geminiService';
 import { generateAiThumbnail } from './services/aiThumbnailService';
 import { SAMPLE_EDITORIALS } from './services/sampleEditorials';
 import { FileText, Edit3, Eye, Share2 } from 'lucide-react';
@@ -28,6 +28,7 @@ export default function App() {
   const [currentTheme, setCurrentTheme] = useState('slate');
   const [activeTab, setActiveTab] = useState('input');
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState('Processing article...');
   const [wordCountTarget, setWordCountTarget] = useState('all');
 
   const initialDate = SAMPLE_EDITORIALS[0].date;
@@ -49,17 +50,25 @@ export default function App() {
       topic: SAMPLE_EDITORIALS[0].bannerTopic
     }),
     words: SAMPLE_EDITORIALS[0].words,
-    idiomsAndPhrases: SAMPLE_EDITORIALS[0].idiomsAndPhrases || []
+    idiomsAndPhrases: SAMPLE_EDITORIALS[0].idiomsAndPhrases || [],
+    quizQuestions: SAMPLE_EDITORIALS[0].quizQuestions || []
   });
 
   const handleProcessText = async ({ text, title, sourceName, wordCount }) => {
     setIsLoading(true);
+    setLoadingStep('Step 1/2: Extracting Vocabulary & Idioms...');
 
     try {
       let result = { articleTitle: '', articleTopic: '', words: [], idiomsAndPhrases: [] };
+      let quiz = [];
 
       if (apiKey && apiKey.trim() !== "") {
+        // API Hit #1: Exhaustive Vocabulary Extraction
         result = await analyzeEditorialWithGemini(apiKey, text, wordCount, selectedModel);
+
+        // API Hit #2: Dedicated Quiz Generation
+        setLoadingStep('Step 2/2: Building Interactive Practice Quiz Test...');
+        quiz = await generateQuizWithGemini(apiKey, result, selectedModel);
       } else {
         alert('Notice: Gemini API key is missing. Loading pre-formatted sample vocabulary. To analyze custom articles, add your Gemini API key in the top right.');
         result = {
@@ -68,6 +77,7 @@ export default function App() {
           words: SAMPLE_EDITORIALS[0].words,
           idiomsAndPhrases: SAMPLE_EDITORIALS[0].idiomsAndPhrases || []
         };
+        quiz = SAMPLE_EDITORIALS[0].quizQuestions || [];
       }
 
       const generatedSource = sourceName || 'The Hindu Editorial';
@@ -100,7 +110,8 @@ export default function App() {
         bannerTopic: finalTopic,
         mainImageUrl: aiThumbnailUrl,
         words: result.words || [],
-        idiomsAndPhrases: result.idiomsAndPhrases || []
+        idiomsAndPhrases: result.idiomsAndPhrases || [],
+        quizQuestions: quiz || []
       });
 
       setActiveTab('preview');
@@ -108,6 +119,7 @@ export default function App() {
       alert(`Error analyzing article: ${err.message}`);
     } finally {
       setIsLoading(false);
+      setLoadingStep('Processing article...');
     }
   };
 
@@ -132,91 +144,97 @@ export default function App() {
       bannerTopic: sample.bannerTopic,
       mainImageUrl: aiThumbnailUrl,
       words: sample.words,
-      idiomsAndPhrases: sample.idiomsAndPhrases || []
+      idiomsAndPhrases: sample.idiomsAndPhrases || [],
+      quizQuestions: sample.quizQuestions || []
     });
     setActiveTab('preview');
   };
 
   return (
-    <div className="app-container">
-      {/* Header & API Configuration */}
+    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 font-sans antialiased">
+      {/* Top Bar Header */}
       <Header 
         apiKey={apiKey} 
-        setApiKey={setApiKey} 
-        currentTheme={currentTheme}
-        setCurrentTheme={setCurrentTheme}
+        setApiKey={setApiKey}
         selectedModel={selectedModel}
         setSelectedModel={setSelectedModel}
+        currentTheme={currentTheme}
+        setCurrentTheme={setCurrentTheme}
       />
 
-      {/* Main Navigation Tabs */}
-      <nav className="main-app-nav">
-        <button 
-          className={`nav-tab-btn ${activeTab === 'input' ? 'active' : ''}`}
-          onClick={() => setActiveTab('input')}
-        >
-          <FileText className="w-4 h-4" />
-          <span>1. Input Article</span>
-        </button>
+      {/* Main Content Dashboard */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+        
+        {/* Navigation Tabs */}
+        <div className="dashboard-tabs">
+          <button
+            onClick={() => setActiveTab('input')}
+            className={`tab-btn ${activeTab === 'input' ? 'active' : ''}`}
+          >
+            <FileText className="w-4 h-4" />
+            <span>1. Upload Screenshot / Text</span>
+          </button>
+          
+          <button
+            onClick={() => setActiveTab('edit')}
+            className={`tab-btn ${activeTab === 'edit' ? 'active' : ''}`}
+          >
+            <Edit3 className="w-4 h-4" />
+            <span>2. Edit Vocabulary &amp; Quiz ({postData.words.length} Words)</span>
+          </button>
 
-        <button 
-          className={`nav-tab-btn ${activeTab === 'editor' ? 'active' : ''}`}
-          onClick={() => setActiveTab('editor')}
-        >
-          <Edit3 className="w-4 h-4" />
-          <span>2. Edit Vocab & Title ({(postData.words || []).length} Words, {(postData.idiomsAndPhrases || []).length} Idioms)</span>
-        </button>
+          <button
+            onClick={() => setActiveTab('preview')}
+            className={`tab-btn ${activeTab === 'preview' ? 'active' : ''}`}
+          >
+            <Eye className="w-4 h-4" />
+            <span>3. Blogger Theme Live Preview</span>
+          </button>
 
-        <button 
-          className={`nav-tab-btn ${activeTab === 'preview' ? 'active' : ''}`}
-          onClick={() => setActiveTab('preview')}
-        >
-          <Eye className="w-4 h-4" />
-          <span>3. Live Preview</span>
-        </button>
+          <button
+            onClick={() => setActiveTab('export')}
+            className={`tab-btn ${activeTab === 'export' ? 'active' : ''}`}
+          >
+            <Share2 className="w-4 h-4" />
+            <span>4. Auto-Publish to Blogger</span>
+          </button>
+        </div>
 
-        <button 
-          className={`nav-tab-btn ${activeTab === 'export' ? 'active' : ''}`}
-          onClick={() => setActiveTab('export')}
-        >
-          <Share2 className="w-4 h-4" />
-          <span>4. Copy & Export Blogger Code</span>
-        </button>
-      </nav>
+        {/* Dynamic Tab Views */}
+        <div className="dashboard-content">
+          {activeTab === 'input' && (
+            <InputSection
+              onProcessText={handleProcessText}
+              isLoading={isLoading}
+              loadingStep={loadingStep}
+              onSelectSample={handleSelectSample}
+              wordCountTarget={wordCountTarget}
+              setWordCountTarget={setWordCountTarget}
+            />
+          )}
 
-      {/* Main Active Tab Content */}
-      <main>
-        {activeTab === 'input' && (
-          <InputSection 
-            onProcessText={handleProcessText}
-            onSelectSample={handleSelectSample}
-            isLoading={isLoading}
-            apiKey={apiKey}
-            wordCountTarget={wordCountTarget}
-            setWordCountTarget={setWordCountTarget}
-          />
-        )}
+          {activeTab === 'edit' && (
+            <VocabEditor 
+              postData={postData} 
+              setPostData={setPostData} 
+            />
+          )}
 
-        {activeTab === 'editor' && (
-          <VocabEditor 
-            postData={postData}
-            setPostData={setPostData}
-          />
-        )}
+          {activeTab === 'preview' && (
+            <BloggerPreview 
+              postData={postData} 
+              currentTheme={currentTheme} 
+            />
+          )}
 
-        {activeTab === 'preview' && (
-          <BloggerPreview 
-            postData={postData}
-            currentTheme={currentTheme}
-          />
-        )}
+          {activeTab === 'export' && (
+            <HtmlExporter 
+              postData={postData} 
+              currentTheme={currentTheme} 
+            />
+          )}
+        </div>
 
-        {activeTab === 'export' && (
-          <HtmlExporter 
-            postData={postData}
-            currentTheme={currentTheme}
-          />
-        )}
       </main>
     </div>
   );

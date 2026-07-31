@@ -1,302 +1,353 @@
 import React, { useState } from 'react';
-import { FileText, Link, Image as ImageIcon, Sparkles, Zap, ArrowRight, Info, Plus, Trash2, Layers } from 'lucide-react';
+import { Sparkles, FileText, Link, Image as ImageIcon, Zap, Upload, X, Plus, AlertCircle, ArrowRight } from 'lucide-react';
 import { SAMPLE_EDITORIALS } from '../services/sampleEditorials';
-import { extractArticleFromUrl } from '../services/urlExtractionService';
 
-export default function InputSection({ 
-  onProcessText, 
-  onSelectSample, 
-  isLoading, 
-  apiKey,
-  wordCountTarget,
-  setWordCountTarget 
-}) {
+export default function InputSection({ onProcessText, isLoading, loadingStep, onSelectSample, wordCountTarget, setWordCountTarget }) {
   const [activeTab, setActiveTab] = useState('text');
-  const [inputText, setInputText] = useState('');
-  const [urlInput, setUrlInput] = useState('');
-  const [imageList, setImageList] = useState([]); // Array of Base64 image data URLs
+  const [editorialText, setEditorialText] = useState('');
   const [customTitle, setCustomTitle] = useState('');
   const [sourceName, setSourceName] = useState('The Hindu Editorial');
+  const [urlInput, setUrlInput] = useState('');
   const [isExtractingUrl, setIsExtractingUrl] = useState(false);
+  const [urlError, setUrlError] = useState(null);
+
+  // Multi-image state list
+  const [imageList, setImageList] = useState([]);
+
+  const apiKey = localStorage.getItem('gemini_api_key') || '';
+
+  const handleMultiFileUpload = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    files.forEach(file => {
+      if (!file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64 = event.target.result;
+        setImageList(prev => [...prev, { id: Date.now() + Math.random(), name: file.name, base64 }]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleRemoveImage = (id) => {
+    setImageList(prev => prev.filter(img => img.id !== id));
+  };
+
+  const handleExtractFromUrl = async () => {
+    if (!urlInput || !urlInput.trim()) {
+      setUrlError("Please enter a valid Editorial URL.");
+      return;
+    }
+
+    setUrlError(null);
+    setIsExtractingUrl(true);
+
+    try {
+      const targetUrl = urlInput.trim();
+      const corsProxy = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+      const res = await fetch(corsProxy);
+      const data = await res.json();
+
+      if (!data.contents) {
+        throw new Error("Could not fetch page contents.");
+      }
+
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(data.contents, 'text/html');
+
+      const extractedTitle = doc.querySelector('h1')?.innerText?.trim() || doc.title || '';
+      
+      const paragraphs = Array.from(doc.querySelectorAll('article p, main p, p'))
+        .map(p => p.innerText.trim())
+        .filter(t => t.length > 30);
+
+      const extractedText = paragraphs.slice(0, 15).join('\n\n');
+
+      if (!extractedText || extractedText.length < 100) {
+        throw new Error("Could not extract main article text. Please copy/paste the article text directly.");
+      }
+
+      setEditorialText(extractedText);
+      if (extractedTitle) setCustomTitle(extractedTitle);
+      
+      if (targetUrl.includes('livemint.com') || targetUrl.includes('mint')) {
+        setSourceName('LiveMint Editorial');
+      } else if (targetUrl.includes('indianexpress.com')) {
+        setSourceName('Indian Express Editorial');
+      } else if (targetUrl.includes('thehindu.com')) {
+        setSourceName('The Hindu Editorial');
+      }
+
+      setActiveTab('text');
+    } catch (err) {
+      setUrlError(err.message || "Failed to extract article from URL.");
+    } finally {
+      setIsExtractingUrl(false);
+    }
+  };
+
+  const handleProcess = () => {
+    if (activeTab === 'image') {
+      if (imageList.length === 0) {
+        alert("Please upload at least one editorial page screenshot.");
+        return;
+      }
+      const base64Array = imageList.map(img => img.base64);
+      onProcessText({
+        text: base64Array,
+        title: customTitle,
+        sourceName,
+        wordCount: wordCountTarget
+      });
+    } else {
+      if (!editorialText || !editorialText.trim()) {
+        alert("Please paste editorial text or extract from URL first.");
+        return;
+      }
+      onProcessText({
+        text: editorialText.trim(),
+        title: customTitle,
+        sourceName,
+        wordCount: wordCountTarget
+      });
+    }
+  };
 
   const isBusy = isLoading || isExtractingUrl;
 
-  const handleProcess = async () => {
-    if (activeTab === 'text') {
-      if (!inputText.trim()) {
-        alert('Please paste or type editorial text first.');
-        return;
-      }
-      onProcessText({
-        text: inputText,
-        title: customTitle || 'Daily Editorial Vocabulary Analysis',
-        sourceName: sourceName,
-        wordCount: wordCountTarget
-      });
-    } else if (activeTab === 'url') {
-      if (!urlInput.trim()) {
-        alert('Please enter an editorial URL.');
-        return;
-      }
-
-      try {
-        setIsExtractingUrl(true);
-        const extractedText = await extractArticleFromUrl(urlInput);
-        onProcessText({
-          text: extractedText,
-          title: customTitle || 'Daily Editorial Vocabulary Analysis',
-          sourceName: sourceName || `Editorial (${urlInput})`,
-          wordCount: wordCountTarget
-        });
-      } catch (err) {
-        alert(err.message);
-      } finally {
-        setIsExtractingUrl(false);
-      }
-    } else if (activeTab === 'image') {
-      if (imageList.length === 0) {
-        alert('Please upload at least one editorial page screenshot or image.');
-        return;
-      }
-      // Pass array of multiple base64 image data URLs to Gemini
-      onProcessText({
-        text: imageList.length === 1 ? imageList[0] : imageList,
-        title: customTitle || 'Daily Editorial Vocabulary & Tricky Words Analysis',
-        sourceName: sourceName || 'The Hindu Editorial',
-        wordCount: wordCountTarget
-      });
-    }
-  };
-
-  const handleFilesUpload = (filesList) => {
-    const files = Array.from(filesList || []).filter((file) => file.type.startsWith('image/'));
-    if (files.length > 0) {
-      files.forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          setImageList((prev) => [...prev, evt.target.result]);
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-  };
-
-  const handleMultipleImageUpload = (e) => {
-    handleFilesUpload(e.target.files);
-    e.target.value = '';
-  };
-
-  const handleImageDrop = (e) => {
-    e.preventDefault();
-    handleFilesUpload(e.dataTransfer.files);
-  };
-
-  const handleRemoveImage = (indexToRemove) => {
-    setImageList((prev) => prev.filter((_, i) => i !== indexToRemove));
-  };
-
   return (
-    <div className="input-section-card">
-      <div className="input-card-header">
-        <div>
-          <h2 className="section-title">
-            <Sparkles className="title-icon text-indigo-400" />
-            Create Daily Editorial Vocab Post
-          </h2>
-          <p className="section-desc">
-            Provide your editorial source (Text, Link, Multiple Images/Screenshots, or Sample) to automatically extract tricky words, Hindi meanings, mnemonics, root words, and idioms.
-          </p>
-        </div>
-
-        {/* Word count target selector */}
-        <div className="target-count-box">
-          <label>Extraction Mode:</label>
-          <select 
-            value={wordCountTarget} 
-            onChange={(e) => setWordCountTarget(e.target.value === 'all' ? 'all' : Number(e.target.value))}
-            className="count-select"
-          >
-            <option value="all">⚡ Extract ALL Tricky Words in Editorial</option>
-            <option value={5}>Top 5 Words (Standard)</option>
-            <option value={8}>Top 8 Words (Detailed)</option>
-            <option value={10}>Top 10 Words</option>
-            <option value={15}>Top 15 Words</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="input-tabs">
-        <button 
-          className={`tab-btn ${activeTab === 'text' ? 'active' : ''}`}
-          onClick={() => setActiveTab('text')}
-        >
-          <FileText className="tab-icon" />
-          <span>Paste Text</span>
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'url' ? 'active' : ''}`}
-          onClick={() => setActiveTab('url')}
-        >
-          <Link className="tab-icon" />
-          <span>Article URL</span>
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'image' ? 'active' : ''}`}
-          onClick={() => setActiveTab('image')}
-        >
-          <ImageIcon className="tab-icon" />
-          <span>Multiple Images / Screenshots ({imageList.length})</span>
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'sample' ? 'active' : ''}`}
-          onClick={() => setActiveTab('sample')}
-        >
-          <Zap className="tab-icon text-amber-400" />
-          <span>Sample Editorials (1-Click)</span>
-        </button>
-      </div>
-
-      {/* Tab Contents */}
-      <div className="tab-content">
-        {activeTab !== 'sample' && (
-          <div className="input-metadata-grid">
-            <div className="input-field">
-              <label>Editorial Source Name</label>
-              <select 
-                value={sourceName}
-                onChange={(e) => setSourceName(e.target.value)}
-                className="select-input"
-              >
-                <option value="The Hindu Editorial">The Hindu Editorial</option>
-                <option value="Indian Express Editorial">Indian Express Editorial</option>
-                <option value="Times of India Editorial">Times of India Editorial</option>
-                <option value="Business Standard">Business Standard</option>
-                <option value="LiveMint Editorial">LiveMint Editorial</option>
-                <option value="Custom Editorial">Custom Editorial</option>
-              </select>
-            </div>
-            <div className="input-field">
-              <label>Blog Post Headline / Title (Optional)</label>
-              <input 
-                type="text" 
-                placeholder="e.g. Daily Editorial Vocab: Monetary Policy & Inflation" 
-                value={customTitle}
-                onChange={(e) => setCustomTitle(e.target.value)}
-                className="text-input"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* 1. TEXT TAB */}
-        {activeTab === 'text' && (
-          <div className="tab-pane">
-            <textarea 
-              rows={8}
-              className="editorial-textarea"
-              placeholder="Paste raw editorial article text here... (e.g. The Hindu or Indian Express article passage)"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-            />
-          </div>
-        )}
-
-        {/* 2. URL TAB */}
-        {activeTab === 'url' && (
-          <div className="tab-pane">
-            <div className="url-input-box">
-              <Link className="url-icon" />
-              <input 
-                type="url" 
-                placeholder="https://www.thehindu.com/opinion/editorial/..." 
-                value={urlInput}
-                onChange={(e) => setUrlInput(e.target.value)}
-                className="url-input"
-              />
-            </div>
-            <p className="hint-text">
-              <Info className="hint-icon" />
-              Paste any article link. The bot will automatically parse the article text and extract vocabulary.
+    <div className="input-section-container">
+      <div className="input-card">
+        
+        {/* Header */}
+        <div className="input-card-header">
+          <div>
+            <h2 className="section-title">
+              <Sparkles className="title-icon text-indigo-400" />
+              Create Daily Editorial Vocab &amp; Practice Quiz Post
+            </h2>
+            <p className="section-desc">
+              Provide your editorial source (Text, Link, Multiple Images/Screenshots, or Sample) to automatically extract tricky words, Hindi meanings, mnemonics, root words, idioms, and generate an interactive Quiz Test.
             </p>
           </div>
+
+          {/* Word count target selector */}
+          <div className="target-count-box">
+            <label>Extraction Mode:</label>
+            <select 
+              value={wordCountTarget} 
+              onChange={(e) => setWordCountTarget(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+              className="count-select"
+            >
+              <option value="all">⚡ Extract ALL Tricky Words in Editorial</option>
+              <option value={5}>Top 5 Words (Standard)</option>
+              <option value={8}>Top 8 Words (Detailed)</option>
+              <option value={10}>Top 10 Words</option>
+              <option value={15}>Top 15 Words</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="input-tabs">
+          <button 
+            className={`tab-btn ${activeTab === 'text' ? 'active' : ''}`}
+            onClick={() => setActiveTab('text')}
+          >
+            <FileText className="tab-icon" />
+            <span>Paste Text</span>
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === 'url' ? 'active' : ''}`}
+            onClick={() => setActiveTab('url')}
+          >
+            <Link className="tab-icon" />
+            <span>Article URL</span>
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === 'image' ? 'active' : ''}`}
+            onClick={() => setActiveTab('image')}
+          >
+            <ImageIcon className="tab-icon" />
+            <span>Multiple Images / Screenshots ({imageList.length})</span>
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === 'sample' ? 'active' : ''}`}
+            onClick={() => setActiveTab('sample')}
+          >
+            <Zap className="tab-icon text-amber-400" />
+            <span>Sample Editorials (1-Click)</span>
+          </button>
+        </div>
+
+        {/* Tab Contents */}
+        {activeTab === 'text' && (
+          <div className="tab-content">
+            <div className="input-grid">
+              <div className="input-group">
+                <label>Editorial Headline (Optional override)</label>
+                <input 
+                  type="text" 
+                  placeholder="Leave blank for AI auto-extraction (e.g., India's Foreign Policy Must Look Seaward)" 
+                  value={customTitle}
+                  onChange={(e) => setCustomTitle(e.target.value)}
+                  className="input-field"
+                />
+              </div>
+
+              <div className="input-group">
+                <label>Newspaper Source</label>
+                <select 
+                  value={sourceName} 
+                  onChange={(e) => setSourceName(e.target.value)}
+                  className="input-field select-field"
+                >
+                  <option value="The Hindu Editorial">The Hindu Editorial</option>
+                  <option value="Indian Express Editorial">Indian Express Editorial</option>
+                  <option value="LiveMint Editorial">LiveMint Editorial</option>
+                  <option value="Business Standard Editorial">Business Standard Editorial</option>
+                  <option value="Times of India Editorial">Times of India Editorial</option>
+                  <option value="Custom Editorial">Custom Newspaper</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="input-group mt-4">
+              <label>Paste Editorial Article Text</label>
+              <textarea 
+                rows={9} 
+                placeholder="Paste the full editorial passage here..."
+                value={editorialText}
+                onChange={(e) => setEditorialText(e.target.value)}
+                className="input-field textarea-field"
+              />
+            </div>
+          </div>
         )}
 
-        {/* 3. MULTIPLE IMAGES TAB */}
-        {activeTab === 'image' && (
-          <div className="tab-pane">
-            {imageList.length > 0 ? (
-              <div className="multiple-images-container">
-                <div className="image-list-header">
-                  <div className="image-list-title">
-                    <Layers className="w-4 h-4 text-emerald-400" />
-                    <span>{imageList.length} Split Editorial Page Screenshots Uploaded</span>
-                  </div>
-                  
-                  <label className="btn-secondary compact-file-btn">
-                    <Plus className="w-4 h-4" />
-                    <span>Add More Screenshots</span>
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      multiple 
-                      onChange={handleMultipleImageUpload} 
-                      className="hidden-file-input" 
-                    />
-                  </label>
-                </div>
-
-                {/* Uploaded Images Grid */}
-                <div className="uploaded-images-grid">
-                  {imageList.map((imgSrc, idx) => (
-                    <div key={idx} className="uploaded-image-card">
-                      <span className="uploaded-image-badge">
-                        Page #{idx + 1}
-                      </span>
-                      
-                      <button 
-                        onClick={() => handleRemoveImage(idx)} 
-                        title="Remove page"
-                        className="uploaded-image-remove"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-
-                      <img src={imgSrc} alt={`Editorial Page ${idx + 1}`} />
-                    </div>
-                  ))}
-                </div>
+        {activeTab === 'url' && (
+          <div className="tab-content">
+            <div className="input-group">
+              <label>Article / Editorial Web URL</label>
+              <div className="url-input-bar">
+                <input 
+                  type="url" 
+                  placeholder="e.g. https://www.thehindu.com/opinion/editorial/..." 
+                  value={urlInput}
+                  onChange={(e) => setUrlInput(e.target.value)}
+                  className="input-field"
+                />
+                <button 
+                  onClick={handleExtractFromUrl} 
+                  disabled={isExtractingUrl}
+                  className="btn-primary"
+                >
+                  {isExtractingUrl ? 'Extracting...' : 'Fetch Text'}
+                </button>
               </div>
-            ) : (
-              <div
-                className="image-upload-dropzone"
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={handleImageDrop}
-              >
-                <label className="upload-label">
-                  <ImageIcon className="upload-icon" />
-                  <span className="upload-title">
-                    Click or drag multiple editorial page screenshots here
-                  </span>
-                  <span className="upload-sub">
-                    💡 You can select and upload multiple split images (Page 1, Page 2, Page 3) at once for large editorials!
-                  </span>
-                  <input 
-                    type="file" 
-                    accept="image/*" 
-                    multiple
-                    onChange={handleMultipleImageUpload} 
-                    className="hidden-file-input" 
-                  />
-                </label>
+            </div>
+
+            {urlError && (
+              <div className="error-banner">
+                <AlertCircle className="w-4 h-4" />
+                <span>{urlError}</span>
               </div>
             )}
           </div>
         )}
 
-        {/* 4. SAMPLE TAB */}
+        {activeTab === 'image' && (
+          <div className="tab-content">
+            <div className="input-grid mb-4">
+              <div className="input-group">
+                <label>Editorial Headline (Optional)</label>
+                <input 
+                  type="text" 
+                  placeholder="AI will extract article headline automatically from image" 
+                  value={customTitle}
+                  onChange={(e) => setCustomTitle(e.target.value)}
+                  className="input-field"
+                />
+              </div>
+
+              <div className="input-group">
+                <label>Newspaper Source</label>
+                <select 
+                  value={sourceName} 
+                  onChange={(e) => setSourceName(e.target.value)}
+                  className="input-field select-field"
+                >
+                  <option value="The Hindu Editorial">The Hindu Editorial</option>
+                  <option value="Indian Express Editorial">Indian Express Editorial</option>
+                  <option value="LiveMint Editorial">LiveMint Editorial</option>
+                  <option value="Business Standard Editorial">Business Standard Editorial</option>
+                  <option value="Times of India Editorial">Times of India Editorial</option>
+                  <option value="Custom Editorial">Custom Newspaper</option>
+                </select>
+              </div>
+            </div>
+
+            {/* MULTI-FILE UPLOADER DRAG-N-DROP BOX */}
+            <div className="image-uploader-box mb-4" onClick={() => document.getElementById('multiFileInput').click()}>
+              <input 
+                type="file" 
+                id="multiFileInput"
+                accept="image/*"
+                multiple
+                onChange={handleMultiFileUpload}
+                style={{ display: 'none' }}
+              />
+              <Upload className="upload-icon" />
+              <div className="upload-title">Click to Upload Editorial Page Screenshots</div>
+              <div className="upload-subtitle">
+                You can select <strong>multiple screenshots</strong> at once to cover long multi-part newspaper pages.
+              </div>
+            </div>
+
+            {/* GALLERY PREVIEW GRID */}
+            {imageList.length > 0 && (
+              <div>
+                <div className="font-semibold text-slate-300 mb-2 flex items-center justify-between" style={{ fontSize: '13px' }}>
+                  <span>Uploaded Screenshots ({imageList.length} Pages):</span>
+                  <button 
+                    type="button"
+                    onClick={() => setImageList([])}
+                    style={{ background: 'none', border: 'none', color: '#f43f5e', fontSize: '12px', cursor: 'pointer' }}
+                  >
+                    Clear All
+                  </button>
+                </div>
+                <div className="image-preview-grid">
+                  {imageList.map((img, index) => (
+                    <div key={img.id} className="image-preview-card">
+                      <img src={img.base64} alt={`Page ${index + 1}`} />
+                      <div className="image-badge">Page #{index + 1}</div>
+                      <button 
+                        type="button" 
+                        onClick={(e) => { e.stopPropagation(); handleRemoveImage(img.id); }} 
+                        className="image-remove-btn"
+                        title="Remove page"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                  
+                  {/* ADD MORE BUTTON CARD */}
+                  <div className="image-preview-add-card" onClick={() => document.getElementById('multiFileInput').click()}>
+                    <Plus className="w-6 h-6 text-indigo-400" />
+                    <span>Add Page #{imageList.length + 1}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {activeTab === 'sample' && (
-          <div className="tab-pane">
+          <div className="tab-content">
             <div className="samples-grid">
               {SAMPLE_EDITORIALS.map((sample) => (
                 <div key={sample.id} className="sample-card">
@@ -312,7 +363,7 @@ export default function InputSection({
                     onClick={() => onSelectSample(sample)}
                     className="btn-select-sample"
                   >
-                    <span>Load & Generate Blog Post</span>
+                    <span>Load &amp; Generate Blog Post</span>
                     <ArrowRight className="btn-icon" />
                   </button>
                 </div>
@@ -337,7 +388,7 @@ export default function InputSection({
               {isBusy ? (
                 <>
                   <div className="spinner" />
-                  <span>{isExtractingUrl ? 'Extracting article text from URL...' : `Analyzing ${activeTab === 'image' ? `${imageList.length} Editorial Pages` : 'Editorial'} & Extracting Tricky Words...`}</span>
+                  <span>{isExtractingUrl ? 'Extracting article text from URL...' : (loadingStep || `Analyzing ${activeTab === 'image' ? `${imageList.length} Editorial Pages` : 'Editorial'} & Extracting Tricky Words...`)}</span>
                 </>
               ) : (
                 <>

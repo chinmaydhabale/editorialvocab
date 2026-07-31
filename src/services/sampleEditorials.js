@@ -59,6 +59,29 @@ export const SAMPLE_EDITORIALS = [
         sentence: "The government asked public institutions to tighten their belts amid rising fiscal deficit.",
         memoryTrick: "पेट छोटा करने के लिए बेल्ट टाइट करना = कम खाना/कम खर्च करना!"
       }
+    ],
+    quizQuestions: [
+      {
+        id: 1,
+        question: "What is the closest synonym for 'Hawkish' in the economic policy context?",
+        options: ["A) Aggressive / Stringent", "B) Peaceful / Dovish", "C) Neutral", "D) Flexible"],
+        correctOption: "A",
+        explanation: "'Hawkish' implies advocating aggressive interest rate hikes to fight inflation (सख्त नीति का समर्थन करने वाला)."
+      },
+      {
+        id: 2,
+        question: "Which of the following is an antonym for 'Exacerbate'?",
+        options: ["A) Aggravate", "B) Mitigate / Alleviate", "C) Intensify", "D) Worsen"],
+        correctOption: "B",
+        explanation: "'Exacerbate' means to worsen a situation (और ख़राब कर देना). Its antonym is 'Mitigate' or 'Alleviate' (कम करना/राहत देना)."
+      },
+      {
+        id: 3,
+        question: "What does the idiom 'Double-edged sword' mean?",
+        options: ["A) A weapon used in ancient warfare", "B) Something with both beneficial and harmful consequences", "C) A completely harmless action", "D) A single solution to all problems"],
+        correctOption: "B",
+        explanation: "'Double-edged sword' refers to a situation that brings both positive and negative consequences (दोधारी तलवार)."
+      }
     ]
   }
 ];

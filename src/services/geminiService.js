@@ -31,21 +31,28 @@ function extractJsonPayload(rawText) {
   if (withoutFence.startsWith('{') && withoutFence.endsWith('}')) {
     return withoutFence;
   }
+  if (withoutFence.startsWith('[') && withoutFence.endsWith(']')) {
+    return withoutFence;
+  }
 
   const firstBrace = withoutFence.indexOf('{');
   const lastBrace = withoutFence.lastIndexOf('}');
-
   if (firstBrace !== -1 && lastBrace > firstBrace) {
     return withoutFence.slice(firstBrace, lastBrace + 1);
+  }
+
+  const firstBracket = withoutFence.indexOf('[');
+  const lastBracket = withoutFence.lastIndexOf(']');
+  if (firstBracket !== -1 && lastBracket > firstBracket) {
+    return withoutFence.slice(firstBracket, lastBracket + 1);
   }
 
   return withoutFence;
 }
 
 /**
- * Analyzes an editorial passage or multiple image screenshots using Gemini API:
- * Exhaustive extraction mandate: Extracts ALL tricky words across all pages (15-30+ words),
- * actual article title, and specific article topic.
+ * Analyzes an editorial passage or multiple image screenshots using Gemini API (API Hit #1):
+ * Extracts words, article title, and topic.
  */
 export async function analyzeEditorialWithGemini(apiKey, textOrImages, wordCount = 'all', preferredModel = 'gemini-3.6-flash') {
   if (!apiKey || apiKey.trim() === "") {
@@ -179,4 +186,82 @@ SCHEMA:
   }
 
   throw new Error(`Gemini API Error: ${lastError?.message || "Failed to process request."}`);
+}
+
+/**
+ * Dedicated 2nd API Hit: Generates 5-8 Interactive Practice Quiz MCQs based on extracted vocabulary and idioms.
+ */
+export async function generateQuizWithGemini(apiKey, vocabData, preferredModel = 'gemini-3.6-flash') {
+  if (!apiKey || !apiKey.trim()) return [];
+
+  const cleanKey = apiKey.trim();
+  const genAI = new GoogleGenerativeAI(cleanKey);
+  const discoveredModels = await getAvailableGeminiModels(cleanKey);
+
+  const NEW_MODELS_PRIORITY = [
+    preferredModel,
+    "gemini-3.6-flash",
+    "gemini-3.5-flash",
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+    "gemini-1.5-pro"
+  ];
+
+  const MODELS_TO_TRY = [
+    ...NEW_MODELS_PRIORITY.filter(m => discoveredModels.includes(m)),
+    ...NEW_MODELS_PRIORITY,
+    ...discoveredModels
+  ].filter((v, i, a) => v && a.indexOf(v) === i);
+
+  const wordsList = (vocabData.words || []).map(w => `${w.word} (${w.meaningEn} - ${w.meaningHi})`).join(', ');
+  const idiomsList = (vocabData.idiomsAndPhrases || []).map(i => `${i.phrase} (${i.meaningEn})`).join(', ');
+
+  const quizPrompt = `
+You are a senior Examiner and Quiz Maker for UPSC, Banking, and SSC English examinations.
+Based on the following vocabulary words and idioms extracted from today's editorial:
+
+WORDS: ${wordsList}
+IDIOMS: ${idiomsList}
+EDITORIAL TITLE: "${vocabData.articleTitle || 'Today Editorial'}"
+
+TASK:
+Create 5 to 8 high-yield Multiple Choice Questions (MCQs) for students to test their vocabulary and idioms knowledge.
+Create a mix of question types:
+- Synonym / Antonym identification
+- Meaning / Contextual usage
+- Idioms meaning
+
+REQUIREMENTS:
+1. Each question must have exactly 4 options ("A) ...", "B) ...", "C) ...", "D) ...").
+2. "correctOption" must be one of "A", "B", "C", or "D".
+3. Provide a clear, helpful "explanation" in English & Hindi for why that option is correct.
+
+OUTPUT FORMAT (STRICT JSON ARRAY ONLY):
+[
+  {
+    "id": 1,
+    "question": "Which of the following is the closest synonym for 'Hawkish' as used in the article?",
+    "options": ["A) Combative / Aggressive", "B) Peaceful", "C) Submissive", "D) Moderate"],
+    "correctOption": "A",
+    "explanation": "'Hawkish' implies advocating aggressive policy (सख्त या आक्रामक रुख)."
+  }
+]
+`;
+
+  for (const modelName of MODELS_TO_TRY) {
+    try {
+      const model = genAI.getGenerativeModel({ model: modelName });
+      const result = await model.generateContent([quizPrompt]);
+      const response = await result.response;
+      const parsedArray = JSON.parse(extractJsonPayload(response.text()));
+      if (Array.isArray(parsedArray)) {
+        return parsedArray;
+      }
+    } catch (err) {
+      console.warn(`Quiz generation model ${modelName} attempt failed:`, err.message);
+    }
+  }
+
+  return [];
 }
