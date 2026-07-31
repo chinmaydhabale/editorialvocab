@@ -37,110 +37,119 @@ export default function Header({ apiKey, setApiKey, currentTheme, setCurrentThem
   };
 
   return (
-    <header className="app-header">
-      <div className="header-container">
+    <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-slate-950/70 border-b border-indigo-500/10 shadow-lg shadow-indigo-500/5">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-4">
         {/* Brand */}
-        <div className="brand-box">
-          <div className="brand-logo">
-            <BookOpen className="logo-icon" />
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white bg-gradient-to-br from-indigo-500 via-purple-500 to-emerald-500 shadow-[0_0_30px_rgba(99,102,241,0.3)]">
+            <BookOpen className="w-6 h-6" />
           </div>
-          <div>
-            <h1 className="brand-title">
-              Editorial<span className="text-gradient">Vocab</span> Bot
+          <div className="flex flex-col justify-center">
+            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white">
+              Editorial<span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">Vocab</span> Bot
             </h1>
-            <p className="brand-subtitle">
+            <p className="text-xs sm:text-sm font-medium text-slate-400">
               Blogger Automation for Daily Tricky Words & Memory Tricks
             </p>
           </div>
         </div>
 
         {/* Controls */}
-        <div className="header-actions">
+        <div className="flex items-center gap-3">
           {/* Theme Selector */}
-          <div className="theme-selector">
-            <Sliders className="action-icon" />
+          <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-slate-900/50 border border-slate-700/50 rounded-xl">
+            <Sliders className="w-4 h-4 text-slate-400" />
             <select 
               value={currentTheme} 
               onChange={(e) => setCurrentTheme(e.target.value)}
-              className="theme-select"
+              className="bg-transparent text-sm font-semibold text-slate-200 outline-none cursor-pointer"
             >
-              <option value="slate">Theme: Slate Dark</option>
-              <option value="warm">Theme: Warm Paper</option>
-              <option value="cyber">Theme: Cyber Cyan</option>
+              <option value="slate" className="bg-slate-900">Slate Dark</option>
+              <option value="warm" className="bg-slate-900">Warm Paper</option>
+              <option value="cyber" className="bg-slate-900">Cyber Cyan</option>
             </select>
           </div>
 
           {/* API Key Modal Button */}
           <button 
             onClick={() => setShowKeyModal(true)} 
-            className={`btn-api-key ${apiKey ? 'active' : ''}`}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 border ${
+              apiKey 
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20' 
+                : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200 shadow-md'
+            }`}
           >
-            <Key className="btn-icon" />
-            <span>{apiKey ? `API (${selectedModel || '3.6 Flash'})` : 'Set Gemini API Key'}</span>
-            {apiKey && <span className="key-dot" />}
+            <Key className="w-4 h-4" />
+            <span className="hidden sm:inline">{apiKey ? `API: ${selectedModel || '3.6 Flash'}` : 'Set API Key'}</span>
+            <span className="sm:hidden">{apiKey ? 'API Set' : 'API Key'}</span>
+            {apiKey && <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)] ml-1" />}
           </button>
         </div>
       </div>
 
       {/* API Key & Model Configuration Modal */}
       {showKeyModal && (
-        <div className="modal-backdrop" onClick={() => setShowKeyModal(false)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <div className="flex items-center gap-2">
-                <Sparkles className="text-amber-400" />
-                <h3>Gemini AI Settings</h3>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm" onClick={() => setShowKeyModal(false)}>
+          <div className="w-full max-w-lg bg-slate-900 border border-indigo-500/20 shadow-2xl rounded-2xl overflow-hidden transform transition-all" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-5 border-b border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-indigo-500/10 rounded-lg">
+                  <Sparkles className="w-5 h-5 text-indigo-400" />
+                </div>
+                <h3 className="text-lg font-bold text-white">Gemini AI Settings</h3>
               </div>
-              <button onClick={() => setShowKeyModal(false)} className="modal-close">&times;</button>
+              <button onClick={() => setShowKeyModal(false)} className="text-slate-400 hover:text-white transition-colors">
+                <span className="text-2xl leading-none">&times;</span>
+              </button>
             </div>
 
-            <div className="modal-body">
-              <p className="modal-text">
-                Enter your Google Gemini API Key and select from the latest Gemini Flash models.
+            <div className="p-6 space-y-5">
+              <p className="text-sm text-slate-400">
+                Enter your Google Gemini API Key and select from the latest Gemini Flash models to enable automated analysis.
               </p>
               
-              <div className="input-group field-spacing">
-                <label>Gemini API Key</label>
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-slate-300">Gemini API Key</label>
                 <input 
                   type="password" 
                   placeholder="AIzaSy..." 
                   value={tempKey}
                   onChange={(e) => setTempKey(e.target.value)}
-                  className="modal-input"
+                  className="w-full bg-slate-950 border border-slate-800 text-slate-100 px-4 py-3 rounded-xl outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
                 />
               </div>
 
-              <div className="input-group field-spacing">
-                <label className="flex items-center justify-between">
+              <div className="space-y-2">
+                <label className="flex items-center justify-between text-sm font-bold text-slate-300">
                   <span className="flex items-center gap-2">
                     <Cpu className="w-4 h-4 text-indigo-400" />
-                    Gemini Model Target
+                    Model Target
                   </span>
-                  {isDiscovering && <span className="text-xs text-amber-400 flex items-center gap-1"><RefreshCw className="w-3 h-3 animate-spin" /> Detecting API Key Models...</span>}
+                  {isDiscovering && <span className="text-xs text-amber-400 flex items-center gap-1"><RefreshCw className="w-3 h-3 animate-spin" /> Detecting...</span>}
                 </label>
 
                 <select 
                   value={tempModel} 
                   onChange={(e) => setTempModel(e.target.value)} 
-                  className="select-input"
+                  className="w-full bg-slate-950 border border-slate-800 text-slate-100 px-4 py-3 rounded-xl outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors cursor-pointer appearance-none"
                 >
-                  <optgroup label="Latest Gemini 3.x Models">
+                  <optgroup label="Latest Gemini 3.x Models" className="bg-slate-900 text-slate-300">
                     <option value="gemini-3.6-flash">⚡ Gemini 3.6 Flash (Latest Ultra Fast)</option>
                     <option value="gemini-3.5-flash">⚡ Gemini 3.5 Flash</option>
                   </optgroup>
-                  <optgroup label="Gemini 2.x Models">
+                  <optgroup label="Gemini 2.x Models" className="bg-slate-900 text-slate-300">
                     <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
                     <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
                     <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash Exp</option>
                   </optgroup>
-                  <optgroup label="Gemini 1.5 Models">
+                  <optgroup label="Gemini 1.5 Models" className="bg-slate-900 text-slate-300">
                     <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
                     <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
                   </optgroup>
 
                   {/* Discovered Models from User's Key */}
                   {availableModels.length > 0 && (
-                    <optgroup label="Unlocked Models for Your API Key">
+                    <optgroup label="Unlocked Models for Your API Key" className="bg-slate-900 text-emerald-400">
                       {availableModels.map((m, idx) => (
                         <option key={idx} value={m}>✅ {m}</option>
                       ))}
@@ -149,25 +158,28 @@ export default function Header({ apiKey, setApiKey, currentTheme, setCurrentThem
                 </select>
               </div>
 
-              <div className="api-help-box">
-                <HelpCircle className="help-icon" />
-                <span>
-                  Get a free key at{' '}
-                  <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer">
+              <div className="flex items-start gap-2 p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-200 text-sm">
+                <HelpCircle className="w-5 h-5 flex-shrink-0 text-indigo-400 mt-0.5" />
+                <p>
+                  Get a free API key instantly at{' '}
+                  <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300 underline underline-offset-2 font-semibold">
                     Google AI Studio
                   </a>.
-                </span>
+                </p>
               </div>
             </div>
 
-            <div className="modal-footer">
-              <button onClick={() => setShowKeyModal(false)} className="btn-secondary">
+            <div className="flex items-center justify-end gap-3 p-5 border-t border-slate-800 bg-slate-900/50">
+              <button onClick={() => setShowKeyModal(false)} className="px-5 py-2.5 text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition-colors">
                 Cancel
               </button>
-              <button onClick={handleSaveKey} className="btn-primary">
+              <button 
+                onClick={handleSaveKey} 
+                className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-500/25 transition-all transform hover:-translate-y-0.5"
+              >
                 {savedSuccess ? (
                   <>
-                    <CheckCircle className="btn-icon" />
+                    <CheckCircle className="w-4 h-4" />
                     <span>Saved!</span>
                   </>
                 ) : (

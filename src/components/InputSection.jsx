@@ -118,30 +118,32 @@ export default function InputSection({ onProcessText, isLoading, loadingStep, on
   const isBusy = isLoading || isExtractingUrl;
 
   return (
-    <div className="input-section-container">
-      <div className="input-card">
+    <div className="w-full mx-auto max-w-5xl">
+      <div className="glass-panel p-6 sm:p-8 relative overflow-hidden">
+        {/* Animated Background Blob */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
         
         {/* Header */}
-        <div className="input-card-header">
-          <div>
-            <h2 className="section-title">
-              <Sparkles className="title-icon text-indigo-400" />
-              Create Daily Editorial Vocab &amp; Practice Quiz Post
+        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 mb-8 relative z-10">
+          <div className="flex-1">
+            <h2 className="text-2xl sm:text-3xl font-extrabold flex items-center gap-3 mb-2 text-white">
+              <Sparkles className="w-7 h-7 text-indigo-400" />
+              Create Vocabulary Post
             </h2>
-            <p className="section-desc">
-              Provide your editorial source (Text, Link, Multiple Images/Screenshots, or Sample) to automatically extract tricky words, Hindi meanings, mnemonics, root words, idioms, and generate an interactive Quiz Test.
+            <p className="text-slate-400 text-sm sm:text-base font-medium">
+              Provide your editorial source to automatically extract tricky words, Hindi meanings, mnemonics, root words, idioms, and generate an interactive Quiz Test.
             </p>
           </div>
 
           {/* Word count target selector */}
-          <div className="target-count-box">
-            <label>Extraction Mode:</label>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-slate-900/80 border border-slate-700/50 p-4 rounded-xl shadow-inner shrink-0 w-full lg:w-auto">
+            <label className="text-sm font-bold text-slate-300 whitespace-nowrap">Extraction Mode:</label>
             <select 
               value={wordCountTarget} 
               onChange={(e) => setWordCountTarget(e.target.value === 'all' ? 'all' : Number(e.target.value))}
-              className="count-select"
+              className="bg-slate-950 border border-indigo-500/30 text-indigo-200 px-4 py-2 rounded-lg font-bold outline-none focus:ring-2 focus:ring-indigo-500/50 w-full sm:w-auto cursor-pointer"
             >
-              <option value="all">⚡ Extract ALL Tricky Words in Editorial</option>
+              <option value="all">⚡ Extract ALL Tricky Words</option>
               <option value={5}>Top 5 Words (Standard)</option>
               <option value={8}>Top 8 Words (Detailed)</option>
               <option value={10}>Top 10 Words</option>
@@ -151,253 +153,296 @@ export default function InputSection({ onProcessText, isLoading, loadingStep, on
         </div>
 
         {/* Tabs */}
-        <div className="input-tabs">
-          <button 
-            className={`tab-btn ${activeTab === 'text' ? 'active' : ''}`}
-            onClick={() => setActiveTab('text')}
-          >
-            <FileText className="tab-icon" />
-            <span>Paste Text</span>
-          </button>
-          <button 
-            className={`tab-btn ${activeTab === 'url' ? 'active' : ''}`}
-            onClick={() => setActiveTab('url')}
-          >
-            <Link className="tab-icon" />
-            <span>Article URL</span>
-          </button>
-          <button 
-            className={`tab-btn ${activeTab === 'image' ? 'active' : ''}`}
-            onClick={() => setActiveTab('image')}
-          >
-            <ImageIcon className="tab-icon" />
-            <span>Multiple Images / Screenshots ({imageList.length})</span>
-          </button>
-          <button 
-            className={`tab-btn ${activeTab === 'sample' ? 'active' : ''}`}
-            onClick={() => setActiveTab('sample')}
-          >
-            <Zap className="tab-icon text-amber-400" />
-            <span>Sample Editorials (1-Click)</span>
-          </button>
+        <div className="flex bg-slate-900/50 p-1.5 rounded-xl border border-slate-800/50 mb-8 overflow-x-auto no-scrollbar">
+          {[
+            { id: 'text', icon: FileText, label: 'Paste Text' },
+            { id: 'url', icon: Link, label: 'Article URL' },
+            { id: 'image', icon: ImageIcon, label: `Screenshots (${imageList.length})` },
+            { id: 'sample', icon: Zap, label: 'Samples (1-Click)', iconClass: 'text-amber-400' }
+          ].map((tab) => (
+            <button 
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 min-w-[130px] flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-bold transition-all duration-300 ${
+                activeTab === tab.id 
+                  ? 'bg-indigo-500/20 text-indigo-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] border border-indigo-500/20' 
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 border border-transparent'
+              }`}
+            >
+              <tab.icon className={`w-4 h-4 ${tab.iconClass || ''}`} />
+              <span className="whitespace-nowrap">{tab.label}</span>
+            </button>
+          ))}
         </div>
 
         {/* Tab Contents */}
-        {activeTab === 'text' && (
-          <div className="tab-content">
-            <div className="input-grid">
-              <div className="input-group">
-                <label>Editorial Headline (Optional override)</label>
-                <input 
-                  type="text" 
-                  placeholder="Leave blank for AI auto-extraction (e.g., India's Foreign Policy Must Look Seaward)" 
-                  value={customTitle}
-                  onChange={(e) => setCustomTitle(e.target.value)}
-                  className="input-field"
-                />
-              </div>
+        <div className="bg-slate-950/30 rounded-2xl p-5 sm:p-6 border border-slate-800/50 shadow-inner">
+          
+          {/* Text Tab */}
+          {activeTab === 'text' && (
+            <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="input-label">Editorial Headline (Optional override)</label>
+                  <input 
+                    type="text" 
+                    placeholder="Leave blank for AI auto-extraction" 
+                    value={customTitle}
+                    onChange={(e) => setCustomTitle(e.target.value)}
+                    className="input-field"
+                  />
+                </div>
 
-              <div className="input-group">
-                <label>Newspaper Source</label>
-                <select 
-                  value={sourceName} 
-                  onChange={(e) => setSourceName(e.target.value)}
-                  className="input-field select-field"
-                >
-                  <option value="The Hindu Editorial">The Hindu Editorial</option>
-                  <option value="Indian Express Editorial">Indian Express Editorial</option>
-                  <option value="LiveMint Editorial">LiveMint Editorial</option>
-                  <option value="Business Standard Editorial">Business Standard Editorial</option>
-                  <option value="Times of India Editorial">Times of India Editorial</option>
-                  <option value="Custom Editorial">Custom Newspaper</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="input-group mt-4">
-              <label>Paste Editorial Article Text</label>
-              <textarea 
-                rows={9} 
-                placeholder="Paste the full editorial passage here..."
-                value={editorialText}
-                onChange={(e) => setEditorialText(e.target.value)}
-                className="input-field textarea-field"
-              />
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'url' && (
-          <div className="tab-content">
-            <div className="input-group">
-              <label>Article / Editorial Web URL</label>
-              <div className="url-input-bar">
-                <input 
-                  type="url" 
-                  placeholder="e.g. https://www.thehindu.com/opinion/editorial/..." 
-                  value={urlInput}
-                  onChange={(e) => setUrlInput(e.target.value)}
-                  className="input-field"
-                />
-                <button 
-                  onClick={handleExtractFromUrl} 
-                  disabled={isExtractingUrl}
-                  className="btn-primary"
-                >
-                  {isExtractingUrl ? 'Extracting...' : 'Fetch Text'}
-                </button>
-              </div>
-            </div>
-
-            {urlError && (
-              <div className="error-banner">
-                <AlertCircle className="w-4 h-4" />
-                <span>{urlError}</span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'image' && (
-          <div className="tab-content">
-            <div className="input-grid mb-4">
-              <div className="input-group">
-                <label>Editorial Headline (Optional)</label>
-                <input 
-                  type="text" 
-                  placeholder="AI will extract article headline automatically from image" 
-                  value={customTitle}
-                  onChange={(e) => setCustomTitle(e.target.value)}
-                  className="input-field"
-                />
-              </div>
-
-              <div className="input-group">
-                <label>Newspaper Source</label>
-                <select 
-                  value={sourceName} 
-                  onChange={(e) => setSourceName(e.target.value)}
-                  className="input-field select-field"
-                >
-                  <option value="The Hindu Editorial">The Hindu Editorial</option>
-                  <option value="Indian Express Editorial">Indian Express Editorial</option>
-                  <option value="LiveMint Editorial">LiveMint Editorial</option>
-                  <option value="Business Standard Editorial">Business Standard Editorial</option>
-                  <option value="Times of India Editorial">Times of India Editorial</option>
-                  <option value="Custom Editorial">Custom Newspaper</option>
-                </select>
-              </div>
-            </div>
-
-            {/* MULTI-FILE UPLOADER DRAG-N-DROP BOX */}
-            <div className="image-uploader-box mb-4" onClick={() => document.getElementById('multiFileInput').click()}>
-              <input 
-                type="file" 
-                id="multiFileInput"
-                accept="image/*"
-                multiple
-                onChange={handleMultiFileUpload}
-                style={{ display: 'none' }}
-              />
-              <Upload className="upload-icon" />
-              <div className="upload-title">Click to Upload Editorial Page Screenshots</div>
-              <div className="upload-subtitle">
-                You can select <strong>multiple screenshots</strong> at once to cover long multi-part newspaper pages.
-              </div>
-            </div>
-
-            {/* GALLERY PREVIEW GRID */}
-            {imageList.length > 0 && (
-              <div>
-                <div className="font-semibold text-slate-300 mb-2 flex items-center justify-between" style={{ fontSize: '13px' }}>
-                  <span>Uploaded Screenshots ({imageList.length} Pages):</span>
-                  <button 
-                    type="button"
-                    onClick={() => setImageList([])}
-                    style={{ background: 'none', border: 'none', color: '#f43f5e', fontSize: '12px', cursor: 'pointer' }}
+                <div>
+                  <label className="input-label">Newspaper Source</label>
+                  <select 
+                    value={sourceName} 
+                    onChange={(e) => setSourceName(e.target.value)}
+                    className="input-field cursor-pointer appearance-none"
                   >
-                    Clear All
+                    <option value="The Hindu Editorial">The Hindu Editorial</option>
+                    <option value="Indian Express Editorial">Indian Express Editorial</option>
+                    <option value="LiveMint Editorial">LiveMint Editorial</option>
+                    <option value="Business Standard Editorial">Business Standard Editorial</option>
+                    <option value="Times of India Editorial">Times of India Editorial</option>
+                    <option value="Custom Editorial">Custom Newspaper</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="input-label">Paste Editorial Article Text</label>
+                <textarea 
+                  rows={8} 
+                  placeholder="Paste the full editorial passage here..."
+                  value={editorialText}
+                  onChange={(e) => setEditorialText(e.target.value)}
+                  className="input-field resize-y font-body text-[15px] leading-relaxed"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* URL Tab */}
+          {activeTab === 'url' && (
+            <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="input-label">Editorial Headline (Optional)</label>
+                  <input 
+                    type="text" 
+                    placeholder="AI will extract headline from URL if blank" 
+                    value={customTitle}
+                    onChange={(e) => setCustomTitle(e.target.value)}
+                    className="input-field"
+                  />
+                </div>
+
+                <div>
+                  <label className="input-label">Newspaper Source</label>
+                  <select 
+                    value={sourceName} 
+                    onChange={(e) => setSourceName(e.target.value)}
+                    className="input-field cursor-pointer appearance-none"
+                  >
+                    <option value="The Hindu Editorial">The Hindu Editorial</option>
+                    <option value="Indian Express Editorial">Indian Express Editorial</option>
+                    <option value="LiveMint Editorial">LiveMint Editorial</option>
+                    <option value="Business Standard Editorial">Business Standard Editorial</option>
+                    <option value="Times of India Editorial">Times of India Editorial</option>
+                    <option value="Custom Editorial">Custom Newspaper</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="input-label">Article / Editorial Web URL</label>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <input 
+                    type="url" 
+                    placeholder="e.g. https://www.thehindu.com/opinion/editorial/..." 
+                    value={urlInput}
+                    onChange={(e) => setUrlInput(e.target.value)}
+                    className="input-field flex-1"
+                  />
+                  <button 
+                    onClick={handleExtractFromUrl} 
+                    disabled={isExtractingUrl}
+                    className="btn-primary w-full sm:w-auto"
+                  >
+                    {isExtractingUrl ? (
+                      <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Extracting...</>
+                    ) : 'Fetch Text'}
                   </button>
                 </div>
-                <div className="image-preview-grid">
-                  {imageList.map((img, index) => (
-                    <div key={img.id} className="image-preview-card">
-                      <img src={img.base64} alt={`Page ${index + 1}`} />
-                      <div className="image-badge">Page #{index + 1}</div>
-                      <button 
-                        type="button" 
-                        onClick={(e) => { e.stopPropagation(); handleRemoveImage(img.id); }} 
-                        className="image-remove-btn"
-                        title="Remove page"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ))}
-                  
-                  {/* ADD MORE BUTTON CARD */}
-                  <div className="image-preview-add-card" onClick={() => document.getElementById('multiFileInput').click()}>
-                    <Plus className="w-6 h-6 text-indigo-400" />
-                    <span>Add Page #{imageList.length + 1}</span>
-                  </div>
+              </div>
+
+              {urlError && (
+                <div className="flex items-center gap-2 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 font-medium animate-in fade-in">
+                  <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                  <span>{urlError}</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Image Tab */}
+          {activeTab === 'image' && (
+            <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="input-label">Editorial Headline (Optional)</label>
+                  <input 
+                    type="text" 
+                    placeholder="AI will extract headline from image" 
+                    value={customTitle}
+                    onChange={(e) => setCustomTitle(e.target.value)}
+                    className="input-field"
+                  />
+                </div>
+
+                <div>
+                  <label className="input-label">Newspaper Source</label>
+                  <select 
+                    value={sourceName} 
+                    onChange={(e) => setSourceName(e.target.value)}
+                    className="input-field cursor-pointer appearance-none"
+                  >
+                    <option value="The Hindu Editorial">The Hindu Editorial</option>
+                    <option value="Indian Express Editorial">Indian Express Editorial</option>
+                    <option value="LiveMint Editorial">LiveMint Editorial</option>
+                    <option value="Business Standard Editorial">Business Standard Editorial</option>
+                    <option value="Times of India Editorial">Times of India Editorial</option>
+                    <option value="Custom Editorial">Custom Newspaper</option>
+                  </select>
                 </div>
               </div>
-            )}
-          </div>
-        )}
 
-        {activeTab === 'sample' && (
-          <div className="tab-content">
-            <div className="samples-grid">
-              {SAMPLE_EDITORIALS.map((sample) => (
-                <div key={sample.id} className="sample-card">
-                  <div className="sample-card-header">
-                    <span className="sample-badge">{sample.sourceName}</span>
-                    <span className="sample-words-count">{sample.words.length} Tricky Words</span>
+              {/* Uploader Box */}
+              <div 
+                className="group relative flex flex-col items-center justify-center p-8 border-2 border-dashed border-indigo-500/30 bg-indigo-500/5 hover:bg-indigo-500/10 rounded-2xl cursor-pointer transition-all duration-300"
+                onClick={() => document.getElementById('multiFileInput').click()}
+              >
+                <input 
+                  type="file" 
+                  id="multiFileInput"
+                  accept="image/*"
+                  multiple
+                  onChange={handleMultiFileUpload}
+                  className="hidden"
+                />
+                <div className="w-16 h-16 mb-4 rounded-full bg-indigo-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-[0_0_20px_rgba(99,102,241,0.2)]">
+                  <Upload className="w-8 h-8 text-indigo-400" />
+                </div>
+                <h4 className="text-lg font-bold text-white mb-2">Upload Editorial Screenshots</h4>
+                <p className="text-slate-400 text-sm text-center max-w-md">
+                  Select <strong className="text-indigo-300">multiple screenshots</strong> at once to cover long multi-part newspaper pages.
+                </p>
+              </div>
+
+              {/* Gallery */}
+              {imageList.length > 0 && (
+                <div className="pt-4 border-t border-slate-800">
+                  <div className="flex items-center justify-between mb-4">
+                    <h5 className="text-sm font-bold text-slate-300">Uploaded Pages ({imageList.length}):</h5>
+                    <button 
+                      type="button"
+                      onClick={() => setImageList([])}
+                      className="text-xs font-bold text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      Clear All
+                    </button>
                   </div>
-                  <h4 className="sample-title">{sample.title}</h4>
-                  <p className="sample-snippet">
-                    "{sample.text.slice(0, 140)}..."
-                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {imageList.map((img, index) => (
+                      <div key={img.id} className="relative group rounded-xl overflow-hidden border border-slate-700 bg-slate-900 aspect-[3/4]">
+                        <img src={img.base64} alt={`Page ${index + 1}`} className="w-full h-full object-cover group-hover:opacity-60 transition-opacity" />
+                        <div className="absolute top-2 left-2 bg-slate-900/80 backdrop-blur-sm text-indigo-300 text-xs font-bold px-2 py-1 rounded-md border border-slate-700">
+                          #{index + 1}
+                        </div>
+                        <button 
+                          type="button" 
+                          onClick={(e) => { e.stopPropagation(); handleRemoveImage(img.id); }} 
+                          className="absolute top-2 right-2 w-7 h-7 bg-rose-500 hover:bg-rose-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                    
+                    {/* Add More Button */}
+                    <div 
+                      className="rounded-xl border-2 border-dashed border-slate-700 hover:border-indigo-500/50 bg-slate-900/50 hover:bg-indigo-500/10 flex flex-col items-center justify-center cursor-pointer transition-all group aspect-[3/4]"
+                      onClick={() => document.getElementById('multiFileInput').click()}
+                    >
+                      <Plus className="w-8 h-8 text-slate-500 group-hover:text-indigo-400 mb-2 transition-colors" />
+                      <span className="text-xs font-bold text-slate-400 group-hover:text-indigo-300">Add Page</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Sample Tab */}
+          {activeTab === 'sample' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              {SAMPLE_EDITORIALS.map((sample) => (
+                <div key={sample.id} className="bg-slate-900 border border-slate-800 hover:border-amber-500/30 rounded-xl p-5 transition-all hover:shadow-[0_0_30px_rgba(245,158,11,0.1)] group flex flex-col h-full">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="px-3 py-1 bg-indigo-500/10 text-indigo-300 text-xs font-bold rounded-full border border-indigo-500/20">{sample.sourceName}</span>
+                    <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded-full border border-emerald-500/20">{sample.words.length} Words</span>
+                  </div>
+                  <h4 className="text-lg font-bold text-white mb-2 leading-tight group-hover:text-amber-300 transition-colors">{sample.title}</h4>
+                  <p className="text-sm text-slate-400 mb-6 flex-1 italic">"{sample.text.slice(0, 140)}..."</p>
+                  
                   <button 
                     onClick={() => onSelectSample(sample)}
-                    className="btn-select-sample"
+                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-slate-800 hover:bg-amber-500/20 text-slate-200 hover:text-amber-400 border border-slate-700 hover:border-amber-500/30 font-bold rounded-lg transition-all"
                   >
-                    <span>Load &amp; Generate Blog Post</span>
-                    <ArrowRight className="btn-icon" />
+                    Load &amp; Generate Post
+                    <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Action Button */}
         {activeTab !== 'sample' && (
-          <div className="input-action-bar">
+          <div className="mt-8 relative z-10">
             {!apiKey && (
-              <div className="api-notice font-hindi">
-                ⚠️ Gemini API key missing. You can set your key in header, or test instantly using the <strong>Sample Editorials</strong> tab!
+              <div className="mb-4 flex items-center gap-3 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-200/90 text-sm font-medium">
+                <span className="text-xl">⚠️</span>
+                <span>Gemini API key missing. Set your key in the header, or test instantly using the <strong>Sample Editorials</strong> tab!</span>
               </div>
             )}
             <button 
               onClick={handleProcess} 
               disabled={isBusy}
-              className="btn-generate-main"
+              className={`w-full relative overflow-hidden flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-extrabold text-lg transition-all duration-300 ${
+                isBusy 
+                  ? 'bg-slate-800 text-slate-400 cursor-not-allowed border border-slate-700' 
+                  : 'bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:via-purple-500 hover:to-indigo-500 text-white shadow-[0_10px_40px_-10px_rgba(99,102,241,0.6)] hover:shadow-[0_15px_50px_-10px_rgba(99,102,241,0.8)] transform hover:-translate-y-1'
+              }`}
             >
               {isBusy ? (
                 <>
-                  <div className="spinner" />
-                  <span>{isExtractingUrl ? 'Extracting article text from URL...' : (loadingStep || `Analyzing ${activeTab === 'image' ? `${imageList.length} Editorial Pages` : 'Editorial'} & Extracting Tricky Words...`)}</span>
+                  <div className="w-5 h-5 border-2 border-slate-600 border-t-indigo-400 rounded-full animate-spin" />
+                  <span>{isExtractingUrl ? 'Extracting article text from URL...' : (loadingStep || `Analyzing ${activeTab === 'image' ? `${imageList.length} Pages` : 'Editorial'}...`)}</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="btn-icon" />
+                  <Sparkles className="w-6 h-6 text-indigo-200" />
                   <span>
                     {wordCountTarget === 'all' 
-                      ? `Extract ALL Tricky Words & Generate Post ${activeTab === 'image' && imageList.length > 0 ? `(${imageList.length} Pages)` : ''}` 
-                      : `Generate Blogger Vocab Post (${wordCountTarget} Words)`}
+                      ? `Extract ALL Words & Generate Post ${activeTab === 'image' && imageList.length > 0 ? `(${imageList.length} Pages)` : ''}` 
+                      : `Generate Vocab Post (${wordCountTarget} Words)`}
                   </span>
+                  
+                  {/* Subtle shine effect */}
+                  <div className="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-shine" />
                 </>
               )}
             </button>
