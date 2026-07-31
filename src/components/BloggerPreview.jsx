@@ -44,7 +44,7 @@ export default function BloggerPreview({ postData, currentTheme }) {
   };
 
   return (
-    <div className="glass-panel flex flex-col h-[85vh] overflow-hidden max-w-[1400px] mx-auto">
+    <div className="glass-panel animate-fade-slide-in flex flex-col h-[85vh] overflow-hidden max-w-[1400px] mx-auto">
       {/* Top Header Bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 sm:p-6 border-b border-slate-800 bg-slate-900/80">
         <div className="flex items-center gap-3 flex-wrap">
@@ -61,14 +61,14 @@ export default function BloggerPreview({ postData, currentTheme }) {
           {/* Toggle View Mode */}
           <div className="flex bg-slate-900/50 p-1.5 rounded-xl border border-slate-700 shadow-inner">
             <button 
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 ${viewMode === 'preview' ? 'bg-indigo-500 text-white shadow-md' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 active:scale-95 ${viewMode === 'preview' ? 'bg-indigo-500 text-white shadow-md' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}
               onClick={() => setViewMode('preview')}
             >
               <Eye className="w-4 h-4" />
               <span>Visual Render</span>
             </button>
             <button 
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 ${viewMode === 'code' ? 'bg-indigo-500 text-white shadow-md' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 active:scale-95 ${viewMode === 'code' ? 'bg-indigo-500 text-white shadow-md' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}
               onClick={() => setViewMode('code')}
             >
               <Code className="w-4 h-4" />
@@ -82,7 +82,7 @@ export default function BloggerPreview({ postData, currentTheme }) {
       <div className="flex flex-wrap items-center gap-3 p-4 sm:p-5 bg-slate-900/40 border-b border-slate-800">
         <button 
           onClick={handleCopyTitle} 
-          className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all border shadow-sm w-full sm:w-auto bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200"
+          className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 border shadow-sm w-full sm:w-auto bg-slate-800 hover:bg-slate-700 active:scale-95 border-slate-700 text-slate-200"
         >
           {copiedTitle ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
           <span className={copiedTitle ? 'text-emerald-400' : ''}>{copiedTitle ? 'SEO Title Copied!' : 'Copy SEO Blog Title'}</span>
@@ -90,7 +90,7 @@ export default function BloggerPreview({ postData, currentTheme }) {
 
         <button 
           onClick={handleCopyCode} 
-          className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all border shadow-lg w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 border-transparent text-white"
+          className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 border shadow-lg w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 active:scale-95 border-transparent text-white"
         >
           {copiedCode ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4" />}
           <span>{copiedCode ? 'Blogger HTML Copied!' : 'Copy Blogger HTML Code'}</span>
@@ -98,7 +98,7 @@ export default function BloggerPreview({ postData, currentTheme }) {
 
         <button 
           onClick={handleDownloadHtml} 
-          className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all border shadow-sm w-full sm:w-auto bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200"
+          className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 border shadow-sm w-full sm:w-auto bg-slate-800 hover:bg-slate-700 active:scale-95 border-slate-700 text-slate-200"
         >
           <Download className="w-4 h-4" />
           <span>Download .html File</span>

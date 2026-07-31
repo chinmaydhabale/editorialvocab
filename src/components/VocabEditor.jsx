@@ -161,7 +161,7 @@ export default function VocabEditor({ postData, setPostData }) {
   };
 
   return (
-    <div className="max-w-[1400px] mx-auto space-y-8">
+    <div className="max-w-[1400px] mx-auto space-y-8 animate-fade-slide-in">
       
       {/* Blog Post Metadata Header Editor */}
       <div className="glass-panel p-6 sm:p-8 relative overflow-hidden">
@@ -249,7 +249,7 @@ export default function VocabEditor({ postData, setPostData }) {
           <div className="w-2 h-8 bg-indigo-500 rounded-full" />
           Words List <span className="text-slate-500 text-lg">({postData.words.length})</span>
         </h3>
-        <button onClick={handleAddWord} className="btn-secondary">
+        <button onClick={handleAddWord} className="btn-secondary transition-all duration-200 hover:scale-105 active:scale-95">
           <Plus className="w-4 h-4" />
           <span className="hidden sm:inline">Add Word</span>
         </button>
@@ -261,24 +261,24 @@ export default function VocabEditor({ postData, setPostData }) {
           const isEditing = editingIndex === index;
 
           return (
-            <div key={index} className={`bg-slate-900 border rounded-2xl overflow-hidden shadow-lg transition-all duration-300 ${isEditing ? 'border-indigo-500/50 shadow-indigo-500/10' : 'border-slate-800 hover:border-indigo-500/30'}`}>
+            <div key={index} className={`group bg-slate-900 border rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-[1.01] ${isEditing ? 'border-indigo-500/50 shadow-indigo-500/10' : 'border-slate-800 hover:border-indigo-500/30'}`}>
               <div className="flex items-center justify-between p-4 sm:p-5 bg-slate-900/80 border-b border-slate-800">
                 <div className="flex items-center gap-3 flex-wrap">
-                  <span className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center font-bold text-sm shadow-inner">{index + 1}</span>
-                  <span className="text-lg sm:text-xl font-bold text-white">{item.word}</span>
+                  <span className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center font-bold text-sm shadow-inner transition-colors group-hover:border-indigo-500/40">{index + 1}</span>
+                  <span className="text-lg sm:text-xl font-bold text-white transition-colors group-hover:text-indigo-200">{item.word}</span>
                   {item.pos && <span className="text-xs font-bold text-slate-400 bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded-md uppercase tracking-wider">{item.pos}</span>}
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button 
                     onClick={() => setEditingIndex(isEditing ? null : index)}
-                    className={`p-2 rounded-lg transition-colors ${isEditing ? 'bg-indigo-500 text-white shadow-md' : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'}`}
+                    className={`p-2 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 ${isEditing ? 'bg-indigo-500 text-white shadow-md' : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'}`}
                   >
                     {isEditing ? <Check className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
                   </button>
                   <button 
                     onClick={() => handleDeleteWord(index)}
-                    className="p-2 rounded-lg bg-rose-500/10 text-rose-400 hover:text-rose-200 hover:bg-rose-500/30 transition-colors"
+                    className="p-2 rounded-lg bg-rose-500/10 text-rose-400 hover:text-rose-200 hover:bg-rose-500/30 transition-all duration-200 hover:scale-105 active:scale-95"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -360,7 +360,7 @@ export default function VocabEditor({ postData, setPostData }) {
           <div className="w-2 h-8 bg-amber-500 rounded-full" />
           Idioms &amp; Phrases <span className="text-slate-500 text-lg">({(postData.idiomsAndPhrases || []).length})</span>
         </h3>
-        <button onClick={handleAddIdiom} className="btn-secondary border-amber-500/30 hover:bg-amber-500/10 hover:text-amber-300">
+        <button onClick={handleAddIdiom} className="btn-secondary border-amber-500/30 hover:bg-amber-500/10 hover:text-amber-300 transition-all duration-200 hover:scale-105 active:scale-95">
           <Plus className="w-4 h-4" />
           <span className="hidden sm:inline">Add Idiom</span>
         </button>
@@ -371,23 +371,23 @@ export default function VocabEditor({ postData, setPostData }) {
           const isEditing = editingIdiomIndex === index;
 
           return (
-            <div key={index} className={`bg-slate-900 border rounded-2xl overflow-hidden shadow-lg transition-all duration-300 ${isEditing ? 'border-amber-500/50 shadow-amber-500/10' : 'border-slate-800 hover:border-amber-500/30'}`}>
+            <div key={index} className={`group bg-slate-900 border rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-[1.01] ${isEditing ? 'border-amber-500/50 shadow-amber-500/10' : 'border-slate-800 hover:border-amber-500/30'}`}>
               <div className="flex items-center justify-between p-4 sm:p-5 bg-slate-900/80 border-b border-slate-800">
                 <div className="flex items-center gap-3 flex-wrap">
                   <span className="w-8 h-8 rounded-lg bg-amber-500 text-black flex items-center justify-center font-black text-sm shadow-inner">{index + 1}</span>
-                  <span className="text-lg sm:text-xl font-bold text-amber-100">"{item.phrase}"</span>
+                  <span className="text-lg sm:text-xl font-bold text-amber-100 transition-colors group-hover:text-amber-200">"{item.phrase}"</span>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button 
                     onClick={() => setEditingIdiomIndex(isEditing ? null : index)}
-                    className={`p-2 rounded-lg transition-colors ${isEditing ? 'bg-amber-500 text-black shadow-md' : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'}`}
+                    className={`p-2 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 ${isEditing ? 'bg-amber-500 text-black shadow-md' : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'}`}
                   >
                     {isEditing ? <Check className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
                   </button>
                   <button 
                     onClick={() => handleDeleteIdiom(index)}
-                    className="p-2 rounded-lg bg-rose-500/10 text-rose-400 hover:text-rose-200 hover:bg-rose-500/30 transition-colors"
+                    className="p-2 rounded-lg bg-rose-500/10 text-rose-400 hover:text-rose-200 hover:bg-rose-500/30 transition-all duration-200 hover:scale-105 active:scale-95"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -435,7 +435,7 @@ export default function VocabEditor({ postData, setPostData }) {
           <div className="w-2 h-8 bg-cyan-500 rounded-full" />
           Practice Quiz Questions <span className="text-slate-500 text-lg">({(postData.quizQuestions || []).length})</span>
         </h3>
-        <button onClick={handleAddQuiz} className="btn-secondary border-cyan-500/30 hover:bg-cyan-500/10 hover:text-cyan-300">
+        <button onClick={handleAddQuiz} className="btn-secondary border-cyan-500/30 hover:bg-cyan-500/10 hover:text-cyan-300 transition-all duration-200 hover:scale-105 active:scale-95">
           <Plus className="w-4 h-4" />
           <span className="hidden sm:inline">Add Question</span>
         </button>
@@ -446,23 +446,23 @@ export default function VocabEditor({ postData, setPostData }) {
           const isEditing = editingQuizIndex === index;
 
           return (
-            <div key={index} className={`bg-slate-900 border rounded-2xl overflow-hidden shadow-lg transition-all duration-300 ${isEditing ? 'border-cyan-500/50 shadow-cyan-500/10' : 'border-slate-800 hover:border-cyan-500/30'}`}>
+            <div key={index} className={`group bg-slate-900 border rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-[1.01] ${isEditing ? 'border-cyan-500/50 shadow-cyan-500/10' : 'border-slate-800 hover:border-cyan-500/30'}`}>
               <div className="flex items-center justify-between p-4 sm:p-5 bg-slate-900/80 border-b border-slate-800">
                 <div className="flex items-center gap-3 flex-wrap">
                   <span className="w-8 h-8 rounded-lg bg-cyan-500 text-black flex items-center justify-center font-black text-sm shadow-inner">Q{index + 1}</span>
-                  <span className="text-lg sm:text-xl font-bold text-cyan-100">{q.question}</span>
+                  <span className="text-lg sm:text-xl font-bold text-cyan-100 transition-colors group-hover:text-cyan-200">{q.question}</span>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button 
                     onClick={() => setEditingQuizIndex(isEditing ? null : index)}
-                    className={`p-2 rounded-lg transition-colors ${isEditing ? 'bg-cyan-500 text-black shadow-md' : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'}`}
+                    className={`p-2 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 ${isEditing ? 'bg-cyan-500 text-black shadow-md' : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'}`}
                   >
                     {isEditing ? <Check className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
                   </button>
                   <button 
                     onClick={() => handleDeleteQuiz(index)}
-                    className="p-2 rounded-lg bg-rose-500/10 text-rose-400 hover:text-rose-200 hover:bg-rose-500/30 transition-colors"
+                    className="p-2 rounded-lg bg-rose-500/10 text-rose-400 hover:text-rose-200 hover:bg-rose-500/30 transition-all duration-200 hover:scale-105 active:scale-95"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

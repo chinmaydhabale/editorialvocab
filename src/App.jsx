@@ -164,10 +164,10 @@ export default function App() {
       <main className="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 py-8">
         
         {/* Navigation Tabs */}
-        <div className="flex gap-2 p-2 bg-slate-900/40 backdrop-blur-md border border-slate-800/60 rounded-2xl mb-8 overflow-x-auto no-scrollbar w-full">
+        <div className="flex gap-1.5 p-1.5 bg-slate-900/60 backdrop-blur-xl border border-slate-800/60 rounded-2xl mb-8 overflow-x-auto no-scrollbar w-full shadow-inner">
           <button
             onClick={() => setActiveTab('input')}
-            className={`flex-1 min-w-[200px] px-4 py-3 flex items-center justify-center gap-2 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === 'input' ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
+            className={`flex-1 min-w-[140px] px-4 py-3 flex items-center justify-center gap-2 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'input' ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
           >
             <FileText className="w-4 h-4" />
             <span>1. Upload Screenshot / Text</span>
@@ -175,7 +175,7 @@ export default function App() {
           
           <button
             onClick={() => setActiveTab('edit')}
-            className={`flex-1 min-w-[200px] px-4 py-3 flex items-center justify-center gap-2 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === 'edit' ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
+            className={`flex-1 min-w-[140px] px-4 py-3 flex items-center justify-center gap-2 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'edit' ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
           >
             <Edit3 className="w-4 h-4" />
             <span>2. Edit Vocabulary &amp; Quiz ({postData.words.length} Words)</span>
@@ -183,7 +183,7 @@ export default function App() {
 
           <button
             onClick={() => setActiveTab('preview')}
-            className={`flex-1 min-w-[200px] px-4 py-3 flex items-center justify-center gap-2 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === 'preview' ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
+            className={`flex-1 min-w-[140px] px-4 py-3 flex items-center justify-center gap-2 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'preview' ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
           >
             <Eye className="w-4 h-4" />
             <span>3. Blogger Theme Live Preview</span>
@@ -191,7 +191,7 @@ export default function App() {
 
           <button
             onClick={() => setActiveTab('export')}
-            className={`flex-1 min-w-[200px] px-4 py-3 flex items-center justify-center gap-2 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === 'export' ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
+            className={`flex-1 min-w-[140px] px-4 py-3 flex items-center justify-center gap-2 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'export' ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
           >
             <Share2 className="w-4 h-4" />
             <span>4. Auto-Publish to Blogger</span>
@@ -199,8 +199,9 @@ export default function App() {
         </div>
 
         {/* Dynamic Tab Views */}
-        <div className="w-full relative">
+        <div className="w-full relative" key={activeTab}>
           {activeTab === 'input' && (
+            <div className="animate-fade-slide-in">
             <InputSection
               onProcessText={handleProcessText}
               isLoading={isLoading}
@@ -209,27 +210,34 @@ export default function App() {
               wordCountTarget={wordCountTarget}
               setWordCountTarget={setWordCountTarget}
             />
+            </div>
           )}
 
           {activeTab === 'edit' && (
+            <div className="animate-fade-slide-in">
             <VocabEditor 
               postData={postData} 
               setPostData={setPostData} 
             />
+            </div>
           )}
 
           {activeTab === 'preview' && (
+            <div className="animate-fade-slide-in">
             <BloggerPreview 
               postData={postData} 
               currentTheme={currentTheme} 
             />
+            </div>
           )}
 
           {activeTab === 'export' && (
+            <div className="animate-fade-slide-in">
             <HtmlExporter 
               postData={postData} 
               currentTheme={currentTheme} 
             />
+            </div>
           )}
         </div>
 

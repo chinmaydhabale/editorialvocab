@@ -424,7 +424,7 @@ export default function InputSection({ onProcessText, isLoading, loadingStep, on
               className={`w-full relative overflow-hidden flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-extrabold text-lg transition-all duration-300 ${
                 isBusy 
                   ? 'bg-slate-800 text-slate-400 cursor-not-allowed border border-slate-700' 
-                  : 'bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:via-purple-500 hover:to-indigo-500 text-white shadow-[0_10px_40px_-10px_rgba(99,102,241,0.6)] hover:shadow-[0_15px_50px_-10px_rgba(99,102,241,0.8)] transform hover:-translate-y-1'
+                  : 'bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:via-purple-500 hover:to-indigo-500 text-white shadow-[0_10px_40px_-10px_rgba(99,102,241,0.6)] hover:shadow-[0_15px_50px_-10px_rgba(99,102,241,0.8)] transform hover:-translate-y-1 pulse-glow'
               }`}
             >
               {isBusy ? (

@@ -46,7 +46,7 @@ export default function HtmlExporter({ postData, currentTheme }) {
   };
 
   return (
-    <div className="glass-panel p-6 sm:p-10 max-w-5xl mx-auto space-y-10">
+    <div className="glass-panel p-6 sm:p-10 max-w-5xl mx-auto space-y-10 animate-fade-slide-in">
       <div>
         <h2 className="text-2xl sm:text-3xl font-extrabold flex items-center gap-3 text-white mb-2">
           <Globe className="w-8 h-8 text-indigo-400" />
@@ -87,7 +87,7 @@ export default function HtmlExporter({ postData, currentTheme }) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
         
         {/* STEP 1 */}
-        <div className="flex flex-col bg-slate-900/80 border border-slate-800 rounded-2xl p-6 relative shadow-lg hover:border-slate-700 transition-colors">
+        <div className="flex flex-col bg-slate-900/80 border border-slate-800 rounded-2xl p-6 relative shadow-lg hover:border-slate-700 hover:scale-[1.02] transition-transform duration-300">
           <div className="absolute -top-4 -left-4 w-12 h-12 rounded-2xl bg-slate-800 text-slate-300 font-black flex items-center justify-center border border-slate-700 shadow-xl text-sm">1</div>
           <h4 className="text-lg font-bold text-white mb-2 ml-4">Copy SEO Title</h4>
           <p className="text-slate-400 text-sm mb-6 flex-1">High-ranking headline with Newspaper Name, Date & Topic.</p>
@@ -101,7 +101,7 @@ export default function HtmlExporter({ postData, currentTheme }) {
         </div>
 
         {/* STEP 2 */}
-        <div className="flex flex-col bg-indigo-950/30 border-2 border-indigo-500/30 rounded-2xl p-6 relative shadow-[0_0_30px_rgba(99,102,241,0.1)] hover:border-indigo-500/50 transition-colors transform hover:-translate-y-1 duration-300">
+        <div className="flex flex-col bg-indigo-950/30 border-2 border-indigo-500/30 rounded-2xl p-6 relative shadow-[0_0_30px_rgba(99,102,241,0.1)] hover:border-indigo-500/50 hover:scale-[1.02] transition-transform duration-300">
           <div className="absolute -top-4 -left-4 w-12 h-12 rounded-2xl bg-indigo-500 text-white font-black flex items-center justify-center shadow-lg shadow-indigo-500/30 text-sm">2</div>
           <h4 className="text-lg font-bold text-white mb-2 ml-4">Copy Blogger HTML</h4>
           <p className="text-slate-300 text-sm mb-6 flex-1">Includes inline CSS, responsive design & thumbnail image.</p>
@@ -113,7 +113,7 @@ export default function HtmlExporter({ postData, currentTheme }) {
         </div>
 
         {/* STEP 3 */}
-        <div className="flex flex-col bg-slate-900/80 border border-slate-800 rounded-2xl p-6 relative shadow-lg hover:border-slate-700 transition-colors">
+        <div className="flex flex-col bg-slate-900/80 border border-slate-800 rounded-2xl p-6 relative shadow-lg hover:border-slate-700 hover:scale-[1.02] transition-transform duration-300">
           <div className="absolute -top-4 -left-4 w-12 h-12 rounded-2xl bg-slate-800 text-slate-300 font-black flex items-center justify-center border border-slate-700 shadow-xl text-sm">3</div>
           <h4 className="text-lg font-bold text-white mb-2 ml-4">Paste in Blogger</h4>
           <div className="text-slate-400 text-sm mb-6 flex-1 space-y-2">
