@@ -153,24 +153,25 @@ export default function InputSection({ onProcessText, isLoading, loadingStep, on
         </div>
 
         {/* Tabs */}
-        <div className="flex bg-slate-900/50 p-1.5 rounded-xl border border-slate-800/50 mb-8 overflow-x-auto no-scrollbar">
+        <div className="grid grid-cols-2 sm:flex bg-slate-900/50 p-1.5 rounded-xl border border-slate-800/50 mb-8 gap-1.5 sm:overflow-x-auto no-scrollbar">
           {[
-            { id: 'text', icon: FileText, label: 'Paste Text' },
-            { id: 'url', icon: Link, label: 'Article URL' },
-            { id: 'image', icon: ImageIcon, label: `Screenshots (${imageList.length})` },
-            { id: 'sample', icon: Zap, label: 'Samples (1-Click)', iconClass: 'text-amber-400' }
+            { id: 'text', icon: FileText, label: 'Paste Text', shortLabel: 'Text' },
+            { id: 'url', icon: Link, label: 'Article URL', shortLabel: 'URL' },
+            { id: 'image', icon: ImageIcon, label: `Screenshots (${imageList.length})`, shortLabel: `Shots (${imageList.length})` },
+            { id: 'sample', icon: Zap, label: 'Samples (1-Click)', shortLabel: 'Samples', iconClass: 'text-amber-400' }
           ].map((tab) => (
             <button 
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 min-w-[130px] flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-bold transition-all duration-300 ${
+              className={`min-w-0 sm:flex-1 sm:min-w-[130px] flex items-center justify-center gap-2 px-3 sm:px-4 py-3 rounded-lg text-xs sm:text-sm font-bold transition-all duration-300 ${
                 activeTab === tab.id 
                   ? 'bg-indigo-500/20 text-indigo-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] border border-indigo-500/20' 
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 border border-transparent'
               }`}
             >
-              <tab.icon className={`w-4 h-4 ${tab.iconClass || ''}`} />
-              <span className="whitespace-nowrap">{tab.label}</span>
+              <tab.icon className={`w-4 h-4 flex-shrink-0 ${tab.iconClass || ''}`} />
+              <span className="truncate sm:hidden">{tab.shortLabel}</span>
+              <span className="hidden sm:inline truncate">{tab.label}</span>
             </button>
           ))}
         </div>

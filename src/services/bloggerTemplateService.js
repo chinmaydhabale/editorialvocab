@@ -4,11 +4,97 @@
  * Includes interactive Vocabulary Practice Quiz section at the end.
  */
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function asArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function sanitizeTextArray(value) {
+  return asArray(value).map(escapeHtml).filter(Boolean);
+}
+
+function sanitizeImageUrl(value) {
+  const trimmed = String(value ?? '').trim();
+  if (!trimmed) return '';
+
+  const isHttpUrl = /^https?:\/\//i.test(trimmed);
+  const isDataImage = /^data:image\/(?:png|jpe?g|gif|webp|svg\+xml)(?:;[a-z0-9=+-]+)*,/i.test(trimmed);
+
+  return isHttpUrl || isDataImage ? escapeHtml(trimmed) : '';
+}
+
+function normalizeCorrectOption(value) {
+  const option = String(value ?? '').trim().toUpperCase()[0];
+  return ['A', 'B', 'C', 'D'].includes(option) ? option : 'A';
+}
+
+function sanitizeWord(item = {}) {
+  const source = item && typeof item === 'object' ? item : {};
+
+  return {
+    word: escapeHtml(source.word),
+    pos: escapeHtml(source.pos),
+    pronunciation: escapeHtml(source.pronunciation),
+    meaningEn: escapeHtml(source.meaningEn),
+    meaning: escapeHtml(source.meaning),
+    meaningHi: escapeHtml(source.meaningHi),
+    hindiMeaning: escapeHtml(source.hindiMeaning),
+    context: escapeHtml(source.context),
+    synonyms: sanitizeTextArray(source.synonyms),
+    antonyms: sanitizeTextArray(source.antonyms),
+    memoryTrick: escapeHtml(source.memoryTrick),
+    rootWord: escapeHtml(source.rootWord)
+  };
+}
+
+function sanitizeIdiom(item = {}) {
+  const source = item && typeof item === 'object' ? item : {};
+
+  return {
+    phrase: escapeHtml(source.phrase),
+    meaningEn: escapeHtml(source.meaningEn),
+    meaningHi: escapeHtml(source.meaningHi),
+    sentence: escapeHtml(source.sentence)
+  };
+}
+
+function sanitizeQuizQuestion(item = {}) {
+  const source = item && typeof item === 'object' ? item : {};
+
+  return {
+    question: escapeHtml(source.question),
+    options: sanitizeTextArray(source.options),
+    correctOption: normalizeCorrectOption(source.correctOption),
+    explanation: escapeHtml(source.explanation)
+  };
+}
+
 export function generateBloggerHtml(postData, theme = 'slate') {
-  const { title, date, sourceName, mainImageUrl, words = [], idiomsAndPhrases = [], quizQuestions = [] } = postData;
-  const cleanTitle = title || "Daily Editorial Vocabulary & Tricky Words";
-  const cleanDate = date || new Date().toISOString().split('T')[0];
-  const cleanSource = sourceName || "The Hindu Editorial";
+  const {
+    title,
+    date,
+    sourceName,
+    mainImageUrl: rawImageUrl,
+    words: rawWords = [],
+    idiomsAndPhrases: rawIdiomsAndPhrases = [],
+    quizQuestions: rawQuizQuestions = []
+  } = postData || {};
+
+  const cleanTitle = escapeHtml(title || "Daily Editorial Vocabulary & Tricky Words");
+  const cleanDate = escapeHtml(date || new Date().toISOString().split('T')[0]);
+  const cleanSource = escapeHtml(sourceName || "The Hindu Editorial");
+  const mainImageUrl = sanitizeImageUrl(rawImageUrl);
+  const words = asArray(rawWords).map(sanitizeWord);
+  const idiomsAndPhrases = asArray(rawIdiomsAndPhrases).map(sanitizeIdiom);
+  const quizQuestions = asArray(rawQuizQuestions).map(sanitizeQuizQuestion);
 
   // Theme Color Configurations
   const themes = {
@@ -54,10 +140,21 @@ export function generateBloggerHtml(postData, theme = 'slate') {
   };
 
   const t = themes[theme] || themes.slate;
+  const isWarmTheme = (theme || '').toLowerCase() === 'warm';
+  const sectionBg = isWarmTheme ? '#ffffff' : 'rgba(255,255,255,0.04)';
+  const infoBg = isWarmTheme ? '#f8fafc' : 'rgba(255,255,255,0.05)';
+  const contextBg = isWarmTheme ? '#ffffff' : 'rgba(255,255,255,0.03)';
+  const optionBg = isWarmTheme ? '#ffffff' : 'rgba(255,255,255,0.02)';
+  const rootBg = isWarmTheme ? '#f3f4f6' : 'rgba(0,0,0,0.18)';
+  const wordShadow = isWarmTheme ? '0 10px 24px rgba(15,23,42,0.08)' : '0 10px 28px rgba(0,0,0,0.22)';
+  const headerShadow = isWarmTheme ? '0 12px 28px rgba(67,56,202,0.08)' : '0 10px 30px rgba(0,0,0,0.24)';
+  const quizHeaderBg = isWarmTheme
+    ? `linear-gradient(135deg, ${t.badgeBg}, #ffffff)`
+    : `linear-gradient(135deg, ${t.accentIndigo}22, ${t.accentIndigo}08)`;
 
   return `
 <!-- EditorialVocab Blogger Container -->
-<div style="font-family: 'Plus Jakarta Sans', 'Hind', sans-serif; background-color: ${t.bgMain}; color: ${t.textMain}; padding: 20px 12px; border-radius: 16px; max-width: 900px; margin: 0 auto; line-height: 1.6;">
+<div style="font-family: 'Plus Jakarta Sans', 'Hind', system-ui, sans-serif; background-color: ${t.bgMain}; color: ${t.textMain}; padding: clamp(14px, 3vw, 24px); border-radius: 16px; max-width: 900px; margin: 0 auto; line-height: 1.6; box-sizing: border-box; overflow: hidden;">
 
   <!-- Featured AI Cover Banner -->
   ${mainImageUrl ? `
@@ -67,14 +164,14 @@ export function generateBloggerHtml(postData, theme = 'slate') {
   ` : ''}
 
   <!-- Header Section -->
-  <div style="background-color: ${t.cardBg}; border: 1px solid ${t.border}; padding: 24px; border-radius: 16px; margin-bottom: 24px; text-align: center;">
-    <div style="display: inline-block; background-color: ${t.badgeBg}; color: ${t.badgeText}; font-size: 13px; font-weight: 800; padding: 4px 14px; border-radius: 20px; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">
+  <div style="background-color: ${t.cardBg}; border: 1px solid ${t.border}; padding: clamp(18px, 4vw, 28px); border-radius: 16px; margin-bottom: 24px; text-align: center; box-shadow: ${headerShadow};">
+    <div style="display: inline-block; max-width: 100%; background-color: ${t.badgeBg}; color: ${t.badgeText}; font-size: 12px; font-weight: 800; padding: 5px 14px; border-radius: 999px; text-transform: uppercase; margin-bottom: 14px; letter-spacing: 0.5px; box-sizing: border-box; overflow-wrap: anywhere;">
       📰 ${cleanSource} • ${cleanDate}
     </div>
-    <h1 style="font-size: 26px; font-weight: 800; color: ${t.textMain}; margin: 0 0 10px 0; line-height: 1.35;">
+    <h1 style="font-size: clamp(24px, 4.5vw, 32px); font-weight: 900; color: ${t.textMain}; margin: 0 0 10px 0; line-height: 1.25; letter-spacing: 0; overflow-wrap: anywhere;">
       ${cleanTitle}
     </h1>
-    <p style="font-size: 14px; color: ${t.textMuted}; margin: 0; font-family: 'Hind', sans-serif;">
+    <p style="font-size: 14px; color: ${t.textMuted}; margin: 0 auto; max-width: 760px; font-family: 'Hind', sans-serif;">
       📌 Competitive Exam Prep (UPSC, Banking, SSC, CLAT): आज के एडिटोरियल से चुने गए मुख्य Tricky Words, उनके Hindi Meaning, Synonyms, Antonyms, याद रखने की धांसू Tricks और Idioms &amp; Phrases (मुहावरे) का संग्रह।
     </p>
   </div>
@@ -82,35 +179,35 @@ export function generateBloggerHtml(postData, theme = 'slate') {
   <!-- Words List Section -->
   <div style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 30px;">
     ${words.map((item, index) => `
-    <div style="background-color: ${t.cardBg}; border: 1px solid ${t.border}; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+    <div style="background-color: ${t.cardBg}; border: 1px solid ${t.border}; border-radius: 16px; padding: clamp(16px, 3vw, 22px); box-shadow: ${wordShadow}; box-sizing: border-box;">
       
       <!-- Word Header -->
       <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid ${t.border}; padding-bottom: 12px; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="background-color: ${t.accentIndigo}; color: #ffffff; font-size: 13px; font-weight: 800; width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-width: 0;">
+          <span style="background-color: ${t.accentIndigo}; color: #ffffff; font-size: 13px; font-weight: 800; min-width: 28px; width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
             ${index + 1}
           </span>
-          <h2 style="font-size: 22px; font-weight: 800; color: ${t.textMain}; margin: 0;">
+          <h2 style="font-size: clamp(20px, 4vw, 24px); font-weight: 900; color: ${t.textMain}; margin: 0; line-height: 1.2; overflow-wrap: anywhere;">
             ${item.word}
           </h2>
           ${item.pos ? `<span style="font-size: 12px; font-style: italic; color: ${t.textMuted}; background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 6px;">(${item.pos})</span>` : ''}
         </div>
 
         ${item.pronunciation ? `
-        <div style="font-size: 13px; font-weight: 600; color: ${t.badgeText}; background-color: ${t.badgeBg}; padding: 4px 12px; border-radius: 10px; font-family: 'Hind', sans-serif;">
+        <div style="font-size: 13px; font-weight: 700; color: ${t.badgeText}; background-color: ${t.badgeBg}; padding: 5px 12px; border-radius: 999px; font-family: 'Hind', sans-serif; max-width: 100%; overflow-wrap: anywhere;">
           🗣️ ${item.pronunciation}
         </div>
         ` : ''}
       </div>
 
       <!-- English & Hindi Meaning Grid -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-bottom: 14px;">
-        <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 10px; border-left: 3px solid ${t.accentIndigo};">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 12px; margin-bottom: 14px;">
+        <div style="background: ${infoBg}; padding: 12px; border-radius: 10px; border-left: 3px solid ${t.accentIndigo}; box-sizing: border-box;">
           <div style="font-size: 11px; font-weight: 800; color: ${t.textMuted}; text-transform: uppercase; margin-bottom: 4px;">English Definition</div>
           <div style="font-size: 14px; color: ${t.textMain};">${item.meaningEn || item.meaning}</div>
         </div>
 
-        <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 10px; border-left: 3px solid ${t.accentEmerald}; font-family: 'Hind', sans-serif;">
+        <div style="background: ${infoBg}; padding: 12px; border-radius: 10px; border-left: 3px solid ${t.accentEmerald}; font-family: 'Hind', sans-serif; box-sizing: border-box;">
           <div style="font-size: 11px; font-weight: 800; color: ${t.accentEmerald}; text-transform: uppercase; margin-bottom: 4px;">हिंदी अर्थ</div>
           <div style="font-size: 16px; font-weight: 700; color: ${t.textMain};">${item.meaningHi || item.hindiMeaning || '—'}</div>
         </div>
@@ -118,13 +215,13 @@ export function generateBloggerHtml(postData, theme = 'slate') {
 
       <!-- Context Sentence -->
       ${item.context ? `
-      <div style="background: rgba(255,255,255,0.03); padding: 10px 14px; border-radius: 10px; font-size: 13.5px; color: ${t.textMuted}; margin-bottom: 12px; font-style: italic; border: 1px dashed ${t.border};">
+      <div style="background: ${contextBg}; padding: 10px 14px; border-radius: 10px; font-size: 13.5px; color: ${t.textMuted}; margin-bottom: 12px; font-style: italic; border: 1px dashed ${t.border};">
         📝 <strong>Editorial Context:</strong> "${item.context}"
       </div>
       ` : ''}
 
       <!-- Synonyms & Antonyms Grid -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin-bottom: 12px;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 10px; margin-bottom: 12px;">
         <div style="font-size: 13px;">
           <strong style="color: ${t.accentEmerald};">✓ Synonyms:</strong> ${(item.synonyms || []).join(', ') || 'N/A'}
         </div>
@@ -147,7 +244,7 @@ export function generateBloggerHtml(postData, theme = 'slate') {
 
       <!-- Root Word Breakdown -->
       ${item.rootWord ? `
-      <div style="font-size: 12.5px; color: ${t.textMuted}; background: rgba(0,0,0,0.15); padding: 8px 12px; border-radius: 8px;">
+      <div style="font-size: 12.5px; color: ${t.textMuted}; background: ${rootBg}; padding: 8px 12px; border-radius: 8px;">
         🌱 <strong>Root Word Breakdown:</strong> ${item.rootWord}
       </div>
       ` : ''}
@@ -158,17 +255,17 @@ export function generateBloggerHtml(postData, theme = 'slate') {
 
   <!-- Dedicated Idioms & Phrases Section -->
   ${idiomsAndPhrases.length > 0 ? `
-  <div style="background-color: ${t.cardBg}; border: 1px solid ${t.border}; border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+  <div style="background-color: ${t.cardBg}; border: 1px solid ${t.border}; border-radius: 16px; padding: clamp(16px, 3vw, 24px); margin-bottom: 24px; box-shadow: ${wordShadow};">
     <div style="display: flex; align-items: center; gap: 10px; border-bottom: 2px solid ${t.accentAmber}; padding-bottom: 10px; margin-bottom: 16px;">
       <span style="font-size: 24px;">🔥</span>
-      <h2 style="font-size: 20px; font-weight: 800; color: ${t.textMain}; margin: 0; text-transform: uppercase;">
+      <h2 style="font-size: clamp(18px, 4vw, 22px); font-weight: 900; color: ${t.textMain}; margin: 0; text-transform: uppercase; line-height: 1.25;">
         Editorial Idioms &amp; Phrases (आज के मुहावरे)
       </h2>
     </div>
 
     <div style="display: flex; flex-direction: column; gap: 14px;">
       ${idiomsAndPhrases.map((ph, idx) => `
-      <div style="background: rgba(0,0,0,0.25); border: 1px solid ${t.border}; padding: 14px; border-radius: 12px;">
+      <div style="background: ${sectionBg}; border: 1px solid ${t.border}; padding: 14px; border-radius: 12px;">
         <div style="font-size: 16px; font-weight: 800; color: ${t.accentAmber}; margin-bottom: 6px;">
           ${idx + 1}. ${ph.phrase}
         </div>
@@ -184,7 +281,7 @@ export function generateBloggerHtml(postData, theme = 'slate') {
         ` : ''}
 
         ${ph.sentence ? `
-        <div style="font-size: 13px; color: ${t.textMuted}; font-style: italic; background: rgba(255,255,255,0.03); padding: 6px 10px; border-radius: 6px;">
+        <div style="font-size: 13px; color: ${t.textMuted}; font-style: italic; background: ${contextBg}; padding: 6px 10px; border-radius: 6px;">
           💬 <strong>Example:</strong> "${ph.sentence}"
         </div>
         ` : ''}
@@ -196,14 +293,14 @@ export function generateBloggerHtml(postData, theme = 'slate') {
 
   <!-- Interactive Swipe Card Quiz -->
   ${quizQuestions.length > 0 ? `
-  <div id="evQBox" style="background-color: ${t.cardBg}; border: 2px solid ${t.accentIndigo}; border-radius: 20px; padding: 0; margin-bottom: 24px; overflow: hidden;">
+  <div id="evQBox" style="background-color: ${t.cardBg}; border: 2px solid ${t.accentIndigo}; border-radius: 20px; padding: 0; margin-bottom: 24px; overflow: hidden; box-shadow: ${wordShadow};">
     
     <!-- Quiz Header -->
-    <div style="padding: 20px 24px; background: linear-gradient(135deg, ${t.accentIndigo}22, ${t.accentIndigo}08); border-bottom: 1px solid ${t.border};">
+    <div style="padding: clamp(16px, 3vw, 22px) clamp(16px, 3vw, 24px); background: ${quizHeaderBg}; border-bottom: 1px solid ${t.border};">
       <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
         <span style="font-size: 26px;">🧠</span>
-        <div>
-          <h2 style="font-size: 20px; font-weight: 800; color: ${t.textMain}; margin: 0;">Vocabulary Practice Quiz</h2>
+        <div style="min-width: 0;">
+          <h2 style="font-size: clamp(19px, 4vw, 22px); font-weight: 900; color: ${t.textMain}; margin: 0; line-height: 1.2;">Vocabulary Practice Quiz</h2>
           <span style="font-size: 12px; color: ${t.textMuted}; font-family: 'Hind', sans-serif;">आज के एडिटोरियल से खुद को टेस्ट करें!</span>
         </div>
       </div>
@@ -217,9 +314,9 @@ export function generateBloggerHtml(postData, theme = 'slate') {
     </div>
 
     <!-- Card Viewport -->
-    <div style="position: relative; overflow: hidden; min-height: 320px;" id="evViewport">
+    <div style="position: relative; overflow: hidden; min-height: 300px;" id="evViewport">
       ${quizQuestions.map((q, idx) => `
-      <div id="evC${idx}" class="evCard" style="position: absolute; top: 0; left: 0; width: 100%; padding: 24px; box-sizing: border-box; transition: transform 0.45s cubic-bezier(.4,0,.2,1), opacity 0.45s ease; ${idx === 0 ? 'transform: translateX(0); opacity: 1;' : 'transform: translateX(105%); opacity: 0;'}">
+      <div id="evC${idx}" class="evCard" aria-hidden="${idx === 0 ? 'false' : 'true'}" style="position: absolute; top: 0; left: 0; width: 100%; padding: clamp(18px, 3vw, 24px); box-sizing: border-box; transition: transform 0.45s cubic-bezier(.4,0,.2,1), opacity 0.45s ease; ${idx === 0 ? 'display: block; transform: translateX(0); opacity: 1; visibility: visible; pointer-events: auto;' : 'display: none; transform: translateX(105%); opacity: 0; visibility: hidden; pointer-events: none;'}">
         
         <!-- Question Number Pill -->
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
@@ -227,16 +324,16 @@ export function generateBloggerHtml(postData, theme = 'slate') {
         </div>
 
         <!-- Question Text -->
-        <div style="font-size: 18px; font-weight: 700; color: ${t.textMain}; line-height: 1.6; margin-bottom: 20px; font-family: 'Plus Jakarta Sans', sans-serif;">${q.question}</div>
+        <div style="font-size: clamp(16px, 3.5vw, 18px); font-weight: 800; color: ${t.textMain}; line-height: 1.55; margin-bottom: 20px; font-family: 'Plus Jakarta Sans', sans-serif; overflow-wrap: anywhere;">${q.question}</div>
 
         <!-- Options -->
         <div style="display: flex; flex-direction: column; gap: 10px;">
           ${(q.options || []).map((opt, oi) => {
             const letter = ['A','B','C','D'][oi];
             return `
-          <div id="evO${idx}_${letter}" onclick="evPick(${idx},'${letter}')" style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; border: 2px solid ${t.border}; border-radius: 12px; cursor: pointer; transition: all 0.3s cubic-bezier(.4,0,.2,1); user-select: none; background: transparent;">
+          <div id="evO${idx}_${letter}" onclick="evPick(${idx},'${letter}')" role="button" tabindex="0" style="display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; border: 2px solid ${t.border}; border-radius: 12px; cursor: pointer; transition: all 0.3s cubic-bezier(.4,0,.2,1); user-select: none; background: ${optionBg}; box-sizing: border-box;">
             <span id="evD${idx}_${letter}" style="min-width: 36px; height: 36px; border-radius: 50%; border: 2px solid ${t.border}; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: ${t.textMuted}; transition: all 0.3s ease; flex-shrink: 0;">${letter}</span>
-            <span style="font-size: 15px; font-weight: 600; color: ${t.textMain}; line-height: 1.4;">${opt.replace(/^[A-D]\)\s*/, '')}</span>
+            <span style="font-size: 15px; font-weight: 700; color: ${t.textMain}; line-height: 1.45; overflow-wrap: anywhere;">${opt.replace(/^[A-D]\)\s*/, '')}</span>
           </div>`;
           }).join('')}
         </div>
@@ -247,7 +344,7 @@ export function generateBloggerHtml(postData, theme = 'slate') {
       `).join('')}
 
       <!-- Scorecard Card -->
-      <div id="evScore" class="evCard" style="position: absolute; top: 0; left: 0; width: 100%; padding: 24px; box-sizing: border-box; transform: translateX(105%); opacity: 0; transition: transform 0.45s cubic-bezier(.4,0,.2,1), opacity 0.45s ease;">
+      <div id="evScore" class="evCard" aria-hidden="true" style="display: none; position: absolute; top: 0; left: 0; width: 100%; padding: clamp(18px, 3vw, 24px); box-sizing: border-box; transform: translateX(105%); opacity: 0; visibility: hidden; pointer-events: none; transition: transform 0.45s cubic-bezier(.4,0,.2,1), opacity 0.45s ease;">
         <div style="text-align: center; padding: 20px 0;">
           <div id="evEmoji" style="font-size: 56px; margin-bottom: 8px;">🏆</div>
           <div style="font-size: 12px; font-weight: 800; color: ${t.textMuted}; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 4px;">YOUR SCORE</div>
@@ -259,22 +356,22 @@ export function generateBloggerHtml(postData, theme = 'slate') {
           <div id="evReview" style="text-align: left; margin-top: 16px; border-top: 1px solid ${t.border}; padding-top: 16px;"></div>
 
           <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap;">
-            <button onclick="evRetry()" style="background: ${t.accentIndigo}; color: #fff; border: none; padding: 12px 30px; font-size: 14px; font-weight: 800; border-radius: 10px; cursor: pointer;">🔄 Retry Quiz</button>
+            <button type="button" onclick="evRetry()" style="background: ${t.accentIndigo}; color: #fff; border: none; padding: 12px 30px; font-size: 14px; font-weight: 800; border-radius: 10px; cursor: pointer;">🔄 Retry Quiz</button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Navigation Bar -->
-    <div id="evNav" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-top: 1px solid ${t.border}; background: ${t.cardBg};">
-      <button id="evPrev" onclick="evGo(-1)" style="background: transparent; border: 2px solid ${t.border}; color: ${t.textMuted}; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; opacity: 0.4; pointer-events: none;">← Back</button>
+    <div id="evNav" style="display: flex; align-items: center; justify-content: space-between; padding: 14px clamp(16px, 3vw, 24px); border-top: 1px solid ${t.border}; background: ${t.cardBg}; gap: 10px; flex-wrap: wrap;">
+      <button id="evPrev" type="button" onclick="evGo(-1)" style="flex: 1 1 92px; background: transparent; border: 2px solid ${t.border}; color: ${t.textMuted}; padding: 10px 18px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; opacity: 0.4; pointer-events: none;">← Back</button>
       
       <!-- Dot Indicators -->
       <div id="evDots" style="display: flex; gap: 6px; align-items: center;">
         ${quizQuestions.map((_, idx) => `<span id="evDot${idx}" style="width: ${idx === 0 ? '24px' : '8px'}; height: 8px; border-radius: 4px; background: ${idx === 0 ? t.accentIndigo : t.border}; transition: all 0.4s ease; cursor: pointer;" onclick="evGoTo(${idx})"></span>`).join('')}
       </div>
 
-      <button id="evNext" onclick="evGo(1)" style="background: ${t.accentIndigo}; border: none; color: #fff; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s;">Next →</button>
+      <button id="evNext" type="button" onclick="evGo(1)" style="flex: 1 1 92px; background: ${t.border}; border: none; color: ${t.textMuted}; padding: 10px 18px; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: not-allowed; transition: all 0.2s; opacity: 0.65; pointer-events: none;">Choose answer</button>
     </div>
   </div>
 
@@ -286,43 +383,74 @@ export function generateBloggerHtml(postData, theme = 'slate') {
     var qTexts={${quizQuestions.map((q,i)=>`${i}:${JSON.stringify(q.question)}`).join(',')}};
     var C={a:'${t.accentIndigo}',e:'${t.accentEmerald}',r:'${t.accentRose}',am:'${t.accentAmber}',b:'${t.border}',bg:'${t.cardBg}',t:'${t.textMain}',m:'${t.textMuted}'};
 
+    function setNextState(){
+      var nb=document.getElementById('evNext');
+      if(!nb || cur>=total)return;
+      var answered=ans[cur]!==undefined;
+      nb.style.pointerEvents=answered?'auto':'none';
+      nb.style.cursor=answered?'pointer':'not-allowed';
+      nb.style.opacity=answered?'1':'0.65';
+      if(answered){
+        nb.style.color='#fff';
+        nb.style.background=cur===total-1?'linear-gradient(135deg,'+C.a+',#8b5cf6)':C.a;
+        nb.textContent=cur===total-1?'Submit ✅':'Next →';
+      }else{
+        nb.style.color=C.m;
+        nb.style.background=C.b;
+        nb.textContent='Choose answer';
+      }
+    }
+
     function show(idx, dir){
-      // Hide current card
       var old=document.getElementById(cur<total?'evC'+cur:'evScore');
-      if(old){old.style.transform='translateX('+(dir>0?'-105%':'105%')+')';old.style.opacity='0';}
+      if(old){
+        old.style.transform='translateX('+(dir>0?'-105%':'105%')+')';
+        old.style.opacity='0';
+        old.style.pointerEvents='none';
+        old.setAttribute('aria-hidden','true');
+        setTimeout(function(){old.style.visibility='hidden';old.style.display='none';},460);
+      }
       cur=idx;
-      // Show new card
       setTimeout(function(){
         var nw=document.getElementById(cur<total?'evC'+cur:'evScore');
-        if(nw){nw.style.transform='translateX(0)';nw.style.opacity='1';}
-      },50);
-      // Update dots
+        if(nw){
+          nw.style.display='block';
+          nw.style.visibility='visible';
+          nw.style.pointerEvents='auto';
+          nw.setAttribute('aria-hidden','false');
+          nw.style.transform='translateX(0)';
+          nw.style.opacity='1';
+        }
+      },30);
       for(var i=0;i<total;i++){
         var d=document.getElementById('evDot'+i);
         if(d){d.style.width=i===cur?'24px':'8px';d.style.background=ans[i]!==undefined?(i===cur?C.a:C.e):(i===cur?C.a:C.b);}
       }
-      // Update buttons
-      var pb=document.getElementById('evPrev'), nb=document.getElementById('evNext');
-      if(cur===0){pb.style.opacity='0.4';pb.style.pointerEvents='none';}else{pb.style.opacity='1';pb.style.pointerEvents='auto';}
+      var pb=document.getElementById('evPrev');
+      if(pb){if(cur===0){pb.style.opacity='0.4';pb.style.pointerEvents='none';}else{pb.style.opacity='1';pb.style.pointerEvents='auto';}}
       if(cur>=total){
-        document.getElementById('evNav').style.display='none';
-      } else if(cur===total-1 && ans[cur]!==undefined){
-        nb.textContent='Submit ✅';nb.style.background='linear-gradient(135deg,'+C.a+',#8b5cf6)';
-      } else {
-        nb.textContent='Next →';nb.style.background=C.a;
+        var nav=document.getElementById('evNav');if(nav)nav.style.display='none';
+      }else{
+        setNextState();
       }
-      // Resize viewport
       setTimeout(function(){
         var card=document.getElementById(cur<total?'evC'+cur:'evScore');
-        if(card){document.getElementById('evViewport').style.minHeight=card.scrollHeight+'px';}
+        var viewport=document.getElementById('evViewport');
+        if(card&&viewport){viewport.style.minHeight=card.scrollHeight+'px';}
       },100);
     }
 
-    window.evGoTo=function(i){if(!done&&i<total)show(i,i>cur?1:-1);};
+    window.evGoTo=function(i){
+      if(done||i>=total)return;
+      if(i>cur+1)return;
+      if(i>cur&&ans[cur]===undefined)return;
+      show(i,i>cur?1:-1);
+    };
     window.evGo=function(dir){
       var next=cur+dir;
       if(next<0)return;
-      if(cur===total-1 && dir===1 && ans[cur]!==undefined && !done){evSubmit();return;}
+      if(dir>0&&cur<total&&ans[cur]===undefined)return;
+      if(cur===total-1&&dir===1&&!done){evSubmit();return;}
       if(next>=total)return;
       show(next,dir);
     };
@@ -332,7 +460,7 @@ export function generateBloggerHtml(postData, theme = 'slate') {
       ans[qi]=letter;
       ['A','B','C','D'].forEach(function(l){
         var o=document.getElementById('evO'+qi+'_'+l),d=document.getElementById('evD'+qi+'_'+l);
-        if(o){o.style.borderColor=C.b;o.style.background='transparent';}
+        if(o){o.style.borderColor=C.b;o.style.background='${optionBg}';}
         if(d){d.style.borderColor=C.b;d.style.background='transparent';d.style.color=C.m;d.textContent=l;}
       });
       var so=document.getElementById('evO'+qi+'_'+letter),sd=document.getElementById('evD'+qi+'_'+letter);
@@ -345,8 +473,7 @@ export function generateBloggerHtml(postData, theme = 'slate') {
       // Update dots
       var dot=document.getElementById('evDot'+qi);
       if(dot&&qi!==cur)dot.style.background=C.e;
-      // Update next btn text if last Q
-      if(qi===total-1){var nb=document.getElementById('evNext');nb.textContent='Submit ✅';nb.style.background='linear-gradient(135deg,'+C.a+',#8b5cf6)';}
+      setNextState();
       // Auto-advance after short delay
       if(qi<total-1){setTimeout(function(){show(qi+1,1);},400);}
     };
@@ -402,23 +529,27 @@ export function generateBloggerHtml(postData, theme = 'slate') {
         document.getElementById('evR'+i).style.display='none';
         ['A','B','C','D'].forEach(function(l){
           var o=document.getElementById('evO'+i+'_'+l),d=document.getElementById('evD'+i+'_'+l);
-          if(o){o.style.borderColor=C.b;o.style.background='transparent';o.style.cursor='pointer';}
+          if(o){o.style.borderColor=C.b;o.style.background='${optionBg}';o.style.cursor='pointer';}
           if(d){d.style.borderColor=C.b;d.style.background='transparent';d.style.color=C.m;d.textContent=l;}
         });
       }
       // Reset scorecard position
-      var sc=document.getElementById('evScore');sc.style.transform='translateX(105%)';sc.style.opacity='0';
+      var sc=document.getElementById('evScore');sc.style.display='none';sc.style.transform='translateX(105%)';sc.style.opacity='0';sc.style.visibility='hidden';sc.style.pointerEvents='none';sc.setAttribute('aria-hidden','true');
       // Reset all cards
       for(var i=0;i<total;i++){
         var c=document.getElementById('evC'+i);
+        c.style.display=i===0?'block':'none';
         c.style.transform=i===0?'translateX(0)':'translateX(105%)';
         c.style.opacity=i===0?'1':'0';
+        c.style.visibility=i===0?'visible':'hidden';
+        c.style.pointerEvents=i===0?'auto':'none';
+        c.setAttribute('aria-hidden',i===0?'false':'true');
       }
       cur=0;
       // Reset dots + nav
       for(var i=0;i<total;i++){var d=document.getElementById('evDot'+i);d.style.width=i===0?'24px':'8px';d.style.background=i===0?C.a:C.b;}
       var pb=document.getElementById('evPrev'),nb=document.getElementById('evNext');
-      pb.style.opacity='0.4';pb.style.pointerEvents='none';nb.textContent='Next →';nb.style.background=C.a;
+      pb.style.opacity='0.4';pb.style.pointerEvents='none';setNextState();
       document.getElementById('evQBox').scrollIntoView({behavior:'smooth',block:'start'});
       setTimeout(function(){document.getElementById('evViewport').style.minHeight=document.getElementById('evC0').scrollHeight+'px';},100);
     };
@@ -427,6 +558,21 @@ export function generateBloggerHtml(postData, theme = 'slate') {
     setTimeout(function(){
       var c=document.getElementById('evC0');
       if(c)document.getElementById('evViewport').style.minHeight=c.scrollHeight+'px';
+      setNextState();
+      for(var i=0;i<total;i++){
+        ['A','B','C','D'].forEach(function(l){
+          var option=document.getElementById('evO'+i+'_'+l);
+          if(option){
+            option.onkeydown=function(evt){
+              if(evt.key==='Enter'||evt.key===' '){
+                evt.preventDefault();
+                var parts=this.id.split('_');
+                evPick(Number(parts[0].replace('evO','')),parts[1]);
+              }
+            };
+          }
+        });
+      }
     },200);
   })();
   </script>

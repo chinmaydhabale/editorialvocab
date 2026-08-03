@@ -81,7 +81,7 @@ export default function Header({ apiKey, setApiKey, currentTheme, setCurrentThem
           >
             <Key className="w-4 h-4" />
             <span className="hidden sm:inline">{apiKey ? `API: ${selectedModel || '3.6 Flash'}` : 'Set API Key'}</span>
-            <span className="sm:hidden">{apiKey ? 'API Set' : 'API Key'}</span>
+            <span className="sm:hidden whitespace-nowrap">{apiKey ? 'API Set' : 'API Key'}</span>
             {apiKey && <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)] ml-1" />}
           </button>
         </div>

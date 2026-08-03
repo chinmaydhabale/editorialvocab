@@ -164,37 +164,41 @@ export default function App() {
       <main className="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 py-8">
         
         {/* Navigation Tabs */}
-        <div className="flex gap-1.5 p-1.5 bg-slate-900/60 backdrop-blur-xl border border-slate-800/60 rounded-2xl mb-8 overflow-x-auto no-scrollbar w-full shadow-inner">
+        <div className="grid grid-cols-2 sm:flex gap-1.5 p-1.5 bg-slate-900/60 backdrop-blur-xl border border-slate-800/60 rounded-2xl mb-8 sm:overflow-x-auto no-scrollbar w-full shadow-inner">
           <button
             onClick={() => setActiveTab('input')}
-            className={`flex-1 min-w-[140px] px-4 py-3 flex items-center justify-center gap-2 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'input' ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
+            className={`min-w-0 sm:flex-1 sm:min-w-[140px] px-3 sm:px-4 py-3 flex items-center justify-center gap-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 ${activeTab === 'input' ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
           >
             <FileText className="w-4 h-4" />
-            <span>1. Upload Screenshot / Text</span>
+            <span className="truncate sm:hidden">1. Upload</span>
+            <span className="hidden sm:inline truncate">1. Upload Screenshot / Text</span>
           </button>
           
           <button
             onClick={() => setActiveTab('edit')}
-            className={`flex-1 min-w-[140px] px-4 py-3 flex items-center justify-center gap-2 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'edit' ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
+            className={`min-w-0 sm:flex-1 sm:min-w-[140px] px-3 sm:px-4 py-3 flex items-center justify-center gap-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 ${activeTab === 'edit' ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
           >
             <Edit3 className="w-4 h-4" />
-            <span>2. Edit Vocabulary &amp; Quiz ({postData.words.length} Words)</span>
+            <span className="truncate sm:hidden">2. Edit ({postData.words.length})</span>
+            <span className="hidden sm:inline truncate">2. Edit Vocabulary &amp; Quiz ({postData.words.length} Words)</span>
           </button>
 
           <button
             onClick={() => setActiveTab('preview')}
-            className={`flex-1 min-w-[140px] px-4 py-3 flex items-center justify-center gap-2 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'preview' ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
+            className={`min-w-0 sm:flex-1 sm:min-w-[140px] px-3 sm:px-4 py-3 flex items-center justify-center gap-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 ${activeTab === 'preview' ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
           >
             <Eye className="w-4 h-4" />
-            <span>3. Blogger Theme Live Preview</span>
+            <span className="truncate sm:hidden">3. Preview</span>
+            <span className="hidden sm:inline truncate">3. Blogger Theme Live Preview</span>
           </button>
 
           <button
             onClick={() => setActiveTab('export')}
-            className={`flex-1 min-w-[140px] px-4 py-3 flex items-center justify-center gap-2 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'export' ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
+            className={`min-w-0 sm:flex-1 sm:min-w-[140px] px-3 sm:px-4 py-3 flex items-center justify-center gap-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 ${activeTab === 'export' ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
           >
             <Share2 className="w-4 h-4" />
-            <span>4. Auto-Publish to Blogger</span>
+            <span className="truncate sm:hidden">4. Publish</span>
+            <span className="hidden sm:inline truncate">4. Auto-Publish to Blogger</span>
           </button>
         </div>
 
