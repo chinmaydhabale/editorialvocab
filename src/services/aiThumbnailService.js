@@ -9,6 +9,8 @@ function escapeSvgText(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;');
+}
+
 function truncateTitle(str, max = 52) {
   const text = String(str || '').trim();
   if (text.length <= max) return text;
