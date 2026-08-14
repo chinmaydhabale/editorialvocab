@@ -54,7 +54,7 @@ function extractJsonPayload(rawText) {
  * Analyzes an editorial passage or multiple image screenshots using Gemini API (API Hit #1):
  * Extracts words, article title, and topic.
  */
-export async function analyzeEditorialWithGemini(apiKey, textOrImages, wordCount = 'all', preferredModel = 'gemini-3.6-flash') {
+export async function analyzeEditorialWithGemini(apiKey, textOrImages, wordCount = 'all', preferredModel = 'gemini-3.7-flash') {
   if (!apiKey || apiKey.trim() === "") {
     throw new Error("Gemini API Key missing. Please provide your API key in settings or use sample editorials.");
   }
@@ -66,6 +66,7 @@ export async function analyzeEditorialWithGemini(apiKey, textOrImages, wordCount
 
   const NEW_MODELS_PRIORITY = [
     preferredModel,
+    "gemini-3.7-flash",
     "gemini-3.6-flash",
     "gemini-3.5-flash",
     "gemini-2.5-flash",
@@ -191,7 +192,7 @@ SCHEMA:
 /**
  * Dedicated 2nd API Hit: Generates 5-8 Interactive Practice Quiz MCQs based on extracted vocabulary and idioms.
  */
-export async function generateQuizWithGemini(apiKey, vocabData, preferredModel = 'gemini-3.6-flash') {
+export async function generateQuizWithGemini(apiKey, vocabData, preferredModel = 'gemini-3.7-flash') {
   if (!apiKey || !apiKey.trim()) return [];
 
   const cleanKey = apiKey.trim();
@@ -200,6 +201,7 @@ export async function generateQuizWithGemini(apiKey, vocabData, preferredModel =
 
   const NEW_MODELS_PRIORITY = [
     preferredModel,
+    "gemini-3.7-flash",
     "gemini-3.6-flash",
     "gemini-3.5-flash",
     "gemini-2.5-flash",

@@ -5,7 +5,7 @@ import { getAvailableGeminiModels } from '../services/geminiService';
 export default function Header({ apiKey, setApiKey, currentTheme, setCurrentTheme, selectedModel, setSelectedModel }) {
   const [showKeyModal, setShowKeyModal] = useState(false);
   const [tempKey, setTempKey] = useState(apiKey);
-  const [tempModel, setTempModel] = useState(selectedModel || 'gemini-3.6-flash');
+  const [tempModel, setTempModel] = useState(selectedModel || 'gemini-3.7-flash');
   const [availableModels, setAvailableModels] = useState([]);
   const [isDiscovering, setIsDiscovering] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
@@ -80,7 +80,7 @@ export default function Header({ apiKey, setApiKey, currentTheme, setCurrentThem
             }`}
           >
             <Key className="w-4 h-4" />
-            <span className="hidden sm:inline">{apiKey ? `API: ${selectedModel || '3.6 Flash'}` : 'Set API Key'}</span>
+            <span className="hidden sm:inline">{apiKey ? `API: ${selectedModel || '3.7 Flash'}` : 'Set API Key'}</span>
             <span className="sm:hidden whitespace-nowrap">{apiKey ? 'API Set' : 'API Key'}</span>
             {apiKey && <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)] ml-1" />}
           </button>
@@ -134,7 +134,8 @@ export default function Header({ apiKey, setApiKey, currentTheme, setCurrentThem
                   className="w-full bg-slate-950 border border-slate-800 text-slate-100 px-4 py-3 rounded-xl outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors cursor-pointer appearance-none"
                 >
                   <optgroup label="Latest Gemini 3.x Models" className="bg-slate-900 text-slate-300">
-                    <option value="gemini-3.6-flash">⚡ Gemini 3.6 Flash (Latest Ultra Fast)</option>
+                    <option value="gemini-3.7-flash">⚡ Gemini 3.7 Flash (State-of-the-Art Speed & Reasoning)</option>
+                    <option value="gemini-3.6-flash">⚡ Gemini 3.6 Flash (Ultra Fast)</option>
                     <option value="gemini-3.5-flash">⚡ Gemini 3.5 Flash</option>
                   </optgroup>
                   <optgroup label="Gemini 2.x Models" className="bg-slate-900 text-slate-300">

@@ -62,7 +62,7 @@ export async function runBotCycle(options = {}) {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
   const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
-  const preferredModel = process.env.PREFERRED_MODEL || 'gemini-3.6-flash';
+  const preferredModel = process.env.PREFERRED_MODEL || 'gemini-3.7-flash';
   const theme = process.env.BLOG_THEME || config.botOptions?.theme || 'warm';
   const wordCount = process.env.WORD_COUNT || config.botOptions?.wordCount || 'all';
 

@@ -24,7 +24,7 @@ function buildSeoBlogTitle({ sourceName, dateStr, headline }) {
 
 export default function App() {
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || '');
-  const [selectedModel, setSelectedModel] = useState(() => localStorage.getItem('gemini_selected_model') || 'gemini-3.6-flash');
+  const [selectedModel, setSelectedModel] = useState(() => localStorage.getItem('gemini_selected_model') || 'gemini-3.7-flash');
   const [currentTheme, setCurrentTheme] = useState('warm');
   const [activeTab, setActiveTab] = useState('input');
   const [isLoading, setIsLoading] = useState(false);

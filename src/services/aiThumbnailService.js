@@ -9,10 +9,16 @@ function escapeSvgText(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;');
+function truncateTitle(str, max = 52) {
+  const text = String(str || '').trim();
+  if (text.length <= max) return text;
+  const sliced = text.slice(0, max);
+  const lastSpace = sliced.lastIndexOf(' ');
+  return (lastSpace > 25 ? sliced.slice(0, lastSpace) : sliced) + '...';
 }
 
 export function generateAiThumbnail({ title, sourceName, date, topic = "Daily Editorial Vocabulary" }) {
-  const cleanTitle = escapeSvgText((title || "Daily Editorial Vocabulary").slice(0, 45));
+  const cleanTitle = escapeSvgText(truncateTitle(title || "Daily Editorial Vocabulary", 52));
   const cleanSource = escapeSvgText((sourceName || "The Hindu & Indian Express").toUpperCase());
   const cleanDate = escapeSvgText(date || new Date().toISOString().split('T')[0]);
   const cleanTopic = escapeSvgText((topic || "Daily Editorial Vocabulary").slice(0, 64).toUpperCase());

@@ -22,9 +22,12 @@ export const NEWSPAPERS_ARRAY = [
  * e.g. "2026-07-29" -> "July"
  */
 export function getMonthTagFromDate(dateStr) {
-  const d = dateStr ? new Date(dateStr) : new Date();
+  let d = dateStr ? new Date(dateStr) : new Date();
+  if (isNaN(d.getTime())) {
+    d = new Date();
+  }
   const monthIndex = d.getMonth();
-  return MONTHS_ARRAY[monthIndex] || 'July';
+  return MONTHS_ARRAY[monthIndex] || MONTHS_ARRAY[new Date().getMonth()];
 }
 
 /**

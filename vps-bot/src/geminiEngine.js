@@ -15,12 +15,13 @@ export function parseApiKeys(apiKeyInput) {
 
 /**
  * Strict Model Priority:
- * 1. gemini-3.6-flash (Default Primary)
- * 2. gemini-3.5-flash (Secondary Fallback)
+ * 1. gemini-3.7-flash (Default Primary)
+ * 2. gemini-3.6-flash (Secondary Fallback)
+ * 3. gemini-3.5-flash (Tertiary Fallback)
  * Strictly does NOT go below gemini-3.5-flash!
  */
-function getAllowedModels(preferredModel = 'gemini-3.6-flash') {
-  const allowedList = ['gemini-3.6-flash', 'gemini-3.5-flash'];
+function getAllowedModels(preferredModel = 'gemini-3.7-flash') {
+  const allowedList = ['gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.5-flash'];
   const pref = (preferredModel || '').trim();
   if (pref && allowedList.includes(pref)) {
     return [pref, ...allowedList.filter(m => m !== pref)];
@@ -71,10 +72,10 @@ function extractJsonPayload(rawText) {
 
 /**
  * Analyzes editorial text using Gemini API with Strict Model Fallback:
- * Default: gemini-3.6-flash -> Fallback: gemini-3.5-flash (No lower models used).
+ * Default: gemini-3.7-flash -> Fallback: gemini-3.6-flash -> gemini-3.5-flash (No lower models used).
  * Multi-Key Auto-Fallback supported if keys list has multiple keys.
  */
-export async function analyzeEditorialWithGemini(apiKeyInput, editorialText, wordCount = 'all', preferredModel = 'gemini-3.6-flash') {
+export async function analyzeEditorialWithGemini(apiKeyInput, editorialText, wordCount = 'all', preferredModel = 'gemini-3.7-flash') {
   const keysList = parseApiKeys(apiKeyInput);
 
   if (keysList.length === 0) {
@@ -181,9 +182,9 @@ ${editorialText}
 
 /**
  * Generates 5-8 MCQs based on extracted vocabulary and idioms with Strict Model Fallback.
- * Default: gemini-3.6-flash -> Fallback: gemini-3.5-flash.
+ * Default: gemini-3.7-flash -> Fallback: gemini-3.6-flash -> gemini-3.5-flash.
  */
-export async function generateQuizWithGemini(apiKeyInput, vocabData, preferredModel = 'gemini-3.6-flash') {
+export async function generateQuizWithGemini(apiKeyInput, vocabData, preferredModel = 'gemini-3.7-flash') {
   const keysList = parseApiKeys(apiKeyInput);
   if (keysList.length === 0) return [];
 

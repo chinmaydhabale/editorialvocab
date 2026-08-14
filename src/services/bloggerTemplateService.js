@@ -426,7 +426,7 @@ ${jsonLdSchema}
             return `
           <div id="evO${idx}_${letter}" onclick="evPick(${idx},'${letter}')" role="button" tabindex="0" style="display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; border: 2px solid ${t.border}; border-radius: 12px; cursor: pointer; transition: all 0.3s cubic-bezier(.4,0,.2,1); user-select: none; background: ${optionBg}; box-sizing: border-box;">
             <span id="evD${idx}_${letter}" style="min-width: 36px; height: 36px; border-radius: 50%; border: 2px solid ${t.border}; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: ${t.textMuted}; transition: all 0.3s ease; flex-shrink: 0;">${letter}</span>
-            <span style="font-size: 15px; font-weight: 700; color: ${t.textMain}; line-height: 1.45; overflow-wrap: anywhere;">${opt.replace(/^[A-D]\)\s*/, '')}</span>
+            <span style="font-size: 15px; font-weight: 700; color: ${t.textMain}; line-height: 1.45; overflow-wrap: anywhere;">${opt.replace(/^[A-D][\)\.\:\-\s]\s*/i, '')}</span>
           </div>`;
           }).join('')}
         </div>

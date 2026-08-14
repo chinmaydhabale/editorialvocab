@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Sparkles, FileText, Link, Image as ImageIcon, Zap, Upload, X, Plus, AlertCircle, ArrowRight } from 'lucide-react';
 import { SAMPLE_EDITORIALS } from '../services/sampleEditorials';
+import { extractArticleFromUrl } from '../services/urlExtractionService';
 
 export default function InputSection({ onProcessText, isLoading, loadingStep, onSelectSample, wordCountTarget, setWordCountTarget }) {
   const [activeTab, setActiveTab] = useState('text');
@@ -46,40 +47,29 @@ export default function InputSection({ onProcessText, isLoading, loadingStep, on
 
     try {
       const targetUrl = urlInput.trim();
-      const corsProxy = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
-      const res = await fetch(corsProxy);
-      const data = await res.json();
+      const extractedContent = await extractArticleFromUrl(targetUrl);
 
-      if (!data.contents) {
-        throw new Error("Could not fetch page contents.");
+      // Extract headline if found in content
+      const headlineMatch = extractedContent.match(/^Headline:\s*(.+)$/im);
+      if (headlineMatch && headlineMatch[1]) {
+        setCustomTitle(headlineMatch[1].trim());
       }
 
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(data.contents, 'text/html');
-
-      const extractedTitle = doc.querySelector('h1')?.innerText?.trim() || doc.title || '';
-      
-      const paragraphs = Array.from(doc.querySelectorAll('article p, main p, p'))
-        .map(p => p.innerText.trim())
-        .filter(t => t.length > 30);
-
-      const extractedText = paragraphs.slice(0, 15).join('\n\n');
-
-      if (!extractedText || extractedText.length < 100) {
-        throw new Error("Could not extract main article text. Please copy/paste the article text directly.");
-      }
-
-      setEditorialText(extractedText);
-      if (extractedTitle) setCustomTitle(extractedTitle);
-      
-      if (targetUrl.includes('livemint.com') || targetUrl.includes('mint')) {
+      // Detect Newspaper Source
+      const lowerUrl = targetUrl.toLowerCase();
+      if (lowerUrl.includes('livemint.com') || lowerUrl.includes('mint')) {
         setSourceName('LiveMint Editorial');
-      } else if (targetUrl.includes('indianexpress.com')) {
+      } else if (lowerUrl.includes('indianexpress.com')) {
         setSourceName('Indian Express Editorial');
-      } else if (targetUrl.includes('thehindu.com')) {
+      } else if (lowerUrl.includes('thehindu.com')) {
         setSourceName('The Hindu Editorial');
+      } else if (lowerUrl.includes('business-standard.com')) {
+        setSourceName('Business Standard Editorial');
+      } else if (lowerUrl.includes('timesofindia.indiatimes.com')) {
+        setSourceName('Times of India Editorial');
       }
 
+      setEditorialText(extractedContent);
       setActiveTab('text');
     } catch (err) {
       setUrlError(err.message || "Failed to extract article from URL.");
