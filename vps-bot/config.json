@@ -1,0 +1,17 @@
+{
+  "feeds": [
+    {
+      "name": "The Hindu",
+      "category": "Editorial",
+      "url": "https://www.thehindu.com/opinion/editorial/feeder/default.rss",
+      "enabled": true
+    }
+  ],
+  "botOptions": {
+    "maxArticlesPerRun": 3,
+    "theme": "warm",
+    "wordCount": "all",
+    "isDraft": false,
+    "titleTemplate": "The Hindu Editorial Vocabulary: {title} ({date}) | Hindi Meaning & Synonyms"
+  }
+}

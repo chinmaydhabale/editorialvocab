@@ -14,6 +14,12 @@
     <meta content='Daily editorial vocabulary with English meanings, Hindi support, mnemonics, idioms, root words, and exam-focused word practice.' name='description'/>
   </b:if>
 
+  <b:if cond='data:blog.searchLabel or data:blog.searchQuery or data:blog.pageType == &quot;archive&quot; or data:blog.url contains &quot;updated-max&quot; or data:blog.url contains &quot;max-results&quot;'>
+    <meta content='noindex,follow' name='robots'/>
+  <b:else/>
+    <meta content='index,follow,max-image-preview:large' name='robots'/>
+  </b:if>
+
   <link href='https://fonts.googleapis.com/css2?family=Hind:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700;800;900&amp;family=Libre+Baskerville:wght@400;700&amp;display=swap' rel='stylesheet'/>
 
   <b:skin><![CDATA[
@@ -1319,6 +1325,7 @@
         <b:widget id='Blog1' locked='true' title='Blog Posts' type='Blog' version='1'>
           <b:widget-settings>
             <b:widget-setting name='showDateHeader'>false</b:widget-setting>
+            <b:widget-setting name='postsPerPage'>12</b:widget-setting>
             <b:widget-setting name='style.textcolor'>#ffffff</b:widget-setting>
             <b:widget-setting name='showShareButtons'>false</b:widget-setting>
             <b:widget-setting name='authorLabel'>By</b:widget-setting>
@@ -1337,7 +1344,7 @@
             <b:widget-setting name='postsPerAd'>3</b:widget-setting>
             <b:widget-setting name='showBacklinks'>false</b:widget-setting>
             <b:widget-setting name='style.bordercolor'>#ffffff</b:widget-setting>
-            <b:widget-setting name='showInlineAds'>true</b:widget-setting>
+            <b:widget-setting name='showInlineAds'>false</b:widget-setting>
             <b:widget-setting name='showReactions'>false</b:widget-setting>
           </b:widget-settings>
           <b:includable id='main' var='top'>
@@ -1419,6 +1426,270 @@
                   <a expr:href='data:olderPageUrl'>Older posts</a>
                 </b:if>
               </nav>
+
+              <noscript>
+                <p class='feed-note'>JavaScript disabled hai, isliye Blogger server jitne posts bhej raha hai utne hi dikh rahe hain.</p>
+              </noscript>
+
+              <script type='text/javascript'>
+              //<![CDATA[
+                (function () {
+                  var path = window.location.pathname.replace(/\/+$/, '') || '/';
+                  var params = new URLSearchParams(window.location.search);
+                  var grid = document.querySelector('.feed-grid');
+                  var pager = document.querySelector('.blog-pager');
+                  var maxPosts = 12;
+                  var callbackName = 'editorialVocabRenderIndexFeed';
+
+                  if (!grid) {
+                    return;
+                  }
+
+                  function isIndexPage() {
+                    return path === '/' ||
+                      path === '/index.html' ||
+                      path.indexOf('/search') === 0 ||
+                      path.indexOf('/search/label/') === 0 ||
+                      path.indexOf('/search?') === 0;
+                  }
+
+                  if (!isIndexPage()) {
+                    return;
+                  }
+
+                  if (grid.querySelectorAll('.post-card').length > 1) {
+                    return;
+                  }
+
+                  grid.style.visibility = 'hidden';
+                  grid.style.minHeight = Math.max(grid.offsetHeight, 520) + 'px';
+
+                  function escapeHtml(value) {
+                    return String(value || '')
+                      .replace(/&/g, '&amp;')
+                      .replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;')
+                      .replace(/"/g, '&quot;')
+                      .replace(/'/g, '&#39;');
+                  }
+
+                  function stripHtml(value) {
+                    var holder = document.createElement('div');
+                    holder.innerHTML = value || '';
+                    return holder.textContent || holder.innerText || '';
+                  }
+
+                  function truncate(value, length) {
+                    var text = stripHtml(value).replace(/\s+/g, ' ').trim();
+                    if (text.length <= length) {
+                      return text;
+                    }
+                    return text.slice(0, length).replace(/\s+\S*$/, '') + '...';
+                  }
+
+                  function resizeBloggerImage(url) {
+                    return String(url || '')
+                      .replace(/\/s\d+(-c)?\//, '/s800/')
+                      .replace(/\/w\d+-h\d+[^/]*\//, '/s800/')
+                      .replace(/=s\d+(-c)?/, '=s800')
+                      .replace(/=w\d+-h\d+[^&]*/, '=s800');
+                  }
+
+                  function findImageInHtml(html) {
+                    var holder = document.createElement('div');
+                    var image;
+                    var styleMatch;
+                    holder.innerHTML = html || '';
+                    image = holder.querySelector('img[src]');
+
+                    if (image && image.getAttribute('src')) {
+                      return resizeBloggerImage(image.getAttribute('src'));
+                    }
+
+                    styleMatch = String(html || '').match(/url\((['"]?)(https?:\/\/[^'")]+)\1\)/i);
+                    return styleMatch ? resizeBloggerImage(styleMatch[2]) : '';
+                  }
+
+                  function getEntryText(entry) {
+                    if (entry.summary && entry.summary.$t) {
+                      return entry.summary.$t;
+                    }
+                    if (entry.content && entry.content.$t) {
+                      return entry.content.$t;
+                    }
+                    return '';
+                  }
+
+                  function getPostLink(entry) {
+                    var links = entry.link || [];
+                    for (var index = 0; index < links.length; index += 1) {
+                      if (links[index].rel === 'alternate') {
+                        return links[index].href;
+                      }
+                    }
+                    return '#';
+                  }
+
+                  function getPostImage(entry) {
+                    var thumbnail = entry.media$thumbnail && entry.media$thumbnail.url;
+                    if (thumbnail) {
+                      return resizeBloggerImage(thumbnail);
+                    }
+                    if (entry.content && entry.content.$t) {
+                      return findImageInHtml(entry.content.$t);
+                    }
+                    if (entry.summary && entry.summary.$t) {
+                      return findImageInHtml(entry.summary.$t);
+                    }
+                    return '';
+                  }
+
+                  function formatDate(entry) {
+                    var rawDate = entry.published && entry.published.$t;
+                    var date = rawDate ? new Date(rawDate) : null;
+                    if (!date || isNaN(date.getTime())) {
+                      return '';
+                    }
+                    return date.toLocaleDateString('en-IN', {
+                      weekday: 'long',
+                      day: '2-digit',
+                      month: 'long',
+                      year: 'numeric'
+                    });
+                  }
+
+                  function renderLabels(entry) {
+                    var categories = entry.category || [];
+                    var html = '';
+                    for (var index = 0; index < categories.length && index < 4; index += 1) {
+                      var label = categories[index].term || '';
+                      if (label) {
+                        html += '<a class="label-pill" href="/search/label/' + encodeURIComponent(label) + '">' + escapeHtml(label) + '</a>';
+                      }
+                    }
+                    return html ? '<div class="label-list">' + html + '</div>' : '';
+                  }
+
+                  function renderPost(entry) {
+                    var title = entry.title && entry.title.$t ? entry.title.$t : 'Untitled Lesson';
+                    var link = getPostLink(entry);
+                    var image = getPostImage(entry);
+                    var summary = getEntryText(entry);
+                    var date = formatDate(entry);
+                    var imageHtml = image
+                      ? '<img alt="' + escapeHtml(title) + '" loading="lazy" src="' + escapeHtml(image) + '"/>'
+                      : '<span class="thumb-placeholder">EV</span>';
+
+                    return [
+                      '<article class="post-card">',
+                        '<a class="post-thumb" href="' + escapeHtml(link) + '">',
+                          imageHtml,
+                        '</a>',
+                        '<div class="post-card-body">',
+                          '<div class="post-meta"><span>' + escapeHtml(date) + '</span></div>',
+                          renderLabels(entry),
+                          '<h2><a href="' + escapeHtml(link) + '">' + escapeHtml(title) + '</a></h2>',
+                          '<p class="post-snippet">' + escapeHtml(truncate(summary, 170)) + '</p>',
+                          '<a class="read-link" href="' + escapeHtml(link) + '">Read lesson</a>',
+                        '</div>',
+                      '</article>'
+                    ].join('');
+                  }
+
+                  function getFeedPath() {
+                    var labelPrefix = '/search/label/';
+                    var label;
+                    if (path.indexOf(labelPrefix) === 0) {
+                      label = decodeURIComponent(path.slice(labelPrefix.length));
+                      return '/feeds/posts/default/-/' + encodeURIComponent(label);
+                    }
+                    return '/feeds/posts/default';
+                  }
+
+                  function buildQuery() {
+                    var query = [
+                      'alt=json-in-script',
+                      'max-results=' + maxPosts,
+                      'callback=' + callbackName
+                    ];
+                    var updatedMax = params.get('updated-max');
+                    var searchQuery = params.get('q');
+
+                    if (updatedMax) {
+                      query.push('updated-max=' + encodeURIComponent(updatedMax));
+                    }
+                    if (searchQuery) {
+                      query.push('q=' + encodeURIComponent(searchQuery));
+                    }
+
+                    return query.join('&');
+                  }
+
+                  function buildOlderUrl(entries) {
+                    var last = entries[entries.length - 1];
+                    var updated = last && last.updated && last.updated.$t;
+                    var basePath = path.indexOf('/search/label/') === 0 ? path : '/search';
+                    var urlParams;
+
+                    if (!updated) {
+                      return '';
+                    }
+
+                    urlParams = new URLSearchParams();
+                    urlParams.set('updated-max', updated);
+                    urlParams.set('max-results', String(maxPosts));
+
+                    if (params.get('q')) {
+                      urlParams.set('q', params.get('q'));
+                    }
+
+                    return basePath + '?' + urlParams.toString();
+                  }
+
+                  function updatePager(entries) {
+                    var olderUrl = buildOlderUrl(entries);
+                    var newerLink;
+                    var olderLink;
+
+                    if (!pager || !olderUrl) {
+                      return;
+                    }
+
+                    newerLink = pager.querySelector('a[href*="updated-max"]');
+                    olderLink = pager.querySelector('a:last-child');
+
+                    if (path !== '/' && path !== '/index.html' && newerLink) {
+                      newerLink.setAttribute('href', '/');
+                    }
+
+                    if (olderLink) {
+                      olderLink.setAttribute('href', olderUrl);
+                    } else {
+                      pager.insertAdjacentHTML('beforeend', '<a href="' + escapeHtml(olderUrl) + '">Older posts</a>');
+                    }
+                  }
+
+                  window[callbackName] = function (json) {
+                    var entries = json && json.feed && json.feed.entry ? json.feed.entry : [];
+                    if (!entries.length) {
+                      grid.style.visibility = '';
+                      grid.style.minHeight = '';
+                      return;
+                    }
+
+                    grid.innerHTML = entries.map(renderPost).join('');
+                    grid.setAttribute('data-feed-source', 'blogger-default-feed');
+                    grid.style.visibility = '';
+                    grid.style.minHeight = '';
+                    updatePager(entries);
+                  };
+
+                  var script = document.createElement('script');
+                  script.src = getFeedPath() + '?' + buildQuery();
+                  document.body.appendChild(script);
+                }());
+              //]]>
+              </script>
             </b:if>
           </b:includable>
           <b:includable id='backlinkDeleteIcon' var='backlink'/>

@@ -1,0 +1,32 @@
+{
+  "name": "vps-automated-bot",
+  "version": "1.0.0",
+  "description": "Automated RSS feed reader and Google Blogger publisher for daily editorial vocabulary, idioms & interactive quizzes",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "once": "node src/index.js --once",
+    "dry-run": "node src/index.js --dry-run",
+    "get-token": "node src/getRefreshToken.js",
+    "migrate-jump-breaks": "node src/addJumpBreaksToExistingPosts.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "node-cron": "^3.0.3",
+    "rss-parser": "^3.13.0"
+  },
+  "keywords": [
+    "editorial",
+    "vocabulary",
+    "blogger",
+    "rss",
+    "gemini-ai",
+    "automation",
+    "upsc"
+  ],
+  "author": "EditorialVocab",
+  "license": "MIT"
+}
