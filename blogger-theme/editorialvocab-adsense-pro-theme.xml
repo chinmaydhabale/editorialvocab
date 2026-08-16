@@ -7,6 +7,18 @@
   <meta content='IE=edge' http-equiv='X-UA-Compatible'/>
   <b:include data='blog' name='all-head-content'/>
 
+  <!-- Google tag (gtag.js) -->
+  <script async='async' src='https://www.googletagmanager.com/gtag/js?id=G-DK3DKF7BJ2'/>
+  <script>
+  //<![CDATA[
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-DK3DKF7BJ2');
+  //]]>
+  </script>
+
   <!-- Dynamic Page Title -->
   <title><b:if cond='data:view.isError'>404 Page Not Found - <data:blog.title/></b:if><b:if cond='data:view.isPost'><data:view.title.escaped/> - <data:blog.title/></b:if><b:if cond='data:view.isPage'><data:view.title.escaped/> - <data:blog.title/></b:if><b:if cond='data:view.isMultipleItems and not data:view.isHomepage'><data:view.search.label/> Vocabulary Archive - <data:blog.title/></b:if><b:if cond='data:view.isHomepage'><data:blog.title/> - Daily Editorial Vocabulary &amp; Exam English</b:if></title>
 
