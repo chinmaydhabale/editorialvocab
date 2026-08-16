@@ -1316,10 +1316,10 @@
                       <!-- Breadcrumbs -->
                       <nav aria-label='Breadcrumbs' class='ev-breadcrumbs'>
                         <a href='/'>Home</a>
-                        <span>&rsaquo;</span>
+                        <span>&#8250;</span>
                         <b:if cond='data:post.labels'>
                           <a expr:href='data:post.labels.first.url'><data:post.labels.first.name/></a>
-                          <span>&rsaquo;</span>
+                          <span>&#8250;</span>
                         </b:if>
                         <span><data:post.title/></span>
                       </nav>
@@ -1378,7 +1378,7 @@
                     <div class='ev-static-page'>
                       <nav aria-label='Breadcrumbs' class='ev-breadcrumbs'>
                         <a href='/'>Home</a>
-                        <span>&rsaquo;</span>
+                        <span>&#8250;</span>
                         <span><data:post.title/></span>
                       </nav>
                       <h1 class='ev-static-title'><data:post.title/></h1>
@@ -1414,7 +1414,7 @@
                           </div>
                           <div class='ev-card-footer'>
                             <a class='ev-read-more' expr:href='data:post.url'>
-                              Read Full Vocabulary Lesson &rarr;
+                              Read Full Vocabulary Lesson &#8594;
                             </a>
                           </div>
                         </div>
@@ -1425,12 +1425,12 @@
                   <!-- Pagination Controls -->
                   <div class='ev-pagination'>
                     <b:if cond='data:newerPageUrl'>
-                      <a class='ev-page-btn' expr:href='data:newerPageUrl'>&larr; Newer Articles</a>
+                      <a class='ev-page-btn' expr:href='data:newerPageUrl'>&#8592; Newer Articles</a>
                     <b:else/>
                       <span/>
                     </b:if>
                     <b:if cond='data:olderPageUrl'>
-                      <a class='ev-page-btn' expr:href='data:olderPageUrl'>Older Articles &rarr;</a>
+                      <a class='ev-page-btn' expr:href='data:olderPageUrl'>Older Articles &#8594;</a>
                     </b:if>
                   </div>
                 </b:if>
@@ -1470,7 +1470,7 @@
             Download our seamless continuous <strong>Pagebreakless PDFs</strong> on every article page for mobile &amp; tablet revision!
           </p>
           <a href='/p/the-hindu-editorial-vocabulary.html' style='display: block; text-align: center; background: var(--primary); color: #ffffff; padding: 9px 16px; border-radius: var(--radius-full); font-size: 13px; font-weight: 800; text-decoration: none;'>
-            Browse PDF Archive &rarr;
+            Browse PDF Archive &#8594;
           </a>
         </div>
 
@@ -1573,7 +1573,7 @@
 
       <!-- Bottom Copyright Strip -->
       <div class='ev-footer-bottom'>
-        <p>&copy; <script>document.write(new Date().getFullYear())</script> EditorialVocab.in — All rights reserved.</p>
+        <p>&#169; <script>document.write(new Date().getFullYear())</script> EditorialVocab.in — All rights reserved.</p>
         <div class='ev-footer-policy-row'>
           <a href='/p/privacy-policy.html'>Privacy Policy</a>
           <span>•</span>
