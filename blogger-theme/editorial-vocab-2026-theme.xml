@@ -20,13 +20,13 @@
   </script>
 
   <!-- Dynamic Page Title -->
-  <title><b:if cond='data:view.isError'>404 Page Not Found - <data:blog.title/></b:if><b:if cond='data:view.isPost'><data:view.title.escaped/> - <data:blog.title/></b:if><b:if cond='data:view.isPage'><data:view.title.escaped/> - <data:blog.title/></b:if><b:if cond='data:view.isMultipleItems and not data:view.isHomepage'><data:view.search.label/> Vocabulary Archive - <data:blog.title/></b:if><b:if cond='data:view.isHomepage'><data:blog.title/> - Daily Editorial Vocabulary &amp; Exam English</b:if></title>
+  <title><b:if cond='data:view.isError'>404 Page Not Found - <data:blog.title/></b:if><b:if cond='data:view.isPost'><data:view.title.escaped/> - <data:blog.title/></b:if><b:if cond='data:view.isPage'><data:view.title.escaped/> - <data:blog.title/></b:if><b:if cond='data:view.isMultipleItems and not data:view.isHomepage'><data:view.search.label/> Vocabulary - <data:blog.title/></b:if><b:if cond='data:view.isHomepage'><data:blog.title/> - Daily Editorial Vocabulary &amp; Exam English</b:if></title>
 
   <!-- Meta Description -->
   <b:if cond='data:blog.metaDescription'>
     <meta expr:content='data:blog.metaDescription' name='description'/>
   <b:else/>
-    <meta content='Daily Editorial Vocabulary from The Hindu and Indian Express with Hindi Meanings, Synonyms, Antonyms, Mnemonics, Idioms, Root Words and Interactive Quiz for UPSC, SSC and Banking Exams.' name='description'/>
+    <meta content='Daily Editorial Vocabulary from The Hindu and Indian Express with Hindi Meanings, Synonyms, Antonyms, Mnemonics, Idioms, Root Words and Interactive Practice Quiz for UPSC, SSC and Banking Exams.' name='description'/>
   </b:if>
 
   <!-- Robots Indexing -->
@@ -39,10 +39,10 @@
   <!-- Canonical Link -->
   <link expr:href='data:view.url.canonical' rel='canonical'/>
 
-  <!-- Google Fonts - Highly Readable Typography for Editorial Content & AdSense Approval -->
+  <!-- High-Readability Publisher Fonts for Fast Loading & AdSense Approval -->
   <link rel='preconnect' href='https://fonts.googleapis.com'/>
   <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin='anonymous'/>
-  <link href='https://fonts.googleapis.com/css2?family=Hind:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&amp;family=Merriweather:ital,wght@0,400;0,700;1,400&amp;display=swap' rel='stylesheet'/>
+  <link href='https://fonts.googleapis.com/css2?family=Hind:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&amp;display=swap' rel='stylesheet'/>
 
   <!-- Open Graph Meta Tags -->
   <meta expr:content='data:blog.title' property='og:site_name'/>
@@ -59,33 +59,26 @@
 
   <b:skin><![CDATA[
     /*
-     * EditorialVocab AdSense Pro Theme
-     * Clean, Fast, High-Readability Publisher Theme
-     * 100% AdSense Policy & Core Web Vitals Compliant
+     * EditorialVocab AdSense Pro Theme (Clean & Minimal Edition)
+     * High Speed, Reader Friendly, 100% Policy-Safe
      */
 
     :root {
-      --bg-body: #f8fafc;
+      --bg-page: #f8fafc;
       --bg-card: #ffffff;
-      --bg-card-alt: #f1f5f9;
+      --bg-subtle: #f1f5f9;
       --text-main: #0f172a;
       --text-body: #334155;
       --text-muted: #64748b;
       --text-light: #94a3b8;
-      --border-color: #e2e8f0;
+      --border: #e2e8f0;
       --border-strong: #cbd5e1;
       
       --primary: #4f46e5;
       --primary-hover: #4338ca;
-      --primary-light: #eef2ff;
-      
-      --accent-emerald: #059669;
-      --accent-amber: #d97706;
-      --accent-rose: #e11d48;
+      --primary-subtle: #eef2ff;
 
-      --font-heading: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      --font-serif: 'Merriweather', Georgia, serif;
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       --font-hindi: 'Hind', sans-serif;
 
       --radius-sm: 8px;
@@ -93,14 +86,13 @@
       --radius-lg: 16px;
       --radius-full: 9999px;
 
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-      --shadow-md: 0 4px 14px rgba(0,0,0,0.06);
-      --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.05);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.07);
       
-      --container-max: 1200px;
+      --max-width: 1200px;
     }
 
-    /* Reset & Base */
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
@@ -113,15 +105,14 @@
     }
 
     body {
-      background-color: var(--bg-body);
+      background-color: var(--bg-page);
       color: var(--text-body);
-      font-family: var(--font-body);
+      font-family: var(--font-sans);
       line-height: 1.7;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
     }
 
     a {
@@ -141,20 +132,19 @@
       display: block;
     }
 
-    /* Layout Structure */
     .ev-container {
-      max-width: var(--container-max);
+      max-width: var(--max-width);
       margin: 0 auto;
       padding: 0 20px;
       width: 100%;
     }
 
-    /* Top Announcement Bar */
+    /* Top Strip */
     .ev-topbar {
       background-color: #0f172a;
-      color: #e2e8f0;
+      color: #cbd5e1;
       font-size: 12.5px;
-      padding: 7px 0;
+      padding: 6px 0;
       border-bottom: 1px solid #1e293b;
     }
 
@@ -169,7 +159,6 @@
     .ev-topbar-links {
       display: flex;
       gap: 16px;
-      align-items: center;
     }
 
     .ev-topbar-links a {
@@ -183,252 +172,209 @@
       text-decoration: none;
     }
 
-    /* Site Header */
+    /* Main Header */
     .ev-header {
       background-color: #ffffff;
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
       z-index: 100;
       box-shadow: var(--shadow-sm);
     }
 
-    .ev-header-main {
+    .ev-header-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 16px 0;
+      padding: 14px 0;
       gap: 20px;
     }
 
-    .ev-brand {
+    .ev-brand-group {
       display: flex;
       flex-direction: column;
     }
 
-    .ev-logo-text {
-      font-family: var(--font-heading);
+    .ev-brand-logo {
       font-size: 24px;
       font-weight: 900;
       color: var(--text-main);
       letter-spacing: -0.5px;
+      line-height: 1.1;
+    }
+
+    .ev-brand-logo span {
+      color: var(--primary);
+    }
+
+    .ev-brand-sub {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Clean Navigation Menu */
+    .ev-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .ev-nav a {
+      color: var(--text-body);
+      font-size: 14px;
+      font-weight: 700;
+      padding: 7px 12px;
+      border-radius: var(--radius-sm);
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .ev-nav a:hover {
+      color: var(--primary);
+      background-color: var(--primary-subtle);
+      text-decoration: none;
+    }
+
+    .ev-search-wrap {
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .ev-logo-text span {
-      color: var(--primary);
-    }
-
-    .ev-tagline {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-weight: 500;
-      margin-top: -2px;
-    }
-
-    /* Navigation Bar */
-    .ev-nav {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .ev-nav-link {
-      color: var(--text-body);
-      font-size: 14px;
-      font-weight: 700;
-      padding: 8px 14px;
-      border-radius: var(--radius-sm);
-      transition: all 0.2s ease;
-      white-space: nowrap;
-    }
-
-    .ev-nav-link:hover, .ev-nav-link.active {
-      color: var(--primary);
-      background-color: var(--primary-light);
-      text-decoration: none;
-    }
-
-    .ev-nav-badge {
-      background: var(--accent-rose);
-      color: #ffffff;
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: var(--radius-full);
-      margin-left: 4px;
-      font-weight: 800;
-    }
-
-    /* Search Bar in Header */
-    .ev-search-form {
+    .ev-search-box {
       position: relative;
-      display: flex;
-      align-items: center;
     }
 
-    .ev-search-input {
-      background: var(--bg-body);
-      border: 1px solid var(--border-color);
-      padding: 8px 14px 8px 34px;
+    .ev-search-box input {
+      background: var(--bg-page);
+      border: 1px solid var(--border);
+      padding: 7px 14px 7px 32px;
       border-radius: var(--radius-full);
       font-size: 13px;
       color: var(--text-main);
       outline: none;
-      width: 180px;
-      transition: all 0.2s ease;
+      width: 170px;
+      transition: all 0.2s;
     }
 
-    .ev-search-input:focus {
-      width: 240px;
+    .ev-search-box input:focus {
+      width: 220px;
       border-color: var(--primary);
       background: #ffffff;
-      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
     }
 
-    .ev-search-icon {
+    .ev-search-box span {
       position: absolute;
-      left: 12px;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
       color: var(--text-light);
+      font-size: 12px;
       pointer-events: none;
-      font-size: 13px;
     }
 
-    /* Mobile Menu Toggle */
-    .ev-mobile-toggle {
+    .ev-mob-btn {
       display: none;
       background: none;
-      border: 1px solid var(--border-color);
-      padding: 8px;
+      border: 1px solid var(--border);
+      padding: 6px 10px;
       border-radius: var(--radius-sm);
       cursor: pointer;
-      font-size: 20px;
+      font-size: 18px;
       color: var(--text-main);
     }
 
-    /* Ad Units - Clear AdSense Policy Compliant */
-    .ev-ad-slot {
-      margin: 20px auto;
-      text-align: center;
-      max-width: 100%;
-      overflow: hidden;
-    }
-
-    .ev-ad-label {
-      display: block;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      color: var(--text-light);
-      text-transform: uppercase;
-      margin-bottom: 6px;
-      text-align: center;
-    }
-
-    .ev-ad-box {
-      min-height: 90px;
-      background: #f8fafc;
-      border: 1px dashed var(--border-strong);
-      border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto;
-      padding: 10px;
-    }
-
-    /* Main Content & Sidebar Grid */
-    .ev-main-layout {
+    /* Layout Grid */
+    .ev-main-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 330px;
-      gap: 32px;
-      margin: 32px auto 50px auto;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 30px;
+      margin: 28px auto 50px auto;
     }
 
-    .ev-content-column {
+    .ev-main-col {
       min-width: 0;
     }
 
-    .ev-sidebar-column {
+    .ev-sidebar-col {
       min-width: 0;
     }
 
-    /* Article Cards List (Homepage / Index) */
-    .ev-hero-banner {
-      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #0f172a 100%);
+    /* Homepage Welcome Card */
+    .ev-hero-box {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #0f172a 100%);
       color: #ffffff;
-      padding: 32px;
+      padding: 28px 30px;
       border-radius: var(--radius-lg);
-      margin-bottom: 30px;
+      margin-bottom: 26px;
       box-shadow: var(--shadow-md);
-      position: relative;
-      overflow: hidden;
     }
 
-    .ev-hero-eyebrow {
+    .ev-hero-tag {
       display: inline-block;
       background: rgba(255,255,255,0.15);
-      color: #cbd5e1;
+      color: #e0e7ff;
       font-size: 11px;
       font-weight: 800;
       text-transform: uppercase;
-      padding: 4px 12px;
+      padding: 3px 10px;
       border-radius: var(--radius-full);
-      letter-spacing: 1px;
-      margin-bottom: 12px;
+      letter-spacing: 0.8px;
+      margin-bottom: 10px;
     }
 
     .ev-hero-title {
-      font-size: clamp(22px, 3.5vw, 32px);
+      font-size: clamp(20px, 3.5vw, 28px);
       font-weight: 900;
       line-height: 1.25;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       color: #ffffff;
     }
 
-    .ev-hero-desc {
-      font-size: 15px;
+    .ev-hero-text {
+      font-size: 14.5px;
       color: #cbd5e1;
-      max-width: 680px;
+      max-width: 650px;
       line-height: 1.6;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
-    .ev-hero-badges {
+    .ev-hero-links {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
     }
 
-    .ev-hero-badge {
-      background: rgba(255, 255, 255, 0.1);
+    .ev-hero-btn {
+      background: rgba(255, 255, 255, 0.12);
       border: 1px solid rgba(255, 255, 255, 0.2);
       color: #ffffff;
-      padding: 6px 14px;
+      padding: 5px 12px;
       border-radius: var(--radius-full);
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 700;
     }
 
-    .ev-hero-badge:hover {
+    .ev-hero-btn:hover {
       background: #ffffff;
       color: #0f172a;
       text-decoration: none;
     }
 
-    /* Section Headers */
-    .ev-section-header {
+    /* Section Bar */
+    .ev-sec-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 2px solid var(--border-color);
-      padding-bottom: 12px;
-      margin-bottom: 24px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 10px;
+      margin-bottom: 20px;
     }
 
-    .ev-section-title {
-      font-size: 20px;
+    .ev-sec-title {
+      font-size: 19px;
       font-weight: 900;
       color: var(--text-main);
       display: flex;
@@ -436,633 +382,558 @@
       gap: 8px;
     }
 
-    .ev-section-title::before {
+    .ev-sec-title::before {
       content: '';
       display: block;
       width: 4px;
-      height: 20px;
+      height: 18px;
       background: var(--primary);
       border-radius: var(--radius-full);
     }
 
-    /* Post Feed Cards */
-    .ev-posts-feed {
+    /* Feed Post Cards */
+    .ev-feed {
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 20px;
     }
 
-    .ev-post-card {
+    .ev-card {
       background: var(--bg-card);
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       overflow: hidden;
       box-shadow: var(--shadow-sm);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: transform 0.2s, box-shadow 0.2s;
       display: flex;
       flex-direction: column;
     }
 
-    .ev-post-card:hover {
+    .ev-card:hover {
       transform: translateY(-2px);
       box-shadow: var(--shadow-md);
       border-color: var(--border-strong);
     }
 
-    .ev-card-image {
+    .ev-card-thumb {
       width: 100%;
-      max-height: 240px;
+      max-height: 220px;
       object-fit: cover;
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border);
     }
 
-    .ev-card-content {
-      padding: 22px;
+    .ev-card-body {
+      padding: 20px;
       display: flex;
       flex-direction: column;
       flex: 1;
     }
 
-    .ev-card-meta {
+    .ev-card-tags {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       font-size: 12px;
       color: var(--text-muted);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       flex-wrap: wrap;
     }
 
-    .ev-card-source {
-      background: var(--primary-light);
+    .ev-card-source-tag {
+      background: var(--primary-subtle);
       color: var(--primary);
       font-weight: 800;
-      padding: 3px 10px;
+      padding: 2px 8px;
       border-radius: var(--radius-full);
       font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
-    .ev-card-title {
-      font-size: 20px;
+    .ev-card-h2 {
+      font-size: 19px;
       font-weight: 800;
       line-height: 1.35;
       color: var(--text-main);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
-    .ev-card-title a {
+    .ev-card-h2 a {
       color: var(--text-main);
     }
 
-    .ev-card-title a:hover {
+    .ev-card-h2 a:hover {
       color: var(--primary);
       text-decoration: none;
     }
 
-    .ev-card-snippet {
+    .ev-card-desc {
       font-size: 14px;
       color: var(--text-body);
       line-height: 1.6;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       flex: 1;
     }
 
-    .ev-card-footer {
+    .ev-card-foot {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-top: 1px solid var(--border-color);
-      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
       font-size: 13px;
       font-weight: 700;
     }
 
-    .ev-read-more {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+    .ev-card-read {
       color: var(--primary);
       font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .ev-read-more:hover {
-      gap: 10px;
-      text-decoration: none;
-    }
-
-    /* Single Post / Item Page Styling */
-    .ev-article-view {
+    /* Single Post Container */
+    .ev-post-box {
       background: var(--bg-card);
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: clamp(20px, 4vw, 36px);
+      padding: clamp(20px, 4vw, 34px);
       box-shadow: var(--shadow-sm);
     }
 
-    .ev-breadcrumbs {
+    .ev-crumbs {
       font-size: 13px;
       color: var(--text-muted);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
     }
 
-    .ev-breadcrumbs a {
+    .ev-crumbs a {
       color: var(--text-muted);
     }
 
-    .ev-breadcrumbs a:hover {
+    .ev-crumbs a:hover {
       color: var(--primary);
     }
 
-    .ev-article-title {
-      font-size: clamp(24px, 4vw, 34px);
+    .ev-post-h1 {
+      font-size: clamp(23px, 4vw, 32px);
       font-weight: 900;
       color: var(--text-main);
       line-height: 1.25;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
 
-    .ev-article-meta {
+    .ev-post-meta {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
       font-size: 13px;
       color: var(--text-muted);
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--border-color);
-      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 22px;
       flex-wrap: wrap;
     }
 
-    .ev-post-body {
+    .ev-content {
       font-size: 16px;
       line-height: 1.75;
       color: var(--text-main);
     }
 
-    .ev-post-body p {
+    .ev-content p {
       margin-bottom: 16px;
     }
 
-    .ev-post-body h2 {
-      font-size: 22px;
+    .ev-content h2 {
+      font-size: 21px;
       font-weight: 800;
       color: var(--text-main);
-      margin: 28px 0 14px 0;
+      margin: 26px 0 12px 0;
       line-height: 1.3;
     }
 
-    .ev-post-body h3 {
-      font-size: 18px;
+    .ev-content h3 {
+      font-size: 17px;
       font-weight: 800;
       color: var(--text-main);
-      margin: 22px 0 10px 0;
+      margin: 20px 0 10px 0;
     }
 
-    .ev-post-body ul, .ev-post-body ol {
-      margin: 0 0 18px 24px;
-    }
-
-    .ev-post-body li {
-      margin-bottom: 6px;
-    }
-
-    /* Social Share Bar */
-    .ev-share-bar {
-      margin: 32px 0;
-      padding: 16px 20px;
-      background: var(--bg-card-alt);
-      border: 1px solid var(--border-color);
+    /* Share Bar */
+    .ev-share {
+      margin: 28px 0;
+      padding: 14px 18px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
       border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
     }
 
-    .ev-share-title {
-      font-size: 13px;
+    .ev-share span {
+      font-size: 12.5px;
       font-weight: 800;
       color: var(--text-main);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
-    .ev-share-buttons {
+    .ev-share-links {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
     }
 
-    .ev-btn-share {
+    .ev-share-btn {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      font-size: 12.5px;
+      gap: 5px;
+      font-size: 12px;
       font-weight: 700;
-      padding: 7px 14px;
+      padding: 6px 12px;
       border-radius: var(--radius-sm);
       color: #ffffff;
       text-decoration: none;
-      transition: opacity 0.2s ease;
     }
 
-    .ev-btn-share:hover {
+    .ev-share-btn:hover {
       opacity: 0.9;
-      text-decoration: none;
       color: #ffffff;
+      text-decoration: none;
     }
 
-    .ev-btn-wa { background: #25d366; }
-    .ev-btn-tg { background: #0088cc; }
-    .ev-btn-tw { background: #000000; }
+    .ev-s-wa { background: #25d366; }
+    .ev-s-tg { background: #0088cc; }
+    .ev-s-tw { background: #000000; }
 
-    /* Static Policy Pages */
-    .ev-static-page {
+    /* Static Pages */
+    .ev-page-box {
       background: var(--bg-card);
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: clamp(24px, 4vw, 44px);
+      padding: clamp(24px, 4vw, 40px);
       box-shadow: var(--shadow-sm);
     }
 
-    .ev-static-title {
-      font-size: clamp(26px, 4vw, 34px);
+    .ev-page-h1 {
+      font-size: clamp(24px, 4vw, 32px);
       font-weight: 900;
       color: var(--text-main);
-      margin-bottom: 20px;
-      border-bottom: 2px solid var(--border-color);
-      padding-bottom: 16px;
+      margin-bottom: 16px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 12px;
     }
 
-    /* 404 ERROR PAGE STYLES - 100% Comprehensive Handling */
-    .ev-error-page {
+    /* 404 / ERROR / EMPTY STATE HANDLER */
+    .ev-notice-box {
       background: #ffffff;
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: clamp(32px, 5vw, 60px) 24px;
+      padding: clamp(30px, 5vw, 50px) 20px;
       text-align: center;
       box-shadow: var(--shadow-md);
-      max-width: 800px;
-      margin: 30px auto;
+      margin: 10px auto;
     }
 
-    .ev-error-badge {
+    .ev-notice-icon {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 80px;
-      height: 80px;
+      width: 70px;
+      height: 70px;
       border-radius: 50%;
       background: #fee2e2;
       color: #ef4444;
-      font-size: 36px;
-      margin-bottom: 18px;
+      font-size: 32px;
+      margin-bottom: 16px;
     }
 
-    .ev-error-code {
-      font-size: clamp(48px, 8vw, 84px);
+    .ev-notice-icon.info {
+      background: var(--primary-subtle);
+      color: var(--primary);
+    }
+
+    .ev-notice-code {
+      font-size: clamp(42px, 7vw, 72px);
       font-weight: 900;
       color: var(--text-main);
       line-height: 1;
-      letter-spacing: -2px;
+      margin-bottom: 8px;
+    }
+
+    .ev-notice-h2 {
+      font-size: clamp(19px, 3.5vw, 24px);
+      font-weight: 800;
+      color: var(--text-main);
       margin-bottom: 10px;
     }
 
-    .ev-error-heading {
-      font-size: clamp(20px, 3.5vw, 26px);
-      font-weight: 800;
-      color: var(--text-main);
-      margin-bottom: 12px;
-    }
-
-    .ev-error-desc {
-      font-size: 15px;
+    .ev-notice-p {
+      font-size: 14.5px;
       color: var(--text-muted);
-      max-width: 540px;
-      margin: 0 auto 24px auto;
+      max-width: 520px;
+      margin: 0 auto 20px auto;
       line-height: 1.6;
     }
 
-    .ev-error-search {
-      max-width: 460px;
-      margin: 0 auto 28px auto;
-    }
-
-    .ev-error-search-box {
+    .ev-notice-form {
+      max-width: 440px;
+      margin: 0 auto 22px auto;
       display: flex;
       gap: 8px;
     }
 
-    .ev-error-search-input {
+    .ev-notice-form input {
       flex: 1;
-      padding: 12px 18px;
-      border: 2px solid var(--border-color);
+      padding: 11px 16px;
+      border: 2px solid var(--border);
       border-radius: var(--radius-md);
       font-size: 14px;
       outline: none;
-      transition: border-color 0.2s;
     }
 
-    .ev-error-search-input:focus {
+    .ev-notice-form input:focus {
       border-color: var(--primary);
     }
 
-    .ev-error-search-btn {
+    .ev-notice-form button {
       background: var(--primary);
       color: #ffffff;
       border: none;
-      padding: 12px 22px;
+      padding: 11px 20px;
       border-radius: var(--radius-md);
       font-weight: 800;
       font-size: 14px;
       cursor: pointer;
     }
 
-    .ev-error-search-btn:hover {
-      background: var(--primary-hover);
-    }
-
-    .ev-error-quick-links {
+    .ev-notice-btns {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 10px;
-      margin-bottom: 24px;
+      gap: 8px;
     }
 
-    .ev-error-btn {
-      background: var(--bg-card-alt);
+    .ev-btn-pill {
+      background: var(--bg-subtle);
       color: var(--text-main);
-      border: 1px solid var(--border-color);
-      padding: 10px 18px;
+      border: 1px solid var(--border);
+      padding: 8px 16px;
       border-radius: var(--radius-full);
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 700;
-      transition: all 0.2s ease;
     }
 
-    .ev-error-btn:hover {
+    .ev-btn-pill:hover {
       background: var(--primary);
       color: #ffffff;
       border-color: var(--primary);
       text-decoration: none;
     }
 
-    .ev-error-btn-primary {
+    .ev-btn-pill.primary {
       background: var(--primary);
       color: #ffffff;
       border-color: var(--primary);
     }
 
-    .ev-error-btn-primary:hover {
-      background: var(--primary-hover);
-    }
-
     /* Sidebar Widgets */
-    .ev-widget-card {
+    .ev-sidebar-card {
       background: var(--bg-card);
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: 24px;
-      margin-bottom: 24px;
+      padding: 20px;
+      margin-bottom: 20px;
       box-shadow: var(--shadow-sm);
     }
 
-    .ev-widget-title {
-      font-size: 16px;
+    .ev-sidebar-title {
+      font-size: 15px;
       font-weight: 900;
       color: var(--text-main);
-      border-bottom: 2px solid var(--border-color);
-      padding-bottom: 10px;
-      margin-bottom: 16px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 8px;
+      margin-bottom: 14px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
-    .ev-widget-title::before {
+    .ev-sidebar-title::before {
       content: '';
       display: block;
       width: 4px;
-      height: 16px;
+      height: 14px;
       background: var(--primary);
       border-radius: var(--radius-full);
     }
 
-    /* Label Cloud Widget */
-    .ev-label-cloud {
+    .ev-cloud {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 6px;
     }
 
-    .ev-label-tag {
-      background: var(--bg-card-alt);
-      border: 1px solid var(--border-color);
+    .ev-tag {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
       color: var(--text-body);
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 700;
-      padding: 6px 12px;
+      padding: 5px 10px;
       border-radius: var(--radius-full);
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
+      gap: 4px;
     }
 
-    .ev-label-tag:hover {
-      background: var(--primary-light);
+    .ev-tag:hover {
+      background: var(--primary-subtle);
       color: var(--primary);
       border-color: var(--primary);
       text-decoration: none;
     }
 
-    .ev-label-count {
+    .ev-tag-count {
       background: var(--border-strong);
       color: var(--text-main);
       font-size: 10px;
-      padding: 2px 6px;
+      padding: 1px 5px;
       border-radius: var(--radius-full);
       font-weight: 800;
     }
 
-    /* About Author Widget */
-    .ev-author-box {
-      text-align: center;
-    }
-
-    .ev-author-avatar {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      background: var(--primary-light);
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      margin: 0 auto 12px auto;
-      border: 3px solid var(--border-color);
-    }
-
-    .ev-author-name {
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--text-main);
-      margin-bottom: 4px;
-    }
-
-    .ev-author-bio {
-      font-size: 13px;
-      color: var(--text-muted);
-      line-height: 1.5;
-      margin-bottom: 14px;
-    }
-
-    /* Pagination / Next Prev */
-    .ev-pagination {
+    /* Pagination */
+    .ev-pager {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin: 32px 0;
-      gap: 12px;
+      margin: 26px 0;
+      gap: 10px;
     }
 
-    .ev-page-btn {
+    .ev-pager-btn {
       background: var(--bg-card);
-      border: 1.5px solid var(--border-color);
+      border: 1.5px solid var(--border);
       color: var(--text-main);
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 800;
-      padding: 10px 20px;
+      padding: 9px 18px;
       border-radius: var(--radius-md);
       box-shadow: var(--shadow-sm);
-      transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
       gap: 6px;
     }
 
-    .ev-page-btn:hover {
+    .ev-pager-btn:hover {
       background: var(--primary);
       color: #ffffff;
       border-color: var(--primary);
       text-decoration: none;
-      box-shadow: var(--shadow-md);
     }
 
-    /* Footer Styles - AdSense Compliance */
+    /* Footer */
     .ev-footer {
       background: #0f172a;
       color: #cbd5e1;
       margin-top: auto;
       border-top: 1px solid #1e293b;
-      padding: 50px 0 24px 0;
+      padding: 44px 0 20px 0;
     }
 
     .ev-footer-grid {
       display: grid;
       grid-template-columns: 2fr 1fr 1fr 1fr;
-      gap: 36px;
-      margin-bottom: 40px;
+      gap: 30px;
+      margin-bottom: 34px;
     }
 
-    .ev-footer-brand {
-      font-size: 22px;
+    .ev-footer-logo {
+      font-size: 20px;
       font-weight: 900;
       color: #ffffff;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      margin-bottom: 10px;
     }
 
-    .ev-footer-brand span {
+    .ev-footer-logo span {
       color: #818cf8;
     }
 
     .ev-footer-desc {
-      font-size: 13.5px;
+      font-size: 13px;
       line-height: 1.6;
       color: #94a3b8;
-      margin-bottom: 16px;
-      max-width: 320px;
+      max-width: 300px;
     }
 
-    .ev-footer-title {
-      font-size: 14px;
+    .ev-footer-h4 {
+      font-size: 13.5px;
       font-weight: 800;
       color: #ffffff;
       text-transform: uppercase;
       letter-spacing: 0.8px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       border-bottom: 1px solid #334155;
-      padding-bottom: 8px;
+      padding-bottom: 6px;
     }
 
-    .ev-footer-links {
+    .ev-footer-menu {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
 
-    .ev-footer-links a {
+    .ev-footer-menu a {
       color: #94a3b8;
-      font-size: 13.5px;
+      font-size: 13px;
       font-weight: 600;
-      transition: color 0.2s ease;
     }
 
-    .ev-footer-links a:hover {
+    .ev-footer-menu a:hover {
       color: #ffffff;
       text-decoration: underline;
     }
 
-    .ev-footer-bottom {
+    .ev-footer-bot {
       border-top: 1px solid #1e293b;
-      padding-top: 24px;
+      padding-top: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 14px;
-      font-size: 12.5px;
+      gap: 12px;
+      font-size: 12px;
       color: #64748b;
     }
 
-    .ev-footer-policy-row {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .ev-footer-policy-row a {
+    .ev-footer-bot a {
       color: #94a3b8;
     }
 
-    .ev-footer-policy-row a:hover {
+    .ev-footer-bot a:hover {
       color: #ffffff;
     }
 
-    /* Print Media Styles */
+    /* Print Styles */
     @media print {
-      .ev-topbar, .ev-header, .ev-footer, .ev-sidebar-column, .ev-ad-slot,
-      .ev-share-bar, .ev-pagination, .ev-breadcrumbs, #comments, .comments,
+      .ev-topbar, .ev-header, .ev-footer, .ev-sidebar-col,
+      .ev-share, .ev-pager, .ev-crumbs, #comments, .comments,
       #ev-toc-bar, #ev-pdf-section, #ev-quiz-section, #evQBox, .evNav, .evScorecard, button {
         display: none !important;
       }
 
-      body, .ev-main-layout, .ev-content-column {
+      body, .ev-main-grid, .ev-main-col {
         background: #ffffff !important;
         color: #0f172a !important;
         margin: 0 !important;
@@ -1071,19 +942,19 @@
         max-width: 100% !important;
       }
 
-      .ev-article-view {
+      .ev-post-box {
         border: none !important;
         box-shadow: none !important;
         padding: 0 !important;
       }
 
-      .ev-post-card, #ev-vocab-section > div, #ev-idioms-section, #ev-idioms-section > div > div, .ev-print-quiz {
+      .ev-card, #ev-vocab-section > div, #ev-idioms-section, #ev-idioms-section > div > div, .ev-print-quiz {
         page-break-inside: avoid !important;
         break-inside: avoid !important;
         border: 1px solid #cbd5e1 !important;
         background: #ffffff !important;
         box-shadow: none !important;
-        margin-bottom: 14px !important;
+        margin-bottom: 12px !important;
       }
 
       .ev-print-quiz {
@@ -1091,9 +962,9 @@
       }
     }
 
-    /* Responsive Breakpoints */
-    @media (max-width: 992px) {
-      .ev-main-layout {
+    /* Responsive */
+    @media (max-width: 960px) {
+      .ev-main-grid {
         grid-template-columns: 1fr;
       }
 
@@ -1105,7 +976,7 @@
         display: none;
       }
 
-      .ev-mobile-toggle {
+      .ev-mob-btn {
         display: block;
       }
 
@@ -1117,36 +988,27 @@
         left: 0;
         right: 0;
         background: #ffffff;
-        border-bottom: 1px solid var(--border-color);
-        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        padding: 14px 20px;
         box-shadow: var(--shadow-md);
       }
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 600px) {
       .ev-footer-grid {
         grid-template-columns: 1fr;
-      }
-
-      .ev-topbar-inner {
-        justify-content: center;
-        text-align: center;
       }
 
       .ev-topbar-links {
         display: none;
       }
 
-      .ev-header-main {
-        flex-wrap: wrap;
+      .ev-search-box input {
+        width: 130px;
       }
 
-      .ev-search-input {
-        width: 140px;
-      }
-
-      .ev-search-input:focus {
-        width: 180px;
+      .ev-search-box input:focus {
+        width: 170px;
       }
     }
   ]]></b:skin>
@@ -1157,7 +1019,7 @@
   <div class='ev-topbar'>
     <div class='ev-container ev-topbar-inner'>
       <div>
-        <span>📚 Daily UPSC &amp; Banking Exam Editorial Vocabulary Portal</span>
+        <span>📚 Daily Editorial Vocabulary &amp; Exam Preparation Portal</span>
       </div>
       <div class='ev-topbar-links'>
         <a href='/p/about-us.html'>About</a>
@@ -1169,128 +1031,106 @@
     </div>
   </div>
 
-  <!-- Main Sticky Header -->
+  <!-- Clean Header -->
   <header class='ev-header'>
     <div class='ev-container'>
-      <div class='ev-header-main'>
-        <!-- Brand Logo / Title -->
-        <div class='ev-brand'>
-          <a class='ev-logo-text' href='/'>
+      <div class='ev-header-inner'>
+        
+        <!-- Brand Logo -->
+        <div class='ev-brand-group'>
+          <a class='ev-brand-logo' href='/'>
             <span>Editorial</span>Vocab
           </a>
-          <span class='ev-tagline'>Daily Editorial Vocabulary &amp; Exam Prep</span>
+          <span class='ev-brand-sub'>Daily Editorial Vocabulary &amp; Hindi Meanings</span>
         </div>
 
-        <!-- Navigation Menu -->
-        <nav class='ev-nav' id='evMainMenu'>
-          <a class='ev-nav-link' href='/'>Home</a>
-          <a class='ev-nav-link' href='/search/label/The%20Hindu'>The Hindu</a>
-          <a class='ev-nav-link' href='/search/label/Indian%20Express'>Indian Express</a>
-          <a class='ev-nav-link' href='/search/label/Idioms'>Idioms &amp; Phrases</a>
-          <a class='ev-nav-link' href='/search/label/Quiz'>Practice Quiz <span class='ev-nav-badge'>MCQ</span></a>
-          <a class='ev-nav-link' href='/p/the-hindu-editorial-vocabulary.html'>Pillar Archive</a>
-          <a class='ev-nav-link' href='/p/about-us.html'>About</a>
-          <a class='ev-nav-link' href='/p/contact-us.html'>Contact</a>
+        <!-- Clean Menu (Essential Only) -->
+        <nav class='ev-nav' id='evMenu'>
+          <a href='/'>Home</a>
+          <a href='/search/label/The%20Hindu'>The Hindu</a>
+          <a href='/search/label/Indian%20Express'>Indian Express</a>
+          <a href='/search/label/Idioms'>Idioms</a>
+          <a href='/search/label/Quiz'>Practice Quiz</a>
+          <a href='/p/about-us.html'>About</a>
+          <a href='/p/contact-us.html'>Contact</a>
         </nav>
 
-        <!-- Header Search Bar -->
-        <div style='display: flex; align-items: center; gap: 10px;'>
-          <form action='/search' class='ev-search-form' method='get'>
-            <span class='ev-search-icon'>🔍</span>
-            <input class='ev-search-input' name='q' placeholder='Search words, date...' type='text'/>
+        <!-- Search & Mobile Toggle -->
+        <div class='ev-search-wrap'>
+          <form action='/search' class='ev-search-box' method='get'>
+            <span>🔍</span>
+            <input name='q' placeholder='Search word, date...' type='text'/>
           </form>
-          <button aria-label='Toggle menu' class='ev-mobile-toggle' onclick='var m=document.getElementById("evMainMenu");m.classList.toggle("active");'>
+          <button aria-label='Toggle navigation menu' class='ev-mob-btn' onclick='var m=document.getElementById("evMenu");m.classList.toggle("active");'>
             ☰
           </button>
         </div>
+
       </div>
     </div>
   </header>
 
-  <!-- Top Ad Slot (Leaderboard Header) -->
-  <b:section class='ev-ad-slot ev-container' id='ad-header' maxwidgets='1' showaddelement='yes'>
-    <b:widget id='HTML1' locked='false' title='Header Advertisement' type='HTML' version='2'>
-      <b:widget-settings>
-        <b:widget-setting name='content'/>
-      </b:widget-settings>
-      <b:includable id='main'>
-        <div class='ev-ad-slot'>
-          <span class='ev-ad-label'>ADVERTISEMENT</span>
-          <div class='ev-ad-box'>
-            <data:content/>
-          </div>
-        </div>
-      </b:includable>
-    </b:widget>
-  </b:section>
-
-  <!-- Main Content Area -->
+  <!-- Main Container -->
   <div class='ev-container'>
-    <div class='ev-main-layout'>
+    <div class='ev-main-grid'>
       
-      <!-- Primary Content Column -->
-      <main class='ev-content-column'>
+      <!-- Content Column -->
+      <main class='ev-main-col'>
 
-        <!-- ==================== 404 ERROR PAGE VIEW ==================== -->
+        <!-- ==================== 404 UNKNOWN URL / ERROR PAGE ==================== -->
         <b:if cond='data:view.isError'>
-          <div class='ev-error-page'>
-            <div class='ev-error-badge'>🔍</div>
-            <div class='ev-error-code'>404</div>
-            <h1 class='ev-error-heading'>Oops! Page Not Found / पृष्ठ नहीं मिला</h1>
-            <p class='ev-error-desc'>
-              The editorial article or page you are looking for might have been moved, renamed, or is temporarily unavailable. Use the search bar below or explore today's latest vocabulary lessons.
+          <div class='ev-notice-box'>
+            <div class='ev-notice-icon'>🔍</div>
+            <div class='ev-notice-code'>404</div>
+            <h1 class='ev-notice-h2'>Page Not Found / पृष्ठ नहीं मिला</h1>
+            <p class='ev-notice-p'>
+              The page or editorial article you requested does not exist, has been moved, or the link is incorrect. Search our vocabulary lessons below or visit our main categories.
             </p>
             
-            <!-- In-Page 404 Search Form -->
-            <div class='ev-error-search'>
-              <form action='/search' class='ev-error-search-box' method='get'>
-                <input class='ev-error-search-input' name='q' placeholder='Search word, exam topic, or newspaper date...' type='text'/>
-                <button class='ev-error-search-btn' type='submit'>Search</button>
-              </form>
-            </div>
+            <form action='/search' class='ev-notice-form' method='get'>
+              <input name='q' placeholder='Search word, date, or topic...' type='text'/>
+              <button type='submit'>Search</button>
+            </form>
 
-            <!-- Quick Navigation Hub -->
-            <div class='ev-error-quick-links'>
-              <a class='ev-error-btn ev-error-btn-primary' href='/'>🏠 Return to Homepage</a>
-              <a class='ev-error-btn' href='/search/label/The%20Hindu'>📰 The Hindu Editorial Vocab</a>
-              <a class='ev-error-btn' href='/search/label/Indian%20Express'>🗞️ Indian Express Vocab</a>
-              <a class='ev-error-btn' href='/search/label/Idioms'>🔥 Idioms &amp; Phrases</a>
-              <a class='ev-error-btn' href='/search/label/Quiz'>🧠 Daily Practice Quiz</a>
-              <a class='ev-error-btn' href='/p/the-hindu-editorial-vocabulary.html'>📚 Comprehensive Archive</a>
+            <div class='ev-notice-btns'>
+              <a class='ev-btn-pill primary' href='/'>🏠 Return to Home</a>
+              <a class='ev-btn-pill' href='/search/label/The%20Hindu'>📰 The Hindu Vocab</a>
+              <a class='ev-btn-pill' href='/search/label/Indian%20Express'>🗞️ Indian Express</a>
+              <a class='ev-btn-pill' href='/search/label/Idioms'>🔥 Idioms</a>
+              <a class='ev-btn-pill' href='/search/label/Quiz'>🧠 Practice Quiz</a>
             </div>
           </div>
         </b:if>
 
-        <!-- ==================== BLOG POSTS WIDGET ==================== -->
+        <!-- ==================== REGULAR CONTENT / BLOG POSTS ==================== -->
         <b:if cond='not data:view.isError'>
           
-          <!-- Homepage Hero Welcome Banner (Visible only on Homepage) -->
+          <!-- Homepage Welcome Hero -->
           <b:if cond='data:view.isHomepage'>
-            <div class='ev-hero-banner'>
-              <span class='ev-hero-eyebrow'>⚡ Daily UPSC &amp; Banking Vocab Hub</span>
-              <h1 class='ev-hero-title'>Master Daily Editorial English Vocabulary</h1>
-              <p class='ev-hero-desc'>
-                Read daily tricky words from The Hindu &amp; Indian Express editorials with English definitions, Hindi meanings, mnemonic memory tricks, root words, context sentences, idioms, and interactive practice quizzes.
+            <div class='ev-hero-box'>
+              <span class='ev-hero-tag'>⚡ Daily Exam Prep Hub</span>
+              <h1 class='ev-hero-title'>Daily Editorial English Vocabulary</h1>
+              <p class='ev-hero-text'>
+                Curated tricky vocabulary from The Hindu &amp; Indian Express editorials with English definitions, Hindi meanings, mnemonic memory tricks, root words, idioms, and practice quizzes for UPSC, SSC &amp; Banking exams.
               </p>
-              <div class='ev-hero-badges'>
-                <a class='ev-hero-badge' href='/search/label/The%20Hindu'>📰 The Hindu Today</a>
-                <a class='ev-hero-badge' href='/search/label/Indian%20Express'>🗞️ Indian Express</a>
-                <a class='ev-hero-badge' href='/search/label/Idioms'>🔥 Idioms &amp; Phrases</a>
-                <a class='ev-hero-badge' href='/search/label/Quiz'>🧠 Practice MCQ Quiz</a>
-                <a class='ev-hero-badge' href='/p/the-hindu-editorial-analysis.html'>📖 Editorial Analysis</a>
+              <div class='ev-hero-links'>
+                <a class='ev-hero-btn' href='/search/label/The%20Hindu'>📰 The Hindu Today</a>
+                <a class='ev-hero-btn' href='/search/label/Indian%20Express'>🗞️ Indian Express</a>
+                <a class='ev-hero-btn' href='/search/label/Idioms'>🔥 Idioms</a>
+                <a class='ev-hero-btn' href='/search/label/Quiz'>🧠 Practice Quiz</a>
               </div>
             </div>
           </b:if>
 
-          <!-- Label / Search Results Header -->
+          <!-- Label / Search Title Header -->
           <b:if cond='data:view.isSearch or data:view.isLabelSearch'>
-            <div class='ev-section-header'>
-              <h2 class='ev-section-title'>
+            <div class='ev-sec-bar'>
+              <h2 class='ev-sec-title'>
                 <b:if cond='data:view.isLabelSearch'>
                   Category: <data:view.search.label/>
                 </b:if>
                 <b:if cond='data:view.isSearch and not data:view.isLabelSearch'>
-                  Search Results for: &quot;<data:view.search.query/>&quot;
+                  Search: &quot;<data:view.search.query/>&quot;
                 </b:if>
               </h2>
             </div>
@@ -1308,13 +1148,13 @@
 
               <b:includable id='main' var='top'>
                 
-                <!-- ================= SINGLE POST VIEW ================= -->
+                <!-- ================= 1. SINGLE POST VIEW ================= -->
                 <b:if cond='data:view.isPost'>
                   <b:loop values='data:posts' var='post'>
-                    <article class='ev-article-view' itemscope='itemscope' itemtype='https://schema.org/BlogPosting'>
+                    <article class='ev-post-box' itemscope='itemscope' itemtype='https://schema.org/BlogPosting'>
                       
                       <!-- Breadcrumbs -->
-                      <nav aria-label='Breadcrumbs' class='ev-breadcrumbs'>
+                      <nav aria-label='Breadcrumbs' class='ev-crumbs'>
                         <a href='/'>Home</a>
                         <span>&#8250;</span>
                         <b:if cond='data:post.labels'>
@@ -1325,12 +1165,12 @@
                       </nav>
 
                       <!-- Post Title -->
-                      <h1 class='ev-article-title' itemprop='headline'>
+                      <h1 class='ev-post-h1' itemprop='headline'>
                         <data:post.title/>
                       </h1>
 
                       <!-- Post Meta -->
-                      <div class='ev-article-meta'>
+                      <div class='ev-post-meta'>
                         <span>📅 <time expr:datetime='data:post.date' itemprop='datePublished'><data:post.date/></time></span>
                         <span>✍️ <span itemprop='author'><data:post.author.name/></span></span>
                         <b:if cond='data:post.labels'>
@@ -1338,101 +1178,115 @@
                         </b:if>
                       </div>
 
-                      <!-- In-Post Top Ad -->
-                      <div class='ev-ad-slot'>
-                        <span class='ev-ad-label'>ADVERTISEMENT</span>
-                        <div class='ev-ad-box'></div>
-                      </div>
-
-                      <!-- Post Body Content -->
-                      <div class='ev-post-body' itemprop='articleBody'>
+                      <!-- Post Body -->
+                      <div class='ev-content' itemprop='articleBody'>
                         <data:post.body/>
                       </div>
 
-                      <!-- Social Share Bar -->
-                      <div class='ev-share-bar'>
-                        <span class='ev-share-title'>📢 Share Lesson with Aspirants:</span>
-                        <div class='ev-share-buttons'>
-                          <a class='ev-btn-share ev-btn-wa' expr:href='&quot;https://api.whatsapp.com/send?text=&quot; + data:post.title + &quot; &quot; + data:post.url' rel='nofollow noopener' target='_blank'>WhatsApp</a>
-                          <a class='ev-btn-share ev-btn-tg' expr:href='&quot;https://t.me/share/url?url=&quot; + data:post.url + &quot;&amp;text=&quot; + data:post.title' rel='nofollow noopener' target='_blank'>Telegram</a>
-                          <a class='ev-btn-share ev-btn-tw' expr:href='&quot;https://twitter.com/intent/tweet?text=&quot; + data:post.title + &quot;&amp;url=&quot; + data:post.url' rel='nofollow noopener' target='_blank'>X / Twitter</a>
+                      <!-- Share Bar -->
+                      <div class='ev-share'>
+                        <span>Share Lesson:</span>
+                        <div class='ev-share-links'>
+                          <a class='ev-share-btn ev-s-wa' expr:href='&quot;https://api.whatsapp.com/send?text=&quot; + data:post.title + &quot; &quot; + data:post.url' rel='nofollow noopener' target='_blank'>WhatsApp</a>
+                          <a class='ev-share-btn ev-s-tg' expr:href='&quot;https://t.me/share/url?url=&quot; + data:post.url + &quot;&amp;text=&quot; + data:post.title' rel='nofollow noopener' target='_blank'>Telegram</a>
+                          <a class='ev-share-btn ev-s-tw' expr:href='&quot;https://twitter.com/intent/tweet?text=&quot; + data:post.title + &quot;&amp;url=&quot; + data:post.url' rel='nofollow noopener' target='_blank'>X</a>
                         </div>
                       </div>
 
-                      <!-- In-Post Bottom Ad -->
-                      <div class='ev-ad-slot'>
-                        <span class='ev-ad-label'>ADVERTISEMENT</span>
-                        <div class='ev-ad-box'></div>
-                      </div>
-
-                      <!-- Comments Section -->
+                      <!-- Comments -->
                       <b:include data='post' name='commentPicker'/>
 
                     </article>
                   </b:loop>
                 </b:if>
 
-                <!-- ================= STATIC PAGE VIEW ================= -->
+                <!-- ================= 2. STATIC PAGE VIEW ================= -->
                 <b:if cond='data:view.isPage'>
                   <b:loop values='data:posts' var='post'>
-                    <div class='ev-static-page'>
-                      <nav aria-label='Breadcrumbs' class='ev-breadcrumbs'>
+                    <div class='ev-page-box'>
+                      <nav aria-label='Breadcrumbs' class='ev-crumbs'>
                         <a href='/'>Home</a>
                         <span>&#8250;</span>
                         <span><data:post.title/></span>
                       </nav>
-                      <h1 class='ev-static-title'><data:post.title/></h1>
-                      <div class='ev-post-body'>
+                      <h1 class='ev-page-h1'><data:post.title/></h1>
+                      <div class='ev-content'>
                         <data:post.body/>
                       </div>
                     </div>
                   </b:loop>
                 </b:if>
 
-                <!-- ================= HOMEPAGE / ARCHIVE FEED LIST ================= -->
+                <!-- ================= 3. MULTIPLE POSTS (HOMEPAGE / CATEGORY / SEARCH) ================= -->
                 <b:if cond='data:view.isMultipleItems'>
-                  <div class='ev-posts-feed'>
-                    <b:loop values='data:posts' var='post'>
-                      <article class='ev-post-card'>
-                        <b:if cond='data:post.featuredImage'>
-                          <a expr:href='data:post.url'>
-                            <img alt='' class='ev-card-image' expr:src='data:post.featuredImage'/>
-                          </a>
-                        </b:if>
-                        <div class='ev-card-content'>
-                          <div class='ev-card-meta'>
-                            <b:if cond='data:post.labels'>
-                              <span class='ev-card-source'><data:post.labels.first.name/></span>
-                            </b:if>
-                            <span>📅 <data:post.date/></span>
-                          </div>
-                          <h2 class='ev-card-title'>
-                            <a expr:href='data:post.url'><data:post.title/></a>
-                          </h2>
-                          <div class='ev-card-snippet'>
-                            <data:post.snippet/>
-                          </div>
-                          <div class='ev-card-footer'>
-                            <a class='ev-read-more' expr:href='data:post.url'>
-                              Read Full Vocabulary Lesson &#8594;
+                  
+                  <!-- Check if posts exist -->
+                  <b:if cond='data:posts.notEmpty'>
+                    <div class='ev-feed'>
+                      <b:loop values='data:posts' var='post'>
+                        <article class='ev-card'>
+                          <b:if cond='data:post.featuredImage'>
+                            <a expr:href='data:post.url'>
+                              <img alt='' class='ev-card-thumb' expr:src='data:post.featuredImage'/>
                             </a>
+                          </b:if>
+                          <div class='ev-card-body'>
+                            <div class='ev-card-tags'>
+                              <b:if cond='data:post.labels'>
+                                <span class='ev-card-source-tag'><data:post.labels.first.name/></span>
+                              </b:if>
+                              <span>📅 <data:post.date/></span>
+                            </div>
+                            <h2 class='ev-card-h2'>
+                              <a expr:href='data:post.url'><data:post.title/></a>
+                            </h2>
+                            <div class='ev-card-desc'>
+                              <data:post.snippet/>
+                            </div>
+                            <div class='ev-card-foot'>
+                              <a class='ev-card-read' expr:href='data:post.url'>
+                                Read Full Lesson &#8594;
+                              </a>
+                            </div>
                           </div>
-                        </div>
-                      </article>
-                    </b:loop>
-                  </div>
+                        </article>
+                      </b:loop>
+                    </div>
 
-                  <!-- Pagination Controls -->
-                  <div class='ev-pagination'>
-                    <b:if cond='data:newerPageUrl'>
-                      <a class='ev-page-btn' expr:href='data:newerPageUrl'>&#8592; Newer Articles</a>
-                    <b:else/>
-                      <span/>
-                    </b:if>
-                    <b:if cond='data:olderPageUrl'>
-                      <a class='ev-page-btn' expr:href='data:olderPageUrl'>Older Articles &#8594;</a>
-                    </b:if>
-                  </div>
+                    <!-- Pagination -->
+                    <div class='ev-pager'>
+                      <b:if cond='data:newerPageUrl'>
+                        <a class='ev-pager-btn' expr:href='data:newerPageUrl'>&#8592; Newer Articles</a>
+                      <b:else/>
+                        <span/>
+                      </b:if>
+                      <b:if cond='data:olderPageUrl'>
+                        <a class='ev-pager-btn' expr:href='data:olderPageUrl'>Older Articles &#8594;</a>
+                      </b:if>
+                    </div>
+                  </b:if>
+
+                  <!-- ================= UNKNOWN CATEGORY / EMPTY RESULT HANDLER ================= -->
+                  <b:if cond='data:posts.empty'>
+                    <div class='ev-notice-box'>
+                      <div class='ev-notice-icon info'>📂</div>
+                      <h2 class='ev-notice-h2'>No Articles Found / कोई लेख नहीं मिला</h2>
+                      <p class='ev-notice-p'>
+                        There are currently no vocabulary lessons published under this category or search term. Try searching with a different keyword or return to the homepage.
+                      </p>
+                      <form action='/search' class='ev-notice-form' method='get'>
+                        <input name='q' placeholder='Search word, date, or newspaper...' type='text'/>
+                        <button type='submit'>Search</button>
+                      </form>
+                      <div class='ev-notice-btns'>
+                        <a class='ev-btn-pill primary' href='/'>🏠 Go to Homepage</a>
+                        <a class='ev-btn-pill' href='/search/label/The%20Hindu'>📰 The Hindu Vocab</a>
+                        <a class='ev-btn-pill' href='/search/label/Indian%20Express'>🗞️ Indian Express</a>
+                        <a class='ev-btn-pill' href='/search/label/Idioms'>🔥 Idioms</a>
+                      </div>
+                    </div>
+                  </b:if>
+
                 </b:if>
 
               </b:includable>
@@ -1442,41 +1296,32 @@
 
       </main>
 
-      <!-- ==================== SIDEBAR COLUMN ==================== -->
-      <aside class='ev-sidebar-column'>
+      <!-- ==================== SIDEBAR ==================== -->
+      <aside class='ev-sidebar-col'>
         
-        <!-- Sidebar Ad Slot -->
-        <div class='ev-widget-card' style='padding: 16px; text-align: center;'>
-          <span class='ev-ad-label'>ADVERTISEMENT</span>
-          <div class='ev-ad-box' style='min-height: 250px;'></div>
-        </div>
-
         <!-- About Site Widget -->
-        <div class='ev-widget-card'>
-          <h3 class='ev-widget-title'>About EditorialVocab</h3>
-          <div class='ev-author-box'>
-            <div class='ev-author-avatar'>📖</div>
-            <div class='ev-author-name'>EditorialVocab Team</div>
-            <p class='ev-author-bio'>
-              Dedicated daily editorial English vocabulary platform providing curated tricky words, Hindi meanings, mnemonics, and MCQ quizzes for UPSC, SSC, Banking, and CLAT aspirants.
-            </p>
-          </div>
+        <div class='ev-sidebar-card'>
+          <h3 class='ev-sidebar-title'>About EditorialVocab</h3>
+          <p style='font-size: 13.5px; color: var(--text-body); line-height: 1.6; margin-bottom: 12px;'>
+            Daily Editorial Vocabulary from The Hindu and Indian Express with Hindi meanings, mnemonics, and practice quizzes for serious exam aspirants.
+          </p>
+          <a href='/p/about-us.html' style='font-size: 13px; font-weight: 700;'>Read More About Us &#8594;</a>
         </div>
 
         <!-- Free Study PDF Banner -->
-        <div class='ev-widget-card' style='background: linear-gradient(135deg, #eef2ff 0%, #f0fdf4 100%); border: 1.5px dashed var(--primary);'>
-          <h3 class='ev-widget-title' style='color: var(--primary);'>📥 Daily Study PDF</h3>
-          <p style='font-size: 13.5px; color: var(--text-body); margin-bottom: 14px;'>
-            Download our seamless continuous <strong>Pagebreakless PDFs</strong> on every article page for mobile &amp; tablet revision!
+        <div class='ev-sidebar-card' style='background: #f0fdf4; border: 1.5px dashed #16a34a;'>
+          <h3 class='ev-sidebar-title' style='color: #15803d;'>📥 Daily Study PDF</h3>
+          <p style='font-size: 13px; color: #166534; margin-bottom: 12px;'>
+            Download clean continuous <strong>Pagebreakless PDFs</strong> on every post for mobile &amp; tablet revision!
           </p>
-          <a href='/p/the-hindu-editorial-vocabulary.html' style='display: block; text-align: center; background: var(--primary); color: #ffffff; padding: 9px 16px; border-radius: var(--radius-full); font-size: 13px; font-weight: 800; text-decoration: none;'>
+          <a href='/p/the-hindu-editorial-vocabulary.html' style='display: block; text-align: center; background: #16a34a; color: #ffffff; padding: 8px 14px; border-radius: var(--radius-full); font-size: 12.5px; font-weight: 800; text-decoration: none;'>
             Browse PDF Archive &#8594;
           </a>
         </div>
 
-        <!-- Dynamic Labels / Categories Sidebar Section -->
+        <!-- Category Cloud Widget -->
         <b:section id='sidebar-widgets' showaddelement='yes'>
-          <b:widget id='Label1' locked='false' title='Explore Categories' type='Label' version='2'>
+          <b:widget id='Label1' locked='false' title='Categories' type='Label' version='2'>
             <b:widget-settings>
               <b:widget-setting name='sorting'>ALPHA</b:widget-setting>
               <b:widget-setting name='display'>CLOUD</b:widget-setting>
@@ -1485,14 +1330,14 @@
               <b:widget-setting name='showFreqNumbers'>true</b:widget-setting>
             </b:widget-settings>
             <b:includable id='main'>
-              <div class='ev-widget-card'>
-                <h3 class='ev-widget-title'><data:title/></h3>
-                <div class='ev-label-cloud'>
+              <div class='ev-sidebar-card'>
+                <h3 class='ev-sidebar-title'><data:title/></h3>
+                <div class='ev-cloud'>
                   <b:loop values='data:labels' var='label'>
-                    <a class='ev-label-tag' expr:href='data:label.url'>
+                    <a class='ev-tag' expr:href='data:label.url'>
                       <span><data:label.name/></span>
                       <b:if cond='data:this.showFreqNumbers'>
-                        <span class='ev-label-count'><data:label.count/></span>
+                        <span class='ev-tag-count'><data:label.count/></span>
                       </b:if>
                     </a>
                   </b:loop>
@@ -1502,14 +1347,14 @@
           </b:widget>
         </b:section>
 
-        <!-- Compliance Quick Links Widget -->
-        <div class='ev-widget-card'>
-          <h3 class='ev-widget-title'>Site Information</h3>
-          <ul style='list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; font-weight: 600;'>
+        <!-- Compliance Policy Links -->
+        <div class='ev-sidebar-card'>
+          <h3 class='ev-sidebar-title'>Important Pages</h3>
+          <ul style='list-style: none; display: flex; flex-direction: column; gap: 7px; font-size: 13px; font-weight: 600;'>
             <li><a href='/p/about-us.html'>📖 About Us</a></li>
             <li><a href='/p/contact-us.html'>✉️ Contact Us</a></li>
             <li><a href='/p/privacy-policy.html'>🔒 Privacy Policy</a></li>
-            <li><a href='/p/terms-and-conditions.html'>📜 Terms and Conditions</a></li>
+            <li><a href='/p/terms-and-conditions.html'>📜 Terms &amp; Conditions</a></li>
             <li><a href='/p/disclaimer.html'>⚠️ Disclaimer</a></li>
           </ul>
         </div>
@@ -1519,48 +1364,43 @@
     </div>
   </div>
 
-  <!-- Footer Section - 100% AdSense Policy Compliant -->
+  <!-- Footer -->
   <footer class='ev-footer'>
     <div class='ev-container'>
       <div class='ev-footer-grid'>
         
-        <!-- Column 1: About -->
         <div>
-          <div class='ev-footer-brand'>
+          <div class='ev-footer-logo'>
             <span>Editorial</span>Vocab
           </div>
           <p class='ev-footer-desc'>
-            Daily Editorial Vocabulary from The Hindu, Indian Express, and LiveMint. Simplified Hindi meanings, mnemonic tricks, idioms, roots, and practice quizzes for serious exam aspirants.
+            Daily Editorial Vocabulary from The Hindu and Indian Express with Hindi meanings, mnemonic tricks, idioms, and quizzes for competitive exams.
           </p>
         </div>
 
-        <!-- Column 2: Quick Links -->
         <div>
-          <h4 class='ev-footer-title'>Exam Resources</h4>
-          <ul class='ev-footer-links'>
-            <li><a href='/search/label/The%20Hindu'>The Hindu Vocab</a></li>
+          <h4 class='ev-footer-h4'>Categories</h4>
+          <ul class='ev-footer-menu'>
+            <li><a href='/search/label/The%20Hindu'>The Hindu</a></li>
             <li><a href='/search/label/Indian%20Express'>Indian Express</a></li>
             <li><a href='/search/label/Idioms'>Idioms &amp; Phrases</a></li>
-            <li><a href='/search/label/Quiz'>Practice MCQ Quiz</a></li>
-            <li><a href='/p/the-hindu-editorial-vocabulary.html'>Vocabulary Archive</a></li>
+            <li><a href='/search/label/Quiz'>Practice Quiz</a></li>
           </ul>
         </div>
 
-        <!-- Column 3: Pillar Guides -->
         <div>
-          <h4 class='ev-footer-title'>Study Guides</h4>
-          <ul class='ev-footer-links'>
-            <li><a href='/p/the-hindu-editorial-analysis.html'>The Hindu Analysis Hub</a></li>
-            <li><a href='/p/livemint-editorial-analysis.html'>LiveMint Editorial Guide</a></li>
-            <li><a href='/p/upsc-editorial-topics-guide.html'>UPSC Topics Guide</a></li>
-            <li><a href='/search/label/Vocabulary'>Daily Tricky Words</a></li>
+          <h4 class='ev-footer-h4'>Pillars</h4>
+          <ul class='ev-footer-menu'>
+            <li><a href='/p/the-hindu-editorial-analysis.html'>Analysis Hub</a></li>
+            <li><a href='/p/the-hindu-editorial-vocabulary.html'>Pillar Archive</a></li>
+            <li><a href='/p/livemint-editorial-analysis.html'>LiveMint Guide</a></li>
+            <li><a href='/p/upsc-editorial-topics-guide.html'>UPSC Guide</a></li>
           </ul>
         </div>
 
-        <!-- Column 4: AdSense Policy & Legal -->
         <div>
-          <h4 class='ev-footer-title'>Legal &amp; Policy</h4>
-          <ul class='ev-footer-links'>
+          <h4 class='ev-footer-h4'>Legal &amp; Policy</h4>
+          <ul class='ev-footer-menu'>
             <li><a href='/p/about-us.html'>About Us</a></li>
             <li><a href='/p/contact-us.html'>Contact Us</a></li>
             <li><a href='/p/privacy-policy.html'>Privacy Policy</a></li>
@@ -1571,10 +1411,9 @@
 
       </div>
 
-      <!-- Bottom Copyright Strip -->
-      <div class='ev-footer-bottom'>
+      <div class='ev-footer-bot'>
         <p>&#169; <script>document.write(new Date().getFullYear())</script> EditorialVocab.in — All rights reserved.</p>
-        <div class='ev-footer-policy-row'>
+        <div style='display: flex; gap: 14px;'>
           <a href='/p/privacy-policy.html'>Privacy Policy</a>
           <span>•</span>
           <a href='/p/terms-and-conditions.html'>Terms</a>
