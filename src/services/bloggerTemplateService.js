@@ -245,7 +245,51 @@ export function generateBloggerHtml(postData, theme = 'slate') {
   return `
 ${jsonLdSchema}
 <!-- EditorialVocab Blogger Container -->
-<div style="font-family: 'Plus Jakarta Sans', 'Hind', system-ui, sans-serif; background-color: ${t.bgMain}; color: ${t.textMain}; padding: clamp(14px, 3vw, 24px); border-radius: 16px; max-width: 900px; margin: 0 auto; line-height: 1.6; box-sizing: border-box; overflow: hidden;">
+<div id="ev-root" data-ev-container="true" style="font-family: 'Plus Jakarta Sans', 'Hind', system-ui, sans-serif; background-color: ${t.bgMain}; color: ${t.textMain}; padding: clamp(14px, 3vw, 24px); border-radius: 16px; max-width: 900px; margin: 0 auto; line-height: 1.6; box-sizing: border-box; overflow: hidden;">
+
+  <!-- PDF & Print Optimization Styles -->
+  <style>
+    @media print {
+      #ev-toc-bar, #ev-pdf-section, #ev-quiz-section, #evQBox, .evNav, .evScorecard,
+      header, footer, .sidebar, #sidebar, .comments, #comments, .post-feeds,
+      .blog-pager, .breadcrumbs, .share-buttons, .post-share-buttons, .related-posts,
+      nav, .navbar, .widget, iframe, button, a[href^="#"] {
+        display: none !important;
+      }
+      @page {
+        margin: 10mm 10mm 10mm 10mm;
+        size: auto;
+      }
+      body, #ev-root, .ev-container {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        font-size: 13pt !important;
+        line-height: 1.5 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      #ev-vocab-section > div, #ev-idioms-section, #ev-idioms-section > div > div, .ev-print-quiz {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        break-inside: avoid-page !important;
+        margin-bottom: 14px !important;
+        border: 1px solid #cbd5e1 !important;
+        background: #ffffff !important;
+        box-shadow: none !important;
+        color: #0f172a !important;
+      }
+      h1, h2, h3 {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+        color: #0f172a !important;
+      }
+      .ev-print-quiz {
+        display: block !important;
+      }
+    }
+  </style>
 
   <!-- Featured AI Cover Banner -->
   ${mainImageUrl ? `
@@ -267,10 +311,69 @@ ${jsonLdSchema}
     </p>
   </div>
 
+  <!-- Silo Breadcrumbs & Internal Links -->
+  <div style="background-color: ${t.cardBg}; border: 1px solid ${t.border}; padding: 12px 18px; border-radius: 12px; margin-bottom: 20px; font-size: 13px; color: ${t.textMuted}; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; box-shadow: ${headerShadow};">
+    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+      📍 <span style="font-weight: 700; color: ${t.textMain};">Silo Hub:</span>
+      <a href="https://www.editorialvocab.in/" style="color: ${t.accentIndigo}; text-decoration: none; font-weight: 600;">Home</a>
+      <span>&rsaquo;</span>
+      <a href="https://www.editorialvocab.in/p/the-hindu-editorial-analysis.html" style="color: ${t.accentIndigo}; text-decoration: none; font-weight: 700;">The Hindu Analysis Hub</a>
+    </div>
+    <div>
+      📚 <a href="https://www.editorialvocab.in/p/the-hindu-editorial-vocabulary.html" style="color: ${t.accentEmerald}; text-decoration: none; font-weight: 700;">Vocabulary Archive &rarr;</a>
+    </div>
+  </div>
+
+  <!-- Quick Jump Table of Contents Bar -->
+  <div id="ev-toc-bar" style="background-color: ${t.cardBg}; border: 1px solid ${t.border}; padding: 12px 16px; border-radius: 14px; margin-bottom: 24px; box-shadow: ${headerShadow};">
+    <div style="font-size: 11px; font-weight: 800; color: ${t.textMuted}; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+      ⚡ <span>Quick Navigation / Index (Jump to Section)</span>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+      <a href="#ev-vocab-section" style="background: ${t.accentIndigo}18; color: ${t.accentIndigo}; font-size: 12.5px; font-weight: 700; padding: 6px 14px; border-radius: 999px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+        📚 Vocabulary Words (${words.length})
+      </a>
+      ${idiomsAndPhrases.length > 0 ? `
+      <a href="#ev-idioms-section" style="background: ${t.accentAmber}18; color: ${t.accentAmber}; font-size: 12.5px; font-weight: 700; padding: 6px 14px; border-radius: 999px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+        🔥 Idioms &amp; Phrases (${idiomsAndPhrases.length})
+      </a>
+      ` : ''}
+      ${quizQuestions.length > 0 ? `
+      <a href="#evQBox" style="background: ${t.accentEmerald}18; color: ${t.accentEmerald}; font-size: 12.5px; font-weight: 700; padding: 6px 14px; border-radius: 999px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+        🧠 Practice Quiz (${quizQuestions.length} MCQs)
+      </a>
+      ` : ''}
+      <a href="#ev-pdf-section" style="background: rgba(255,255,255,0.06); color: ${t.textMuted}; font-size: 12.5px; font-weight: 700; padding: 6px 14px; border-radius: 999px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+        📥 Save PDF
+      </a>
+    </div>
+  </div>
+
+  <!-- PDF Download Hub Banner -->
+  <div id="ev-pdf-section" style="background: linear-gradient(135deg, ${t.accentIndigo}15, ${t.accentEmerald}15); border: 2px dashed ${t.accentIndigo}; padding: 18px 22px; border-radius: 18px; margin-bottom: 24px; text-align: center; box-sizing: border-box;">
+    <div style="font-size: 17px; font-weight: 900; color: ${t.textMain}; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+      <span>📥</span> <span>Download Daily Editorial Vocab Study PDF</span>
+    </div>
+    <p style="font-size: 13px; color: ${t.textMuted}; margin: 0 0 14px 0; font-family: 'Plus Jakarta Sans', sans-serif;">
+      Save or print today's editorial vocabulary, Hindi meanings, mnemonic memory tricks, and quiz questions in high-quality PDF format for UPSC, SSC &amp; Banking exams.
+    </p>
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+      <button id="ev-pdf-cont-btn" onclick="evDownloadPdf('continuous')" style="background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; font-weight: 800; font-size: 13.5px; padding: 11px 22px; border: none; border-radius: 999px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(16,185,129,0.35); transition: transform 0.2s ease;">
+        📱 Download Pagebreakless PDF
+      </button>
+      <button id="ev-pdf-print-btn" onclick="evDownloadPdf('print')" style="background-color: ${t.cardBg}; color: ${t.textMain}; border: 1.5px solid ${t.border}; font-weight: 800; font-size: 13.5px; padding: 11px 20px; border-radius: 999px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: transform 0.2s ease;">
+        🖨️ Print / A4 Exam Edition
+      </button>
+    </div>
+    <div id="ev-pdf-status" style="display: none; font-size: 12.5px; font-weight: 700; color: ${t.accentEmerald}; margin-top: 12px; font-family: 'Plus Jakarta Sans', sans-serif;">
+      ⚡ Preparing your clean study PDF...
+    </div>
+  </div>
+
   <!--more-->
 
   <!-- Words List Section -->
-  <div style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 30px;">
+  <div id="ev-vocab-section" style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 30px;">
     ${words.map((item, index) => `
     <div style="background-color: ${t.cardBg}; border: 1px solid ${t.border}; border-radius: 16px; padding: clamp(16px, 3vw, 22px); box-shadow: ${wordShadow}; box-sizing: border-box;">
       
@@ -380,6 +483,33 @@ ${jsonLdSchema}
         ` : ''}
       </div>
       `).join('')}
+    </div>
+  </div>
+  ` : ''}
+
+  <!-- Dedicated Printable / PDF Quiz Questions Section (Shown during PDF/Print) -->
+  ${quizQuestions.length > 0 ? `
+  <div class="ev-print-quiz" style="display: none; background-color: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 14px; padding: 18px; margin-bottom: 24px; color: #0f172a; page-break-inside: avoid; break-inside: avoid;">
+    <div style="font-size: 16px; font-weight: 800; color: #0f172a; border-bottom: 2px solid #6366f1; padding-bottom: 6px; margin-bottom: 14px;">
+      🧠 Daily Vocabulary Practice Quiz (Exam Questions &amp; Answer Key)
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      ${quizQuestions.map((q, idx) => `
+      <div style="page-break-inside: avoid; break-inside: avoid; border-bottom: 1px dashed #e2e8f0; padding-bottom: 10px;">
+        <div style="font-weight: 700; font-size: 13.5px; color: #0f172a; margin-bottom: 4px;">
+          Q${idx + 1}. ${q.question}
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 12.5px; color: #334155;">
+          ${(q.options || []).map((opt, oi) => `<div><strong>${['A','B','C','D'][oi]})</strong> ${opt.replace(/^[A-D][\)\.\:\-\s]\s*/i, '')}</div>`).join('')}
+        </div>
+      </div>
+      `).join('')}
+    </div>
+    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-top: 12px; font-size: 12px; color: #1e293b; page-break-inside: avoid; break-inside: avoid;">
+      <strong style="color: #0f766e;">🎯 Answer Key &amp; Explanations:</strong>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 6px; margin-top: 6px;">
+        ${quizQuestions.map((q, idx) => `<div><strong>Q${idx + 1}:</strong> Option <strong>${q.correctOption}</strong> <span style="color: #64748b;">(${q.explanation})</span></div>`).join('')}
+      </div>
     </div>
   </div>
   ` : ''}
@@ -672,6 +802,134 @@ ${jsonLdSchema}
   })();
   </script>
   ` : ''}
+
+  <!-- Client-Side Pagebreakless PDF Download Script -->
+  <script>
+  (function(){
+    window.evDownloadPdf = function(mode) {
+      var statusEl = document.getElementById('ev-pdf-status');
+      var contBtn = document.getElementById('ev-pdf-cont-btn');
+      var printBtn = document.getElementById('ev-pdf-print-btn');
+
+      if (mode === 'print') {
+        window.print();
+        return;
+      }
+
+      if (statusEl) {
+        statusEl.style.display = 'block';
+        statusEl.innerHTML = '⚡ Generating pagebreakless continuous PDF... Please wait a few seconds.';
+      }
+      if (contBtn) contBtn.disabled = true;
+
+      function loadHtml2Pdf(cb) {
+        if (window.html2pdf) {
+          cb();
+          return;
+        }
+        var s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        s.onload = cb;
+        s.onerror = function() {
+          if (statusEl) statusEl.innerHTML = '⚠️ Note: Opening print sheet...';
+          window.print();
+          if (contBtn) contBtn.disabled = false;
+        };
+        document.head.appendChild(s);
+      }
+
+      loadHtml2Pdf(function() {
+        try {
+          var root = document.getElementById('ev-root') || document.querySelector('[data-ev-container="true"]') || document.body;
+          var clone = root.cloneNode(true);
+          clone.id = 'ev-pdf-render-sheet';
+          clone.style.width = '780px';
+          clone.style.maxWidth = '780px';
+          clone.style.margin = '0 auto';
+          clone.style.padding = '22px';
+          clone.style.background = '#ffffff';
+          clone.style.color = '#0f172a';
+          clone.style.boxSizing = 'border-box';
+          clone.style.fontFamily = "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+
+          // Remove non-content UI
+          var removeSelectors = '#ev-toc-bar, #ev-pdf-section, #ev-quiz-section, #evQBox, .evNav, .evScorecard, script, button, a[href^="#"]';
+          var toRemove = clone.querySelectorAll(removeSelectors);
+          toRemove.forEach(function(el) { el.remove(); });
+
+          // Display print quiz in clone
+          var printQuiz = clone.querySelector('.ev-print-quiz');
+          if (printQuiz) {
+            printQuiz.style.display = 'block';
+          }
+
+          // Format all cards to crisp study sheet theme
+          var cards = clone.querySelectorAll('#ev-vocab-section > div, #ev-idioms-section, #ev-idioms-section > div > div, .ev-print-card');
+          cards.forEach(function(c) {
+            c.style.background = '#ffffff';
+            c.style.borderColor = '#cbd5e1';
+            c.style.boxShadow = 'none';
+            c.style.color = '#0f172a';
+            c.style.marginBottom = '14px';
+          });
+
+          var wrapper = document.createElement('div');
+          wrapper.style.position = 'fixed';
+          wrapper.style.top = '-99999px';
+          wrapper.style.left = '-99999px';
+          wrapper.style.width = '780px';
+          wrapper.appendChild(clone);
+          document.body.appendChild(wrapper);
+
+          // Calculate height
+          var heightPx = clone.scrollHeight || clone.offsetHeight || 1200;
+          var heightMm = Math.ceil(heightPx * 0.264583) + 20;
+
+          var docTitle = ${JSON.stringify(cleanTitle || 'Editorial_Vocabulary')};
+          var fileSlug = docTitle.replace(/[^a-zA-Z0-9_-]/g, '_').replace(/_+/g, '_').slice(0, 50);
+          var filename = fileSlug + '_Pagebreakless.pdf';
+
+          var opt = {
+            margin: [8, 8, 8, 8],
+            filename: filename,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, logging: false, scrollY: 0 },
+            jsPDF: { unit: 'mm', format: [210, Math.max(297, heightMm)], orientation: 'portrait' },
+            pagebreak: { mode: [] }
+          };
+
+          window.html2pdf().set(opt).from(clone).save().then(function() {
+            if (wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
+            if (statusEl) {
+              statusEl.innerHTML = '✅ Pagebreakless PDF Downloaded successfully!';
+              setTimeout(function() { statusEl.style.display = 'none'; }, 4000);
+            }
+            if (contBtn) contBtn.disabled = false;
+          }).catch(function(err) {
+            if (wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
+            if (statusEl) statusEl.innerHTML = '⚠️ Note: Opening print preview...';
+            window.print();
+            if (contBtn) contBtn.disabled = false;
+          });
+        } catch (e) {
+          window.print();
+          if (contBtn) contBtn.disabled = false;
+        }
+      });
+    };
+  })();
+  </script>
+
+  <!-- Footer Related Pillar Links -->
+  <div style="background-color: ${t.cardBg}; border: 1px solid ${t.border}; border-radius: 16px; padding: 20px; margin-top: 30px; text-align: center; box-shadow: ${wordShadow};">
+    <h3 style="font-size: 16px; font-weight: 800; color: ${t.textMain}; margin: 0 0 10px 0;">📖 Continue Your UPSC &amp; Competitive Exam Prep</h3>
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 10px;">
+      <a href="https://www.editorialvocab.in/p/the-hindu-editorial-analysis.html" style="background-color: ${t.badgeBg}; color: ${t.badgeText}; font-size: 12px; font-weight: 700; padding: 8px 14px; border-radius: 8px; text-decoration: none;">📰 The Hindu Editorial Analysis Hub</a>
+      <a href="https://www.editorialvocab.in/p/the-hindu-editorial-vocabulary.html" style="background-color: ${t.badgeBg}; color: ${t.badgeText}; font-size: 12px; font-weight: 700; padding: 8px 14px; border-radius: 8px; text-decoration: none;">📚 Daily Editorial Vocab Archive</a>
+      <a href="https://www.editorialvocab.in/p/livemint-editorial-analysis.html" style="background-color: ${t.badgeBg}; color: ${t.badgeText}; font-size: 12px; font-weight: 700; padding: 8px 14px; border-radius: 8px; text-decoration: none;">📊 LiveMint Editorial Guide</a>
+      <a href="https://www.editorialvocab.in/p/upsc-editorial-topics-guide.html" style="background-color: ${t.badgeBg}; color: ${t.badgeText}; font-size: 12px; font-weight: 700; padding: 8px 14px; border-radius: 8px; text-decoration: none;">🎯 UPSC Mains Answer Writing Tips</a>
+    </div>
+  </div>
 
 </div>
   `.trim();

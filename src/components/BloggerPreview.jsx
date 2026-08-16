@@ -56,6 +56,24 @@ export default function BloggerPreview({ postData, currentTheme }) {
     URL.revokeObjectURL(url);
   };
 
+  const handleDownloadPdf = () => {
+    if (typeof window.evDownloadPdf === 'function') {
+      window.evDownloadPdf('continuous');
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+    script.onload = () => {
+      if (typeof window.evDownloadPdf === 'function') {
+        window.evDownloadPdf('continuous');
+      } else {
+        window.print();
+      }
+    };
+    script.onerror = () => window.print();
+    document.head.appendChild(script);
+  };
+
   return (
     <div className="glass-panel animate-fade-slide-in flex flex-col h-[85vh] overflow-hidden max-w-[1400px] mx-auto">
       {/* Top Header Bar */}
@@ -107,6 +125,14 @@ export default function BloggerPreview({ postData, currentTheme }) {
         >
           {copiedCode ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4" />}
           <span>{copiedCode ? 'Blogger HTML Copied!' : 'Copy Blogger HTML Code'}</span>
+        </button>
+
+        <button 
+          onClick={handleDownloadPdf} 
+          className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 border shadow-md w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 active:scale-95 border-emerald-500 text-white"
+        >
+          <Download className="w-4 h-4" />
+          <span>Download Pagebreakless PDF</span>
         </button>
 
         <button 

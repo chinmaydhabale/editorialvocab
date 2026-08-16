@@ -1253,6 +1253,86 @@
         min-height: 42px;
       }
     }
+
+    @media print {
+      .site-header,
+      .top-announcement,
+      .site-footer,
+      .sidebar,
+      .hero-strip,
+      .meta-strip,
+      .search-form,
+      .feed-toolbar,
+      .skip-link,
+      .menu-toggle,
+      .menu-toggle-label,
+      .nav-shell,
+      .site-nav,
+      .post-feeds,
+      .blog-pager,
+      .breadcrumbs,
+      .share-buttons,
+      .post-share-buttons,
+      .related-posts,
+      #comments,
+      .comments,
+      #ev-toc-bar,
+      #ev-pdf-section,
+      #ev-quiz-section,
+      #evQBox,
+      .evNav,
+      .evScorecard,
+      iframe,
+      button {
+        display: none !important;
+      }
+
+      body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        font-size: 12pt !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .main-frame {
+        display: block !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      .content-column,
+      .post-article {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+      }
+
+      article,
+      .post-card,
+      #ev-vocab-section > div,
+      #ev-idioms-section,
+      #ev-idioms-section > div > div,
+      .ev-word-card,
+      .ev-idiom-card,
+      .ev-print-quiz {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        break-inside: avoid-page !important;
+        margin-bottom: 14px !important;
+      }
+
+      .ev-print-quiz {
+        display: block !important;
+      }
+
+      h1, h2, h3 {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+      }
+    }
   ]]></b:skin>
 </head>
 
